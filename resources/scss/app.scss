@@ -1,0 +1,281 @@
+body {
+    @apply bg-white font-roboto-regular
+}
+
+
+/******************************* HEADER ********************/
+.input-search {
+    svg {
+      @apply w-[20px];
+    }
+
+    &:hover{
+      @apply bg-[#2B4C7E33] bg-opacity-80;
+
+    }
+}
+
+.input-search-mobile {
+    svg {
+      @apply w-[30px];
+
+    }
+}
+
+.button-register {
+
+    &:hover{
+        @apply bg-[#2B4C7E33] bg-opacity-80;
+    }
+
+}
+
+.cuenta-icon {
+  svg {
+    @apply w-[16px];
+  }
+}
+
+.menu-back-icon {
+  svg {
+    @apply w-[16px];
+  }
+}
+
+.close-sesion svg {
+  @apply w-[20px];
+
+}
+
+.notify-icon svg {
+  @apply w-[20px] pointer-events-none	;
+}
+
+.icon-bars {
+  svg {
+    @apply w-[30px];
+  }
+}
+
+// * Personaliza la barra de desplazamiento vertical */
+::-webkit-scrollbar {
+  @apply w-[12px];
+
+}
+
+::-webkit-scrollbar-thumb {
+  @apply w-[6px] rounded-[100px] bg-[#7A7A7A];
+
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px #FCFCFC;
+    @apply w-[6px] rounded-[10px] bg-[#FCFCFC];
+}
+
+
+
+/******************************* HOME ********************/
+.home-img {
+    background: linear-gradient(0deg, rgba(43, 76, 126, 0.61) 0%, rgba(43, 76, 126, 0.61) 80%), url('/public/images/home.png');
+    @apply bg-cover w-full bg-center bg-no-repeat;
+}
+
+.button-register-home {
+    &:hover{
+        @apply bg-[#80a6df33] bg-opacity-80;
+    }
+    div {
+        svg {
+          @apply w-[15px];
+        }
+    }
+}
+
+
+/******************************* DUDAS PAGE ********************/
+
+.dudas-img {
+  background-image: url('/public/images/dudas-fondo.png');
+  @apply bg-cover w-full bg-center bg-no-repeat min-h-screen flex flex-col items-center ;
+
+}
+
+.dudas-container {
+  @apply lg:w-[1075px] w-[90%] mx-[10px] lg:mx-[182px] p-[30px] h-auto rounded-[20px] flex flex-col gap-[25px] bg-white mt-[60px] mb-12;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1); /* Ajusta los valores según tus preferencias */
+
+}
+
+.dudas-icon {
+  svg {
+    @apply w-[90px] stroke-[0.5px];
+  }
+}
+
+.dudas-send-button {
+  @apply ml-auto border-primary bg-primary text-white px-[102px] py-[15px] text-center flex items-center justify-center gap-[10px] border-[1.5px] border-solid rounded-full w-full lg:w-[286px];
+
+  svg {
+    @apply w-[18px];
+  }
+}
+
+.input-text {
+  @apply border-[1.5px] border-solid border-[#2B4C7E] rounded-[99px] p-[15px] ;
+
+  :focus {
+    @apply border-[1.5px] border-solid border-[#2B4C7E] rounded-full p-[15px] ;
+
+  }
+}
+
+@media (max-width: 1024px) {
+  .dudas-icon {
+    svg {
+      @apply w-[55px];
+    }
+  }
+}
+
+/******************************* RESOURCE PAGE ********************/
+
+.resource-send-button {
+  @apply mx-auto border-primary bg-primary text-white px-[20px] py-[10px] text-center flex items-center justify-center gap-[10px] border-[1.5px] border-solid rounded-[6px];
+
+  svg {
+    @apply w-[18px];
+  }
+}
+
+
+.resource-card-star {
+  svg {
+    @apply w-[19px] h-[19px];
+  }
+  svg {
+    @apply fill-[#EABA0F];
+  }
+}
+
+.info-resource {
+  svg {
+    @apply w-[20px] h-[20px];
+  }
+}
+
+/******************************* SUGERENCIAS PAGE ********************/
+
+.sugerencias-img {
+  background: linear-gradient(to bottom,  transparent 60%, #ffffff 40%), url('/public/images/sugerencias-fondo.png');
+  @apply bg-inherit bg-top lg:bg-contain w-full lg:bg-top bg-no-repeat flex flex-col items-center;
+
+}
+
+.sugerencias-container {
+  @apply lg:w-[1075px] w-[90%] mx-[10px] lg:mx-[182px] p-[30px] h-auto rounded-[20px] flex flex-col gap-[25px] bg-white mt-[60px] mb-12 shadow-xl;
+}
+
+.sugerencias-icon {
+  svg {
+    @apply w-[90px] stroke-[0.5px];
+  }
+}
+
+.sugerencias-send-button {
+  @apply ml-auto border-primary bg-primary text-white px-[102px] py-[15px] text-center flex items-center justify-center gap-[10px] border-[1.5px] border-solid rounded-full w-full lg:w-[286px];
+
+  svg {
+    @apply w-[18px];
+  }
+}
+
+@media (max-width: 1024px) {
+  .sugerencias-icon {
+    svg {
+      @apply w-[55px];
+    }
+  }
+}
+
+/******************************* CARROUSEL ********************/
+
+@media (max-width: 600px) {
+    .containerCarrousel{
+      padding: 20px !important;
+    }
+}
+
+.containerCarrousel .swiper-container {
+  @apply relative px-0 py-[20px] sm:px-[40px];
+}
+
+.containerCarrousel{
+    @apply overflow-hidden z-[1];
+  }
+  .containerCarrousel .swiper-slide {
+    @apply relative text-[18px] bg-white text-start cursor-pointer;
+    box-shadow: 0px 8px 8px rgba(196, 196, 196, 0.25);
+  }
+
+  .swiper-button-next{
+    @apply relative w-[20px] h-[20px] mr-[-25px] right-[-16px];
+
+    &::after {
+      @apply text-[20px];
+    }
+  }
+  .swiper-button-prev{
+    @apply relative w-[20px] h-[20px] ml-[-25px] left-[-16px];
+
+    &::after {
+      @apply text-[20px];
+    }
+  }
+
+  .containerCarrousel .swiper-pagination {
+    @apply justify-center absolute bottom-[-11px] flex-row mt-[40px];
+  }
+
+  /* Personalización de las bolas de paginación */
+  .swiper-pagination-bullet {
+    @apply w-[8px] h-[8px] rounded-[50%] bg-[#D9D9D9] opacity-70 inline-block;
+
+  }
+
+  /* Personalización de la bola activa */
+  .swiper-pagination-bullet-active {
+    @apply w-[21px] h-[8px] rounded-[55px] bg-[#D9D9D9] opacity-100;
+  }
+
+  .cards-icons {
+    svg {
+      @apply w-[18px] h-[18px] fill-[#E4E4E4];
+    }
+  }
+
+  .cards-stars {
+    .star-filled svg{
+        @apply fill-[#EABA0F] text-transparent
+    }
+    .star-no-filled svg{
+        @apply fill-[#E4E4E4] text-transparent
+    }
+    svg {
+      @apply w-[19px] h-[19px];
+    }
+  }
+
+  .arrow-see-more {
+    svg{
+      @apply w-[20px] h-[20px];
+    }
+  }
+
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
