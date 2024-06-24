@@ -14,8 +14,10 @@ class CoursesAssessmentsModel extends Model {
     protected $keyType = 'string';
 
     protected $fillable = [
-        'user_uid', 'calification', 'course_uid'
+        'user_uid', 'calification', 'course_uid', 'uid'
     ];
+
+    public $timestamps = false;
 
 
 }

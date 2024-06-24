@@ -2,7 +2,7 @@
 @section('content')
     <div class="flex flex-wrap gap-[50px] 2xl:gap-[158px] px-[20px] lg:px-[120px] py-[56px] justify-around">
         <div class="flex flex-col gap-[25px] max-w-[610px]">
-            <h1 class="text-primary text-[24px] font-bold">Lorem ipsum dolor sit amet consectetur. Ultricies viverra id nisl
+            <h1 class="text-color_1 text-[24px] font-bold">Lorem ipsum dolor sit amet consectetur. Ultricies viverra id nisl
                 elit interdum.</h1>
             <p>Lorem ipsum dolor sit amet consectetur. Platea aliquet pretium enim cursus. Pretium ut etiam id et eu dui
                 nulla. Non gravida faucibus vitae integer sem egestas metus aliquet laoreet. In pellentesque maecenas donec
@@ -62,7 +62,7 @@
                         </div>
                     </div>
                     <hr class="border-t border-gray-500 border-dashed">
-                    
+
                 </div>
             </div>
 
@@ -73,7 +73,7 @@
                 </button>
             </div>
         </div>
-        
+
 
 
     </div>

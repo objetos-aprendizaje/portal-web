@@ -23,4 +23,19 @@ class EducationalResourcesModel extends Model
     {
         return $this->belongsTo(EducationalResourceStatusesModel::class, 'status_uid', 'uid');
     }
+
+    public function categories()
+    {
+        return $this->belongsToMany(
+            CategoriesModel::class,
+            'educational_resource_categories',
+            'educational_resource_uid',
+            'category_uid'
+        );
+    }
+
+    public function educationalResourceType()
+    {
+        return $this->belongsTo(EducationalResourceTypesModel::class, 'educational_resource_type_uid', 'uid');
+    }
 }
