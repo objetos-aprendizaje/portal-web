@@ -36,9 +36,6 @@ class AppServiceProvider extends ServiceProvider
             $_SERVER['SERVER_PORT'] = '443';
         }
 
-        $u = UsersModel::where('email', 'ja.cabello320@poa.com')->first();
-       // Auth::login($u);
-
         \Carbon\Carbon::setLocale(config('app.locale'));
 
         Event::listen(\Slides\Saml2\Events\SignedIn::class, function (\Slides\Saml2\Events\SignedIn $event) {
