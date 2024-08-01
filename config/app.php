@@ -169,7 +169,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\LoginSystemsConfigServiceProvider::class,
-        App\Providers\MailConfigServiceProvider::class,
     ])->toArray(),
 
     /*

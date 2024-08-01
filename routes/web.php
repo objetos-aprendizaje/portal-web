@@ -22,12 +22,15 @@ use App\Http\Controllers\SuggestionsController;
 use App\Http\Controllers\Webhooks\ProcessPaymentRedsys;
 use App\Http\Controllers\Webhooks\UpdateLoginSystemsController;
 use App\Http\Controllers\CertificateAccessController;
+use App\Http\Controllers\HeaderFooterPagesController;
+use App\Http\Controllers\Profile\CompetencesLearningResultsController;
 use App\Http\Controllers\Profile\MyCourses\EnrolledCoursesController;
 use App\Http\Controllers\Profile\MyCourses\HistoricCoursesController;
 use App\Http\Controllers\Profile\MyCourses\InscribedCoursesController;
 use App\Http\Controllers\Profile\MyEducationalPrograms\EnrolledEducationalProgramsController;
 use App\Http\Controllers\Profile\MyEducationalPrograms\HistoricEducationalProgramsController;
 use App\Http\Controllers\Profile\MyEducationalPrograms\InscribedEducationalProgramsController;
+use App\Http\Controllers\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,7 +60,7 @@ Route::get('/searcher', [SearcherController::class, 'index'])->name("searcher");
 
 Route::post('/searcher/get_learning_objects', [SearcherController::class, 'getLearningObjects']);
 
-Route::get('/pages/{uid}', [PageFooterController::class, 'index']);
+Route::get('/page/{slug}', [HeaderFooterPagesController::class, 'index']);
 
 
 Route::get('/course/{uid}', [CourseInfoController::class, 'index']);
@@ -77,6 +80,9 @@ Route::get('/educational_program/get_educational_program/{uid}', [EducationalPro
 
 Route::get('/resource/{uid}', [ResourceInfoController::class, 'index']);
 Route::get('/resource/get_resource/{uid}', [ResourceInfoController::class, 'getResource']);
+
+Route::post('/resource/access_resource', [ResourceInfoController::class, 'saveAccessResource']);
+
 
 
 Route::middleware(['combined.auth'])->group(function () {
@@ -102,6 +108,11 @@ Route::middleware(['combined.auth'])->group(function () {
 Route::middleware(['combined.auth'])->group(function () {
     Route::get('/notifications/general/get_general_notification_user/{notification_general_uid}', [GeneralNotificationsController::class, 'getGeneralNotificationUser']);
     Route::get('/notifications/general/get_general_notification_automatic_user/{notification_automatic_uid}', [GeneralNotificationsController::class, 'getGeneralNotificationAutomaticUser']);
+});
+
+Route::middleware(['combined.auth'])->group(function () {
+    Route::get('/profile/competences_learning_results', [CompetencesLearningResultsController::class, 'index'])->name("competences-learning-results");
+    Route::post('/profile/competences_learning_results/save_learning_results', [CompetencesLearningResultsController::class, 'saveLearningResults']);
 });
 
 Route::middleware(['combined.auth'])->group(function () {
@@ -154,6 +165,8 @@ Route::middleware(['combined.auth'])->group(function () {
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'index'])->name('login');
+    Route::get('/register', [RegisterController::class, 'index'])->name('login');
+
 
     Route::get('/forgot_password', [LoginController::class, 'index']);
 
@@ -173,6 +186,10 @@ Route::middleware('guest')->group(function () {
 
 });
 
+
+
+Route::post('/register/submit', [RegisterController::class, 'submit'])->name('registerUser');
+
 Route::get('/logout', [LoginController::class, 'logout']);
 Route::get('/recover_password', [RecoverPasswordController::class, 'index'])->name('recover-password');
 Route::post('/recover_password/send', [RecoverPasswordController::class, 'recoverPassword']);
@@ -187,3 +204,7 @@ Route::get('/error/{code}', [ErrorController::class, 'index'])->name('error');
 
 Route::get('/certificate-access', [CertificateAccessController::class, 'index'])->name('certificate-access');
 Route::get('/token_login/{token}', [LoginController::class, 'tokenLogin']);
+
+// Ruta para mostrar el formulario de restablecimiento de contraseña
+Route::get('password/reset/{token}', [ResetPasswordController::class, 'index'])->name('password.reset');
+Route::post('password/reset', [ResetPasswordController::class, 'resetPassword'])->name('password.update');

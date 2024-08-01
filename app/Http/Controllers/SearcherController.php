@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\OperationFailedException;
 use App\Models\CategoriesModel;
 use App\Models\CompetencesModel;
 use App\Models\CoursesAssessmentsModel;
@@ -59,6 +60,8 @@ class SearcherController extends Controller
         $itemsPerPage = $request->get("itemsPerPage");
         $filters =  $request->get('filters');
 
+        $this->validateFilters($filters);
+
         if (env('ENABLED_API_SEARCH')) {
             if (isset($filters['search'])) {
                 $response = $this->searchApi($filters['search']);
@@ -94,8 +97,14 @@ class SearcherController extends Controller
 
         $learning_objects = $learning_objects_query->orderBy('inscription_start_date')->paginate($itemsPerPage);
 
-
         return response()->json($learning_objects);
+    }
+
+    private function validateFilters($filters)
+    {
+        if (isset($filters['learningObjectStatus']) && !in_array($filters['learningObjectStatus'], ['INSCRIPTION', 'ENROLLING', 'DEVELOPMENT', 'FINISHED'])) {
+            throw new OperationFailedException("El estado del objeto de aprendizaje no es válido");
+        }
     }
 
     private function searchApi($searchText)
@@ -119,9 +128,6 @@ class SearcherController extends Controller
 
     private function buildEducationalProgramsQuery($filters = [])
     {
-
-        $statuses_educational_programs = $this->getStatusesFilter($filters);
-
         $educational_programs_query = EducationalProgramsModel::select([
             'educational_programs.uid',
             'educational_programs.name as title',
@@ -135,21 +141,25 @@ class SearcherController extends Controller
             DB::raw("'educational_program' as learning_object_type"),
             'image_path',
         ])
+            ->leftJoin('educational_program_statuses', 'educational_programs.educational_program_status_uid', '=', 'educational_program_statuses.uid')
             ->withCount([
                 'courses as ects_workload' => function ($query) {
                     $query->select(DB::raw("SUM(ects_workload)"));
                 }
             ])
-            ->with('courses', 'courses.average_calification', 'courses.status')->whereHas('courses.status', function ($query) use ($statuses_educational_programs) {
-                $query->whereIn('code', $statuses_educational_programs);
-            });
+            ->with('courses', 'courses.average_calification');
+
+        if (isset($filters['learningObjectStatus'])) {
+            $educational_programs_query->where('educational_program_statuses.code', $filters['learningObjectStatus']);
+        } else {
+            $educational_programs_query->whereIn('educational_program_statuses.code', ['INSCRIPTION', 'DEVELOPMENT', 'ENROLLING', 'FINISHED']);
+        }
 
         if (isset($filters['categories'])) {
             $educational_programs_query->with(['courses.categories'])->whereHas('courses.categories', function ($query) use ($filters) {
                 $query->whereIn('category_uid', $filters['categories']);
             });
         }
-
 
         if (isset($filters['competences'])) {
             $competences = $filters['competences'];
@@ -167,7 +177,7 @@ class SearcherController extends Controller
 
 
         if (isset($filters['search'])) {
-            $educational_programs_query->where('name', 'like', '%' . $filters['search'] . '%')->orWhere('description', 'like', '%' . $filters['search'] . '%');
+            $educational_programs_query->where('educational_programs.name', 'like', '%' . $filters['search'] . '%')->orWhere('description', 'like', '%' . $filters['search'] . '%');
         }
 
         return $educational_programs_query;
@@ -215,8 +225,10 @@ class SearcherController extends Controller
         }
 
         if (isset($filters['search'])) {
-            $educational_resources_query->where('title', 'like', '%' . $filters['search'] . '%')->orWhere('description', 'like', '%' . $filters['search'] . '%')
-            ->orWhereIn('educational_resources.uid', $filters['add_uuids_to_search']);;
+            $educational_resources_query->where('title', 'like', '%' . $filters['search'] . '%')->orWhere('description', 'like', '%' . $filters['search'] . '%');
+            if (isset($filters['add_uuids_to_search'])) {
+                $educational_resources_query->orWhereIn('educational_resources.uid', $filters['add_uuids_to_search']);
+            }
         }
 
         return $educational_resources_query;
@@ -224,8 +236,6 @@ class SearcherController extends Controller
 
     private function buildCoursesQuery($filters = [])
     {
-        $statuses_course = $this->getStatusesFilter($filters);
-
         $courses_query = CoursesModel::select([
             'courses.uid',
             'courses.title',
@@ -248,12 +258,14 @@ class SearcherController extends Controller
                 'califications_avg.course_uid',
                 '=',
                 'courses.uid'
-            );
+            )
+            ->whereNull('educational_program_uid');
 
-        $courses_query->whereNull('educational_program_uid');
-        $courses_query->whereHas('status', function ($query) use ($statuses_course) {
-            $query->whereIn('code', $statuses_course);
-        });
+        if (isset($filters['learningObjectStatus'])) {
+            $courses_query->where('course_statuses.code', $filters['learningObjectStatus']);
+        } else {
+            $courses_query->whereIn('course_statuses.code', ['INSCRIPTION', 'DEVELOPMENT', 'ENROLLING', 'FINISHED']);
+        }
 
         if (isset($filters['categories'])) {
             $courses_query->with('categories')->whereHas('categories', function ($query) use ($filters) {
@@ -293,26 +305,14 @@ class SearcherController extends Controller
         if (isset($filters['search'])) {
             $courses_query->where(function ($query) use ($filters) {
                 $query->where('title', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('description', 'like', '%' . $filters['search'] . '%')->orWhereIn('courses.uid', $filters['add_uuids_to_search']);
+                    ->orWhere('description', 'like', '%' . $filters['search'] . '%');
+
+                if (isset($filters['add_uuids_to_search'])) {
+                    $query->orWhereIn('courses.uid', $filters['add_uuids_to_search']);
+                }
             });
         }
 
         return $courses_query;
-    }
-
-    private function getStatusesFilter($filters)
-    {
-        if (isset($filters['openned_inscriptions'])) $openned_inscriptions = $filters['openned_inscriptions'];
-        else $openned_inscriptions = null;
-
-        if ($openned_inscriptions == "") {
-            $statuses_course = ['INSCRIPTION', 'ACCEPTED_PUBLICATION'];
-        } else if ($openned_inscriptions) {
-            $statuses_course = ['INSCRIPTION'];
-        } else {
-            $statuses_course = ['ACCEPTED_PUBLICATION'];
-        }
-
-        return $statuses_course;
     }
 }

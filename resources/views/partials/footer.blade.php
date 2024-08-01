@@ -4,8 +4,8 @@
         <div>
             <a class="no-effect-hover" href="/" class="">
 
-                @if ($general_options['poa_logo'])
-                    <img src="{{env('BACKEND_URL') . '/' . $general_options['poa_logo'] }}" class="mr-3 w-[212px] h-[75px]" alt="Logo header">
+                @if ($general_options['poa_logo_1'])
+                    <img src="{{env('BACKEND_URL') . '/' . $general_options['poa_logo_1'] }}" class="mr-3 w-[212px] h-[75px]" alt="Logo header">
                 @else
                     <img src="/data/images/default_images/logo-default.png" class="mr-3 w-[100px] h-[100px]"
                         alt="Logo header">
@@ -29,7 +29,7 @@
 
                 @foreach ($footer_pages as $footer_page)
                     <li>
-                        <a href="/pages/{{ $footer_page['uid'] }}" class="text-color_3">
+                        <a href="/page/{{ $footer_page['slug'] }}" class="text-color_3">
                             {{ $footer_page['name'] }}
                         </a>
                     </li>

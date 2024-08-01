@@ -20,6 +20,19 @@ class CompetencesModel extends Model
 
     public function subcompetences()
     {
-        return $this->hasMany(CompetencesModel::class, 'parent_competence_uid', 'uid')->with('subcompetences')->orderBy('name', 'ASC');
+        return $this->hasMany(CompetencesModel::class, 'parent_competence_uid', 'uid')
+            ->orderBy('created_at', 'ASC')
+            ->with(['subcompetences' => function ($query) {
+
+                $query->select('uid', 'name', 'parent_competence_uid', 'is_multi_select')
+                    ->with(['learningResults' => function ($query) {
+                        $query->select('uid', 'name', 'competence_uid');
+                    }]);
+            }]);
+    }
+
+    public function learningResults()
+    {
+        return $this->hasMany(LearningResultsModel::class, 'competence_uid', 'uid');
     }
 }

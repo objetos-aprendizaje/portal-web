@@ -16,18 +16,7 @@
         @endif
     </title>
 
-    @vite(
-    [
-        'resources/css/app.css',
-        'resources/scss/app.scss',
-        'resources/js/app.js',
-        'resources/css/toastify.css',
-        'resources/js/header.js',
-        'resources/js/notifications_handler.js',
-        'resources/js/modal_handler.js',
-        'resources/js/profile/menu.js'
-    ]
-    )
+    @vite(['resources/css/app.css', 'resources/scss/app.scss', 'resources/js/app.js', 'resources/css/toastify.css', 'resources/js/header.js', 'resources/js/notifications_handler.js', 'resources/js/modal_handler.js', 'resources/js/profile/menu.js'])
 
     <style>
         :root {
@@ -43,6 +32,10 @@
 
     @if (isset($resources))
         @vite($resources)
+    @endif
+
+    @if (isset($infiniteTree) && $infiniteTree)
+        @vite(['node_modules/infinite-tree/dist/infinite-tree.css'])
     @endif
 
     <script>

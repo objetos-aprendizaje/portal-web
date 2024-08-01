@@ -38,4 +38,13 @@ class EducationalResourcesModel extends Model
     {
         return $this->belongsTo(EducationalResourceTypesModel::class, 'educational_resource_type_uid', 'uid');
     }
+
+    public function contactEmails()
+    {
+        return $this->hasMany(
+            EducationalResourceEmailsContactsModel::class,
+            'educational_resource_uid',
+            'uid'
+        );
+    }
 }

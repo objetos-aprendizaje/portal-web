@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmailJob;
 use App\Mail\SendDoubt;
 use App\Models\CoursesModel;
 use App\Models\EducationalProgramsModel;
 use App\Models\EducationalResourcesModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Mail;
 
 class DoubtsController extends Controller
 {
@@ -67,18 +67,24 @@ class DoubtsController extends Controller
         $email = $request->input('email');
         $message = e($request->input('message'));
 
+        $parameters = [
+            'name' => $name,
+            'email' => $email,
+            'userMessage' => $message
+        ];
+
         if ($learning_object_type == 'course') {
-            $this->handleCourse($uid, $name, $email, $message);
+            $this->handleCourse($uid, $parameters);
         } else if ($learning_object_type == 'educational_program') {
-            $this->handleEducationalProgram($uid, $name, $email, $message);
+            $this->handleEducationalProgram($uid, $parameters);
         } else if ($learning_object_type == 'educational_resource') {
-            $this->handleEducationalResource($uid, $name, $email, $message);
+            $this->handleEducationalResource($uid, $parameters);
         }
 
         return response()->json(['message' => 'Mensaje enviado correctamente'], 200);
     }
 
-    private function handleCourse($uid, $name, $email, $message)
+    private function handleCourse($uid, $parameters)
     {
         $learning_object = CoursesModel::where('uid', $uid)->with([
             'educational_program_type',
@@ -93,10 +99,13 @@ class DoubtsController extends Controller
         }
 
         $emails_to_send = $this->extractEmails($learning_object);
-        $this->sendEmails($emails_to_send, $name, $email, $message);
+
+        $parameters['learningObjectName'] = $learning_object->title;
+
+        $this->sendEmails($emails_to_send, $parameters);
     }
 
-    private function handleEducationalProgram($uid, $name, $email, $message)
+    private function handleEducationalProgram($uid, $parameters)
     {
         $educational_program = EducationalProgramsModel::where('uid', $uid)->with([
             'educational_program_type',
@@ -110,20 +119,28 @@ class DoubtsController extends Controller
         }
 
         $emails_to_send = $this->extractEmails($educational_program);
-        $this->sendEmails($emails_to_send, $name, $email, $message);
+
+        $parameters['learningObjectName'] = $educational_program->name;
+        $this->sendEmails($emails_to_send, $parameters);
     }
 
-    private function handleEducationalResource($uid, $name, $email, $message)
+    private function handleEducationalResource($uid, $parameters)
     {
-        $educational_resource = EducationalResourcesModel::where('uid', $uid)->with('educationalResourceType', 'educationalResourceType.redirection_queries_educational_program_types')->first();
+        $educational_resource = EducationalResourcesModel::where('uid', $uid)
+            ->with([
+                'contactEmails',
+                'educationalResourceType'
+            ])
+            ->first();
 
         if (!$educational_resource) {
             return response()->json(['message' => 'El recurso educativo no existe'], 404);
         }
 
-        $emails_to_send = $educational_resource->educationalResourceType->redirection_queries_educational_program_types->pluck('email')->toArray();
+        $emailsToSend = $educational_resource->contactEmails->pluck('email')->toArray();
 
-        $this->sendEmails($emails_to_send, $name, $email, $message);
+        $parameters['learningObjectName'] = $educational_resource->title;
+        $this->sendEmails($emailsToSend, $parameters);
     }
 
     private function extractEmails($learning_object)
@@ -137,10 +154,10 @@ class DoubtsController extends Controller
         return [];
     }
 
-    private function sendEmails($emails, $name, $email, $message)
+    private function sendEmails($emails, $parameters)
     {
         foreach ($emails as $destination_email) {
-            Mail::to($destination_email)->send(new SendDoubt($name, $email, $message));
+            dispatch(new SendEmailJob($destination_email, 'Has recibido una nueva consulta', $parameters, 'emails.doubt_learning_result'));
         }
     }
 }

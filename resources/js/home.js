@@ -141,7 +141,7 @@ function handleLanes() {
 
             params.body = {
                 lane: lane,
-                active: checkbox.checked,
+                active: checkbox.checked ? 1 : 0,
             };
 
             if (window.userUid) {
@@ -301,12 +301,12 @@ function loadResources(learningObjectsContainer, learning_objects) {
         ).src = `${window.backendUrl}/${learning_object.image_path}`;
 
         templateCloned.querySelector(
-            ".learning-object-inscription-date"
-        ).innerHTML = formatDate(learning_object.inscription_start_date);
+            ".learning-object-start-date"
+        ).innerHTML = formatDate(learning_object.realization_start_date);
 
         templateCloned.querySelector(
-            ".learning-object-realization-date"
-        ).innerHTML = formatDate(learning_object.realization_start_date);
+            ".learning-object-finish-date"
+        ).innerHTML = formatDate(learning_object.realization_finish_date);
 
         learningObjectsContainer.appendChild(
             document.importNode(templateCloned, true)

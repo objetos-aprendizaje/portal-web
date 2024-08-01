@@ -23,11 +23,9 @@ class GeneralOptionsMiddleware
 
         $footer_pages = FooterPagesModel::all()->toArray();
 
-        $header_pages = HeaderPagesModel::all()->toArray();
+        $headerPages = HeaderPagesModel::whereNull('header_page_uid')->with('headerPagesChildren')->orderBy('order', 'asc')->get();
 
         $fonts = $this->getFonts($general_options);
-
-        //dd($fonts);
 
         app()->instance('general_options', $general_options);
 
@@ -35,7 +33,7 @@ class GeneralOptionsMiddleware
         View::share('fonts', $fonts);
 
         View::share('footer_pages', $footer_pages);
-        View::share('header_pages', $header_pages);
+        View::share('header_pages', $headerPages);
 
         return $next($request);
     }

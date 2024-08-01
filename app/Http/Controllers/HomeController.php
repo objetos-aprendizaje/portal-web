@@ -115,7 +115,6 @@ class HomeController extends BaseController
             ->whereHas('status', function ($query) {
                 $query->where('code', 'INSCRIPTION');
             })
-            ->where('inscription_finish_date', '>=', now())
             ->get();
 
         return $featuredEducationalPrograms;
@@ -141,17 +140,24 @@ class HomeController extends BaseController
         return $filtered_courses_carrousel;
     }
 
-    private function getEducationalPrograms()
-    {
-        $educational_programs = EducationalProgramsModel::get();
-        return $educational_programs;
-    }
-
     private function getLanesPreferences()
     {
         $lanes_preferences = null;
         if (Auth::check()) {
             $lanes_preferences = UserLanesModel::where('user_uid', Auth::user()->uid)->get()->pluck('active', 'code')->toArray();
+
+            if(!isset($lanes_preferences['courses'])) {
+                $lanes_preferences['courses'] = true;
+            }
+
+            if(!isset($lanes_preferences['resources'])) {
+                $lanes_preferences['resources'] = true;
+            }
+
+            if(!isset($lanes_preferences['programs'])) {
+                $lanes_preferences['programs'] = true;
+            }
+
         }
 
         if (!$lanes_preferences) {
@@ -246,7 +252,7 @@ class HomeController extends BaseController
         return $educational_resources;
     }
 
-    private function saveLanesPreferences(Request $request)
+    public function saveLanesPreferences(Request $request)
     {
 
         if (!in_array($request->lane, ["courses", "resources", "programs"])) {

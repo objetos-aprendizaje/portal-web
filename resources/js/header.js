@@ -5,19 +5,40 @@ document.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("overlay-layer-menu")
         .addEventListener("click", hideMobileMenu);
-    document
-        .getElementById("your-account-option-btn")
-        .addEventListener("click", showAccountMenu);
+
+
     var myAccountButton = document.getElementById("my-account-btn");
 
     if (myAccountButton) {
         myAccountButton.addEventListener("click", toogleAccountMenu);
     }
 
-    document
-        .getElementById("main-menu-btn")
-        .addEventListener("click", showOptionsMenu);
+    toogleSubmenuMobile();
+
 });
+
+function toogleSubmenuMobile() {
+    const optionsSubmenu = document.querySelectorAll(".option-submenu");
+
+    optionsSubmenu.forEach((option) => {
+        option.addEventListener("click", function () {
+            const submenu = this.querySelector(".submenu");
+
+            const iconClosed = this.querySelector(".icon-closed");
+            const iconOpenned = this.querySelector(".icon-openned");
+
+            if (iconClosed && iconOpenned) {
+                iconClosed.classList.toggle("hidden");
+                iconOpenned.classList.toggle("hidden");
+            }
+
+            if (submenu) {
+                submenu.classList.toggle("hidden");
+                submenu.classList.toggle("menu-mobile");
+            }
+        });
+    });
+}
 
 function toggleMobileMenu() {
     let mobileMenu = document.getElementById("mobile-menu");
@@ -35,28 +56,6 @@ function hideMobileMenu() {
     overlay.classList.add("hidden");
 }
 
-function showAccountMenu() {
-    var optionsMenu = document.getElementById("menu-mobile-options");
-    var accountMenu = document.getElementById("menu-mobile-account");
-
-    optionsMenu.classList.remove("slide-left-center");
-    optionsMenu.classList.add("slide-left");
-
-    accountMenu.classList.remove("not-show");
-    accountMenu.classList.add("slide-right-center");
-}
-
-function showOptionsMenu() {
-    var optionsMenu = document.getElementById("menu-mobile-options");
-    var accountMenu = document.getElementById("menu-mobile-account");
-
-    optionsMenu.classList.remove("slide-left");
-    optionsMenu.classList.add("slide-left-center");
-
-    accountMenu.classList.remove("slide-right-center");
-    accountMenu.classList.add("slide-right");
-
-}
 function toogleAccountMenu() {
     document.getElementById("my-account-menu").classList.toggle("hidden");
 }

@@ -222,11 +222,11 @@
                 @foreach ($categories as $category)
                     <a class="no-effect-hover" href="/searcher?category_uid={{ $category['uid'] }}">
                         <div style="background-color: {{ $category['color'] }}"
-                            class="flex p-[17px] gap-[17px] rounded-[8px] cursor-pointer">
+                            class="flex p-[17px] gap-[17px] rounded-[8px] cursor-pointer h-[135px] items-center">
                             <img class="w-[88px] h-[88px] rounded-[4px]"
                                 src="{{ env('BACKEND_URL') . '/' . $category['image_path'] }}" alt="">
                             <div class="flex flex-col">
-                                <h2 class="text-black mb-[8px]">{{ $category['name'] }}</h2>
+                                <h2 class="text-black mb-[8px] line-clamp line-clamp-2">{{ $category['name'] }}</h2>
 
                                 <p class="text-[18px]">{{ $category['courses_count'] }}
                                     {{ trans_choice('Curso|Cursos', $category['courses_count']) }}</p>
@@ -257,12 +257,12 @@
                         <div class="learning-object-dates">
                             <div class="dates-container">
                                 <p class="text-color_4">Fecha de inicio: </p>
-                                <p class="dates-container-date learning-object-inscription-date text-color_4"></p>
+                                <p class="dates-container-date learning-object-start-date text-color_4"></p>
                             </div>
 
                             <div class="dates-container">
                                 <p class="text-color_4">Fecha de fin: </p>
-                                <p class="learning-object-realization-date text-color_4"></p>
+                                <p class="learning-object-finish-date text-color_4"></p>
                             </div>
                         </div>
                     </div>

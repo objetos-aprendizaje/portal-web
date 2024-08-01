@@ -10,7 +10,7 @@
             <div class="w-[530px] mb-[25px]">
                 <div class="rounded-[20px] border py-[20px] px-[40px]">
                     <img class="mx-auto block max-w-[211px] max-h-[80px] mb-[15px]"
-                        src="{{ $logo ? asset($logo) : asset('data/images/logo_login.jpg') }}" />
+                        src="{{ $general_options['poa_logo_1'] ? env('BACKEND_URL') . '/' .  $general_options['poa_logo_1'] : asset('data/images/logo_login.jpg') }}" />
 
                     <div class="text-[28px] font-bold text-center mb-[15px]">Reestablece la contraseña</div>
                     <div class="mb-[30px]">Introduce la nueva contraseña</div>
@@ -59,7 +59,7 @@
 
     <section class="md:hidden p-[20px]">
         <img class="mx-auto block max-w-[146px] h-[51px] mb-[15px]"
-            src="{{ $logo ? asset($logo) : asset('data/images/logo_login.jpg') }}" />
+            src="{{ $general_options['poa_logo_1'] ? env('BACKEND_URL') . '/' . $general_options['poa_logo_1'] : asset('data/images/logo_login.jpg') }}" />
 
         <div class="text-[28px] font-bold text-center mb-[15px]">¿Olvidaste la contraseña?</div>
 

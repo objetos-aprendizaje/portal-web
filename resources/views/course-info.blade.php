@@ -124,7 +124,20 @@
                                 {{ e_heroicon('currency-dollar', 'outline', null, 20, 20) }}
                                 <h5>Matrícula</h5>
                             </div>
-                            <p>{{ $course->cost ?? 0 }} €</p>
+                            @if ($course->payment_mode == 'SINGLE_PAYMENT')
+                                <p>{{ number_format($course->cost ?? 0, 2) }} €</p>
+                            @elseif ($course->payment_mode == 'INSTALLMENT_PAYMENT')
+                                @php
+                                    $totalPayments = $course->paymentTerms->sum('cost');
+                                @endphp
+                                <p>{{ number_format($totalPayments, 2) }} €</p>
+                                @foreach ($course->paymentTerms as $paymentTerm)
+                                    <div class="ml-[30px]">
+                                        <h5>{{ $paymentTerm->name }}</h5>
+                                    </div>
+                                    <p>{{ number_format($paymentTerm->cost, 2) }} €</p>
+                                @endforeach
+                            @endif
                         </div>
 
                         @php

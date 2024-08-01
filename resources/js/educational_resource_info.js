@@ -4,8 +4,39 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.userUid) {
         fillStarsHover();
         handleCalificateResource();
+
+        document
+            .getElementById("access-resource")
+            .addEventListener("click", function (event) {
+                event.preventDefault();
+                const dataDestination = this.dataset.destination;
+
+                const educationalResourceUid = document.getElementById(
+                    "educational_resource_uid"
+                ).value;
+
+                accessEducationalResource(dataDestination);
+            });
     }
 });
+
+function accessEducationalResource(dataDestination) {
+    const params = {
+        method: "POST",
+        url: "/resource/access_resource",
+        stringify: true,
+        body: {
+            educational_resource_uid: document.getElementById(
+                "educational_resource_uid"
+            ).value,
+        },
+        loader: true,
+    };
+
+    apiFetch(params).then((response) => {
+        window.open(dataDestination, "_blank");
+    });
+}
 
 /**
  * Función que se encarga de rellenar las estrellas de la calificación al hacer hover sobre ellas.
@@ -21,7 +52,8 @@ function fillStarsHover() {
         });
 
         star.addEventListener("mouseout", function () {
-            const avgCalification = document.getElementById("avg-calification").value;
+            const avgCalification =
+                document.getElementById("avg-calification").value;
             fillStars(avgCalification);
         });
     });
@@ -101,16 +133,20 @@ function reloadResourceInfo() {
     };
 
     apiFetch(params).then((response) => {
-        fillResourceInfo(response)
+        fillResourceInfo(response);
     });
 }
 
 function fillResourceInfo(resource) {
-    document.getElementById("resource-avg-calification-block").classList.remove("hidden");
-    document.getElementById("average-calification").innerText = resource.average_calification;
-    document.getElementById("avg-calification").value = Math.trunc(resource.average_calification);
+    document
+        .getElementById("resource-avg-calification-block")
+        .classList.remove("hidden");
+    document.getElementById("average-calification").innerText =
+        resource.average_calification;
+    document.getElementById("avg-calification").value = Math.trunc(
+        resource.average_calification
+    );
     fillStars(Math.trunc(resource.average_calification));
 }
 
-
-
+function accessResource() {}

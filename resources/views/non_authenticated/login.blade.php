@@ -10,9 +10,9 @@
         <div class="w-1/2 justify-center flex items-center">
             <div class="w-[530px] mb-[25px]">
                 <div class="rounded-[20px] border py-[20px] px-[40px]">
-                    @if (app('general_options')['poa_logo'])
+                    @if (app('general_options')['poa_logo_1'])
                         <img class="mx-auto block max-w-[211px] max-h-[80px] mb-[15px]"
-                            src="{{ env('BACKEND_URL') . '/' . app('general_options')['poa_logo'] }}" />
+                            src="{{ env('BACKEND_URL') . '/' . app('general_options')['poa_logo_1'] }}" />
                     @endif
 
                     <div class="text-[28px] font-bold text-center mb-[15px]">Inicia sesión</div>
@@ -143,9 +143,9 @@
     </section>
 
     <section class="md:hidden p-[20px]">
-        @if (app('general_options')['poa_logo'])
+        @if (app('general_options')['poa_logo_1'])
             <img class="mx-auto block max-w-[146px] h-[51px] mb-[15px]"
-                src="{{ env('BACKEND_URL') . '/' . app('general_options')['poa_logo'] }}" />
+                src="{{ env('BACKEND_URL') . '/' . app('general_options')['poa_logo_1'] }}" />
         @endif
 
         <div class="text-[28px] font-bold text-center mb-[15px]">Inicia sesión</div>

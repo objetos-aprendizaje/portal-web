@@ -23,14 +23,19 @@ let inscriptionDateFlatpickr;
 let realizationDateFlatpickr;
 
 document.addEventListener("DOMContentLoaded", function () {
+    initHandlers();
     initializeFlatpickr();
     initializeTreeSelect();
     handleChecksResourceTypes();
     getResourcesChecked();
     getCategoryChecked();
+    getSearchedText();
+    searchLearningObjects();
+});
 
+function initHandlers() {
     document
-        .getElementById("openned-inscriptions")
+        .getElementById("learning-object-status")
         .addEventListener("change", function () {
             searchLearningObjects();
         });
@@ -115,9 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
             deleteFilter(filterKey);
         }
     });
-
-    searchLearningObjects();
-});
+}
 
 function applyOrder() {
     var orderBy = this.getAttribute("data-order_by");
@@ -139,7 +142,7 @@ function applyOrder() {
 }
 
 function wipeFilters() {
-    document.getElementById("openned-inscriptions").value = "";
+    document.getElementById("learning-object-status").value = "";
     inscriptionDateFlatpickr.clear();
     realizationDateFlatpickr.clear();
     document.getElementById("modality-payment").value = "";
@@ -152,6 +155,8 @@ function wipeFilters() {
     selectedCompetences = [];
     treeSelectCompetences.updateValue([]);
 
+    deleteParamFromUrl("category_uid");
+    deleteParamFromUrl("text");
     searchLearningObjects();
 }
 
@@ -162,8 +167,8 @@ function deleteFilter(filterKey) {
     } else if (filterKey === "competences") {
         selectedCompetences = [];
         treeSelectCompetences.updateValue([]);
-    } else if (filterKey === "opennedInscriptions") {
-        document.getElementById("openned-inscriptions").value = "";
+    } else if (filterKey === "learningObjectStatus") {
+        document.getElementById("learning-object-status").value = "";
     } else if (filterKey === "inscriptionDate") {
         inscriptionDateFlatpickr.clear();
     } else if (filterKey === "realizationDate") {
@@ -174,9 +179,20 @@ function deleteFilter(filterKey) {
         document.getElementById("assessments").value = "";
     } else if (filterKey === "search") {
         document.getElementById("search").value = "";
+        deleteParamFromUrl("text");
     }
 
     searchLearningObjects();
+}
+
+function deleteParamFromUrl(paramName) {
+    let url = new URL(window.location.href);
+    let params = new URLSearchParams(url.search);
+    params.delete(paramName);
+
+    // Actualizar la URL en el navegador
+    url.search = params.toString();
+    window.history.replaceState({}, "", url.toString());
 }
 
 function getParamFromUrl(paramName) {
@@ -191,6 +207,13 @@ function getCategoryChecked() {
     if (category_uid) {
         treeSelectCategories.updateValue([category_uid]);
         selectedCategories = [category_uid];
+    }
+}
+
+function getSearchedText() {
+    let searchText = getParamFromUrl("text");
+    if (searchText) {
+        document.getElementById("search").value = searchText;
     }
 }
 
@@ -305,8 +328,8 @@ function convertCategoriesToOptions(categories) {
 }
 
 function collectFilters() {
-    const opennedInscriptions = document.getElementById(
-        "openned-inscriptions"
+    const learningObjectStatus = document.getElementById(
+        "learning-object-status"
     ).value;
     const inscriptionDate = getFlatpickrDateRangeSql(inscriptionDateFlatpickr);
     const realizationDate = getFlatpickrDateRangeSql(realizationDateFlatpickr);
@@ -315,7 +338,8 @@ function collectFilters() {
     const search = document.getElementById("search").value;
 
     let filters = {};
-    if (opennedInscriptions) filters.opennedInscriptions = opennedInscriptions;
+    if (learningObjectStatus)
+        filters.learningObjectStatus = learningObjectStatus;
     if (inscriptionDate[0]) filters.inscription_start_date = inscriptionDate[0];
     if (inscriptionDate[1])
         filters.inscription_finish_date = inscriptionDate[1];
@@ -418,13 +442,16 @@ function updateFiltersSelectors(filters) {
         );
     }
 
-    if (filters.opennedInscriptions && filters.opennedInscriptions !== "") {
-        addFilter(
-            filters.opennedInscriptions == 1
-                ? "Inscripciones abiertas"
-                : "Inscripciones cerradas",
-            "opennedInscriptions"
+    if (filters.learningObjectStatus && filters.learningObjectStatus !== "") {
+        const learningObjectElement = document.getElementById(
+            "learning-object-status"
         );
+
+        const learningObjectStatusLabel =
+            learningObjectElement.options[learningObjectElement.selectedIndex]
+                .text;
+
+        addFilter(learningObjectStatusLabel, "learningObjectStatus");
     }
 
     if (filters.inscription_start_date && filters.inscription_finish_date) {
@@ -450,8 +477,8 @@ function updateFiltersSelectors(filters) {
     if (filters.modalityPayment) {
         addFilter(
             filters.modalityPayment === "PAID"
-                ? "Cursos de pago"
-                : "Cursos gratuitos",
+                ? "Objetos de pago"
+                : "Objetos gratuitos",
             "modalityPayment"
         );
     }

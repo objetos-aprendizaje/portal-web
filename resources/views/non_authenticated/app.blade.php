@@ -31,7 +31,7 @@
     @endif
 
     <script>
-        @if(Session::has('error'))
+        @if (Session::has('error'))
             var error = "{{ Session::get('error') }}";
         @endif
     </script>
@@ -39,6 +39,18 @@
 </head>
 
 <body>
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            {{ $error }}
+        @endforeach
+    @endif
+
+    @if (session('success'))
+        @foreach (session('success') as $message)
+            {{ $message }}
+        @endforeach
+    @endif
+
     @yield('content')
 
 </body>

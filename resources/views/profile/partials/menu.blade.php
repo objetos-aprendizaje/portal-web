@@ -7,7 +7,7 @@
         <a class="no-effect-hover" href="{{ route('my-profile') }}">
             <li class="menu-element {{ $currentPage === 'myProfile' ? 'menu-element-selected' : '' }}">
                 <div class="menu-content">
-                    {{ e_heroicon('user', 'outline', '#C7C7C7', 24, 24) }}
+                    <div class="icon">{{ e_heroicon('user', 'outline', '#C7C7C7', 24, 24) }}</div>
                     <span>Mi perfil</span>
                 </div>
             </li>
@@ -16,7 +16,7 @@
         <li class="menu-element has-submenu">
             <div class="toggle-submenu menu-content {{ $currentPage === 'my_courses' ? 'menu-element-selected' : '' }}">
                 <div>{{ e_heroicon('academic-cap', 'outline', '#C7C7C7', 24, 24) }}</div>
-                <div><span>Mis cursos</span></div>
+                <div class="icon"><span>Mis cursos</span></div>
                 <div class="icon-up">{{ e_heroicon('chevron-up', 'outline', '#000000', 12, 12) }}</div>
                 <div class="icon-down hidden">{{ e_heroicon('chevron-down', 'outline', '#000000', 12, 12) }}</div>
             </div>
@@ -57,7 +57,7 @@
 
         <li class="menu-element has-submenu">
             <div class="toggle-submenu menu-content {{ $currentPage === 'my_courses' ? 'menu-element-selected' : '' }}">
-                <div>{{ e_heroicon('academic-cap', 'outline', '#C7C7C7', 24, 24) }}</div>
+                <div class="icon">{{ e_heroicon('academic-cap', 'outline', '#C7C7C7', 24, 24) }}</div>
                 <div><span>Mis programas formativos</span></div>
                 <div class="icon-up">{{ e_heroicon('chevron-up', 'outline', '#000000', 12, 12) }}</div>
                 <div class="icon-down hidden">{{ e_heroicon('chevron-down', 'outline', '#000000', 12, 12) }}</div>
@@ -98,11 +98,19 @@
             </ul>
         </li>
 
+        <a class="no-effect-hover" href="{{ route('competences-learning-results') }}">
+            <li class="menu-element {{ $currentPage === 'competences_learning_results' ? 'menu-element-selected' : '' }}">
+                <div class="menu-content">
+                    <div class="icon">{{ e_heroicon('book-open', 'outline', '#C7C7C7', 24, 24) }}</div>
+                    <span>Competencias y resultados de aprendizaje</span>
+                </div>
+            </li>
+        </a>
 
         <a class="no-effect-hover" href="{{ route('notifications') }}">
             <li class="menu-element {{ $currentPage === 'notifications' ? 'menu-element-selected' : '' }}">
                 <div class="menu-content">
-                    {{ e_heroicon('bell-alert', 'outline', '#C7C7C7', 24, 24) }}
+                    <div class="icon">{{ e_heroicon('bell-alert', 'outline', '#C7C7C7', 24, 24) }}</div>
                     <span>Notificaciones</span>
                 </div>
             </li>
@@ -111,7 +119,7 @@
         <a class="no-effect-hover" href="{{ route('categories') }}">
             <li class="menu-element {{ $currentPage === 'categories' ? 'menu-element-selected' : '' }}">
                 <div class="menu-content">
-                    {{ e_heroicon('rectangle-stack', 'outline', '#C7C7C7', 24, 24) }}
+                    <div class="icon">{{ e_heroicon('rectangle-stack', 'outline', '#C7C7C7', 24, 24) }}</div>
                     <span>Mis categorías</span>
                 </div>
             </li>

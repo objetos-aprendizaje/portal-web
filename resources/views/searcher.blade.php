@@ -83,10 +83,12 @@
             <div class="custom-treeselect" id="treeselect-competences"></div>
 
             <div class="h-[50px]">
-                <select class="rounded-[8px] w-full border-none" id="openned-inscriptions">
-                    <option value="">Inscripciones abiertas</option>
-                    <option value="1">Sí</option>
-                    <option value="0">No</option>
+                <select class="rounded-[8px] w-full border-none" id="learning-object-status">
+                    <option value="">Estado</option>
+                    <option value="INSCRIPTION">En inscripción</option>
+                    <option value="DEVELOPMENT">En desarrollo</option>
+                    <option value="ENROLLING">En matriculación</option>
+                    <option value="FINISHED">Finalizado</option>
                 </select>
             </div>
 
@@ -102,7 +104,7 @@
 
             <div>
                 <select class="rounded-[8px] w-full border-none" id="modality-payment">
-                    <option value="">Curso gratuito o pago</option>
+                    <option value="">Objeto gratuito o pago</option>
                     <option value="PAID">De pago</option>
                     <option value="FREE">Gratuitos</option>
                 </select>

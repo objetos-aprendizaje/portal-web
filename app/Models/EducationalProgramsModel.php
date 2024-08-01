@@ -65,4 +65,21 @@ class EducationalProgramsModel extends Model
         )->withPivot('user_uid', 'document_path');
     }
 
+    public function contact_emails()
+    {
+        return $this->hasMany(
+            EducationalProgramsEmailContactsModel::class,
+            'educational_program_uid',
+            'uid'
+        );
+    }
+
+    public function paymentTerms()
+    {
+        return $this->hasMany(
+            EducationalProgramsPaymentTermsModel::class,
+            'educational_program_uid',
+            'uid'
+        );
+    }
 }

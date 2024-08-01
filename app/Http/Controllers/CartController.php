@@ -10,6 +10,7 @@ use App\Models\CoursesPaymentsModel;
 use App\Models\CoursesStudentsModel;
 use App\Models\EducationalProgramsModel;
 use App\Models\EducationalProgramsStudentsModel;
+use App\Models\EducationalProgramStatusesModel;
 use Illuminate\Http\Request;
 
 class CartController extends BaseController
@@ -84,9 +85,16 @@ class CartController extends BaseController
         $this->validateRequest($learningObjectType);
 
         if ($learningObjectType == "course") {
+            // Comprobamos primero que no esté inscrito
+            $isInscribed = CoursesStudentsModel::where('user_uid', auth()->user()->uid)->where('course_uid', $learningObjectUid)->exists();
+            if($isInscribed) throw new OperationFailedException("Ya estás inscrito");
+
             $learningObject = CoursesModel::where('uid', $learningObjectUid)->with(['status', 'students'])->first();
             $statusWithLearningObject = $this->inscribeUserInCourse($learningObject);
         } else if ($learningObjectType == "educational_program") {
+            $isInscribed = EducationalProgramsStudentsModel::where('user_uid', auth()->user()->uid)->where('educational_program_uid', $learningObjectUid)->exists();
+            if($isInscribed) throw new OperationFailedException("Ya estás inscrito");
+
             $learningObject = EducationalProgramsModel::where('uid', $learningObjectUid)->with(['status', 'students'])->first();
             $statusWithLearningObject = $this->inscribeUserInEducationalProgram($learningObject);
         }

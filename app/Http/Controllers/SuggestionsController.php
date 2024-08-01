@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmailJob;
 use App\Models\EmailsSuggestionsModel;
+use App\Models\SuggestionSubmissionEmailsModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -39,14 +41,18 @@ class SuggestionsController extends Controller
         $email = trim($request->input('email'));
         $message = e($request->input('message'));
 
-        // Insertamos los registros
-        EmailsSuggestionsModel::create([
-            'uid' => generate_uuid(),
-            'email' => $email,
+        // Sacamos los emails definidos para el envío
+        $suggestionSubmissionsEmails = SuggestionSubmissionEmailsModel::all();
+
+        $parameters = [
             'name' => $name,
-            'message' => $message,
-            'sent' => 0
-        ]);
+            'email' => $email,
+            'userMessage' => $message,
+        ];
+
+        foreach($suggestionSubmissionsEmails as $email) {
+            dispatch(new SendEmailJob($email->email, 'Nueva sugerencia', $parameters, 'emails.suggestion'));
+        }
 
         return response()->json(['message' => 'Sugerencia enviada correctamente'], 200);
     }

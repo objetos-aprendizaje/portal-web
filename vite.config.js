@@ -36,7 +36,12 @@ export default defineConfig({
                 "resources/js/profile/my_courses/historic_courses.js",
                 "resources/js/profile/my_educational_programs/inscribed_educational_programs.js",
                 "resources/js/profile/my_educational_programs/enrolled_educational_programs.js",
-                "resources/js/profile/my_educational_programs/historic_educational_programs.js"
+                "resources/js/profile/my_educational_programs/historic_educational_programs.js",
+                "resources/js/profile/competences_learning_results.js",
+                "resources/js/renderer_infinite_tree.js",
+                'node_modules/infinite-tree/dist/infinite-tree.css',
+                "resources/js/recover_password.js",
+                "resources/js/register.js",
             ],
             refresh: true,
         }),

@@ -20,7 +20,7 @@ class LoginController extends BaseController
     public function index()
     {
 
-        $logo_bd = GeneralOptionsModel::where('option_name', 'poa_logo')->first();
+        $logo_bd = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
 
         if ($logo_bd != null) $logo = $logo_bd['option_value'];
         else $logo = null;

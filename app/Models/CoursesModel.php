@@ -137,4 +137,12 @@ class CoursesModel extends Model
     public function educationalProgram() {
         return $this->hasOne(EducationalProgramsModel::class, 'uid', 'educational_program_uid');
     }
+
+    public function paymentTerms() {
+        return $this->hasMany(
+            CoursesPaymentTermsModel::class,
+            'course_uid',
+            'uid'
+        );
+    }
 }

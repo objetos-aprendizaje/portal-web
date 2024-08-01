@@ -125,4 +125,13 @@ class UsersModel extends Authenticatable
             'automatic_notification_type_uid'
         );
     }
+
+    public function learningResultsPreferences() {
+        return $this->belongsToMany(
+            LearningResultsModel::class,
+            'user_learning_results_preferences',
+            'user_uid',
+            'learning_result_uid'
+        );
+    }
 }

@@ -7,7 +7,73 @@ window.defaultErrorMessageFetch = "Ha ocurrido un error";
 document.addEventListener("DOMContentLoaded", function () {
     controlCustomCheckboxs();
     applyPreventDefaultForms();
+    controlSubmenus();
+    controlSearch();
 });
+
+/**
+ * Recoge el texto del buscador del header y redirige a la página de búsqueda.
+ */
+function controlSearch() {
+    const searchInput = document.querySelector(".searcher input");
+    const searchButton = document.querySelector(".searcher button");
+
+    function redirectToSearcher() {
+        const query = searchInput.value.trim();
+        if (query) {
+            window.location.href = `/searcher?text=${encodeURIComponent(query)}`;
+        }
+    }
+
+    searchButton.addEventListener("click", function() {
+        redirectToSearcher();
+    });
+
+    searchInput.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            redirectToSearcher();
+        }
+    });
+}
+
+function controlSubmenus() {
+    const menuItems = document.querySelectorAll(".has-submenu-header");
+
+    // Función para ocultar todos los submenús
+    function hideAllSubmenus() {
+        document.querySelectorAll(".submenu-header").forEach((submenu) => {
+            submenu.classList.add("hidden");
+        });
+    }
+
+    menuItems.forEach((item) => {
+        const submenu = item.nextElementSibling; // Asume que el submenú es el siguiente elemento hermano
+
+        item.addEventListener("mouseenter", () => {
+            hideAllSubmenus(); // Oculta todos los submenús
+            submenu.classList.remove("hidden"); // Muestra el submenú correspondiente
+        });
+
+        item.parentNode.addEventListener("mouseleave", () => {
+            // Inicia un temporizador para ocultar el submenú
+            submenu.classList.add("hidden");
+        });
+
+        // Oculta el submenú cuando el cursor sale del submenú
+        submenu.addEventListener("mouseleave", () => {
+            submenu.classList.add("hidden");
+        });
+    });
+
+    // Añade el manejador de eventos al header
+    const header = document.querySelector("header");
+    if (header) {
+        header.addEventListener("mouseleave", () => {
+            // Inicia un temporizador para ocultar todos los submenús
+            hideAllSubmenus();
+        });
+    }
+}
 
 function applyPreventDefaultForms() {
     const forms = document.querySelectorAll("form[prevent-default]");
@@ -179,6 +245,28 @@ function controlCustomCheckboxs() {
                 .classList.toggle("checked", this.checked);
         });
     });
+
+    // Controla los clicks en los iconos de los checks personalizados
+    document
+        .querySelectorAll(".checkbox-container .checkbox-icon")
+        .forEach(function (icon) {
+            icon.addEventListener("click", function () {
+                // Obtener el padre del padre
+                let parentOfParent = icon.parentElement.parentElement;
+
+                // Obtener el .custom-checkbox dentro del padre del padre
+                let customCheckbox = parentOfParent.querySelector('.custom-checkbox');
+
+                // Obtener el valor del .custom-checkbox
+                let checkboxValue = customCheckbox.checked;
+
+                // Cambiar el valor del .custom-checkbox
+                customCheckbox.checked = !checkboxValue;
+
+                customCheckbox.dispatchEvent(new Event('change'));
+
+            });
+        });
 }
 
 export function toggleCheckbox(id) {
@@ -585,7 +673,6 @@ export function updatePagination(container, current_page, last_page) {
     let cssClassCurrentPageBtn = last_page < 2 ? "none" : "flex";
     currentPageBtn.style.display = cssClassCurrentPageBtn;
 }
-
 
 export function handlePagination(container, callback) {
     const paginationButtons = container.querySelectorAll("[data-page]");

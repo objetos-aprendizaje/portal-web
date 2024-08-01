@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EducationalResourceAccessModel;
 use App\Models\EducationalResourcesAssessmentsModel;
 use App\Models\EducationalResourcesModel;
 use Illuminate\Routing\Controller as BaseController;
@@ -84,5 +85,18 @@ class ResourceInfoController extends BaseController
         }
 
         return response()->json(['message' => 'Se ha registrado correctamente la calificación'], 200);
+    }
+
+    public function saveAccessResource(Request $request) {
+        $resourceUid = $request->input('educational_resource_uid');
+
+        EducationalResourceAccessModel::insert([
+            'uid' => generate_uuid(),
+            'user_uid' => auth()->user()->uid,
+            'educational_resource_uid' => $resourceUid,
+            'date' => now(),
+        ]);
+
+        return response()->json(['message' => 'Se ha registrado correctamente el acceso al recurso'], 200);
     }
 }

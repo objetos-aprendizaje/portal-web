@@ -17,6 +17,7 @@
     },
     "dependencies": {
         "flatpickr": "^4.6.13",
+        "infinite-tree": "^1.18.0",
         "postcss-color-function": "^4.1.0",
         "swiper": "^11.1.1",
         "toastify-js": "^1.12.0",

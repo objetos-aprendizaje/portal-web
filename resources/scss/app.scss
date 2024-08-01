@@ -260,30 +260,31 @@ body.modal-open {
 }
 
 /******** MENÚS ********/
-.menu-mobile {
+.menu-mobile-container {
 
-    .option {
-        @apply text-black rounded-md py-[10px] px-[7px] text-base font-medium;
+    .menu-mobile li {
+        @apply text-black rounded-md px-[7px] text-base font-medium cursor-pointer;
     }
 
-    .menu-mobile-container {
-        @apply bg-white border-y w-full rounded-md z-50 gap-[24px] p-[24px] flex-col flex fixed top-[110px];
+    .menu-mobile {
+        @apply bg-white w-full rounded-md z-50 p-[24px] flex-col flex  ;
     }
 
-    .menu-mobile-container.not-show {
-        @apply hidden;
+    .option-label {
+        @apply my-[10px]
     }
 
-    @apply fixed w-full z-50 lg:hidden;
+    .submenu {
+        @apply p-0;
+    }
+
+    @apply w-full z-50 lg:hidden top-[110px] fixed border-y;
 }
 
 .overlay-layer-menu {
     @apply fixed inset-0 bg-black opacity-50 z-40;
 }
 
-.menu-mobile-wrapper {
-    @apply w-full relative overflow-hidden;
-}
 
 .icon-close-session {
     svg {
@@ -779,6 +780,10 @@ body.modal-open {
         @apply flex items-center gap-[20px];
     }
 
+    ul li svg {
+        @apply min-w-[24px] min-h-[24px];
+    }
+
     ul li .menu-content:not(.header):hover {
         @apply hover:bg-color_hover_2;
     }
@@ -797,7 +802,7 @@ body.modal-open {
         }
     }
 
-    @apply select-none text-black pb-6 top-0 overflow-y-auto pt-[109px] w-[270px] bg-white fixed left-0 h-screen lg:block hidden;
+    @apply select-none text-black pb-6 top-0 overflow-y-auto mt-[109px] h-[calc(100%-109px)] w-[270px] bg-white fixed left-0  lg:block hidden;
 }
 
 

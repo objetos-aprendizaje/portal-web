@@ -1,5 +1,5 @@
-<p>Nueva sugerencia de <b>{{ $name }} ({{ $email }})</b></p>
+<p>Nueva sugerencia de <b>{{ $parameters['name'] }} ({{ $parameters['email'] }})</b></p>
 
 <p>
-    {{ $userMessage }}
+    {{ $parameters['userMessage'] }}
 </p>

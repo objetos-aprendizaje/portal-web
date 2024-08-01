@@ -121,7 +121,6 @@ class EducationalProgramInfoController extends BaseController
             ->addSelect(['total_cost' => CoursesModel::select(DB::raw('SUM(cost)'))
                 ->whereColumn('educational_program_uid', 'educational_programs.uid')
             ])
-            ->where('inscription_finish_date', '>=', now())
             ->where('educational_programs.uid', $uid)
             ->first();
 

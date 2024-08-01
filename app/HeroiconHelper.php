@@ -1,20 +1,20 @@
 <?php
 
 if (!function_exists('e_heroicon')) {
-    function e_heroicon($icon, $type = "outline", $color = null, $width = false, $height = false, $class = "")
+    function e_heroicon($icon, $type = "outline", $color = null, $width = false, $height = false, $class = "", $strokeWidth = null)
     {
 
-        echo heroicon($icon, $type, $color, $width, $height, $class);
+        echo heroicon($icon, $type, $color, $width, $height, $class, $strokeWidth);
     }
 }
 
 if (!function_exists('heroicon')) {
-    function heroicon($icon, $type = "outline", $color = null, $width = false, $height = false, $class = "")
+    function heroicon($icon, $type = "outline", $color = null, $width = false, $height = false, $class = null, $strokeWidth = null)
     {
 
         if ($type == "outline") {
             $d = get_heroicon_d_outline($icon);
-            $heroicon = heroicon_outline($d, $color, $width, $height, $class);
+            $heroicon = heroicon_outline($d, $color, $width, $height, $class, $strokeWidth);
         } elseif ($type == "solid") {
             $d = get_heroicon_d_solid($icon);
             $heroicon = heroicon_solid($d, $color, $width, $height, $class);
@@ -25,14 +25,16 @@ if (!function_exists('heroicon')) {
 }
 
 if (!function_exists('heroicon_outline')) {
-    function heroicon_outline($icons, $color, $width = false, $height = false, $class = "")
+    function heroicon_outline($icons, $color, $width = false, $height = false, $class = null, $strokeWidth = null)
     {
         $width = $width ? $width : 24;
         $height = $height ? $height : 24;
         $color = $color ? $color : 'currentColor';
+        $strokeWidth = $strokeWidth ? $strokeWidth : "1.5";
+        $class = $class ? $class : "";
 
 
-        $svg = "<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='" . $color . "' width='" . $width . "' height='" . $height . "' class='" . $class . "'>";
+        $svg = "<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='" . $strokeWidth . "' stroke='" . $color . "' width='" . $width . "' height='" . $height . "' class='" . $class . "'>";
 
         if (is_array($icons)) {
             foreach ($icons as $d) {
@@ -166,6 +168,8 @@ if (!function_exists('get_heroicon_d_outline')) {
                 return "M6 18 18 6M6 6l12 12";
             case "square-2-stack":
                 return "M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6";
+            case "book-open":
+                return "M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25";
             default: // Error icon
                 return "M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z";
         }

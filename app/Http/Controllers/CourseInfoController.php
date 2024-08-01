@@ -14,7 +14,7 @@ class CourseInfoController extends BaseController
     public function index($uid)
     {
         $course = CoursesModel::select('courses.*', 'califications_avg.average_calification')->where('uid', $uid)->with([
-            'status', 'tags', 'teachers', 'course_type',
+            'status', 'tags', 'teachers', 'course_type', 'paymentTerms',
             'blocks.competences' => function ($query) {
                 $query->where('is_multi_select', 0);
             }

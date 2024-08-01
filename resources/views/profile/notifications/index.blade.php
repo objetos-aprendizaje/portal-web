@@ -46,7 +46,10 @@
                         <div
                             class="checkbox-switch peer-checked:bg-color_1 peer-checked:after:border-white peer-checked:after:translate-x-full">
                         </div>
-                        <div class="checkbox-name">{{ $automaticNotificationType->name }}</div>
+                        <div class="checkbox-name">
+                            <div>{{ $automaticNotificationType->name }}</div>
+                            <small class="italic">{{$automaticNotificationType->description}}</small>
+                        </div>
                     </label>
                 </div>
             @endforeach
@@ -97,7 +100,10 @@
                         <div
                             class="checkbox-switch peer-checked:bg-color_1 peer-checked:after:border-white peer-checked:after:translate-x-full">
                         </div>
-                        <div class="checkbox-name">{{ $automaticNotificationType->name }}</div>
+                        <div class="checkbox-name">
+                            <div>{{ $automaticNotificationType->name }}</div>
+                            <small class="italic">{{$automaticNotificationType->description}}</small>
+                        </div>
                     </label>
                 </div>
             @endforeach

@@ -14,8 +14,16 @@ class NotificationsController extends BaseController
     public function index()
     {
         $notification_types = NotificationsTypesModel::all();
-        $automaticNotificationTypes = AutomaticNotificationTypesModel::all();
+
         $user = Auth::user();
+
+        $rolesUser = $user->roles()->get();
+
+        $automaticNotificationTypes = AutomaticNotificationTypesModel::with('roles')
+            ->whereHas('roles', function ($query) use ($rolesUser) {
+                $query->whereIn('uid', $rolesUser->pluck("uid"));
+            })
+            ->get();
 
         return view('profile.notifications.index', [
             "resources" => [
