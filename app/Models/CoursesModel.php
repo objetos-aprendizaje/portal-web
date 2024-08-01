@@ -20,6 +20,12 @@ class CoursesModel extends Model
         'validate_student_registrations', 'lms_url', 'cost'
     ];
 
+    public function average_calification()
+    {
+        return $this->hasOne(CoursesAssessmentsModel::class, 'course_uid')
+            ->selectRaw('course_uid, ROUND(AVG(calification), 1) as average_calification')
+            ->groupBy('course_uid');
+    }
 
     public function status()
     {
@@ -28,14 +34,12 @@ class CoursesModel extends Model
 
     public function teachers()
     {
-        $teacherRoleUid = UserRolesModel::where('code', 'TEACHER')->first()->uid;
-
         return $this->belongsToMany(
             UsersModel::class,
-            'courses_users',
+            'courses_teachers',
             'course_uid',
             'user_uid'
-        )->wherePivot('user_rol_uid', $teacherRoleUid);
+        )->withPivot('type');
     }
 
     public function valorations()
@@ -64,6 +68,81 @@ class CoursesModel extends Model
             'course_categories',
             'course_uid',
             'category_uid'
+        );
+    }
+
+    public function blocks()
+    {
+        return $this->hasMany(
+            BlocksModel::class,
+            'course_uid',
+            'uid'
+        );
+    }
+
+    public function course_type()
+    {
+        return $this->belongsTo(
+            CourseTypesModel::class,
+            'course_type_uid',
+            'uid'
+        );
+    }
+
+    public function contact_emails()
+    {
+        return $this->hasMany(
+            CoursesEmailsContactsModel::class,
+            'course_uid',
+            'uid'
+        );
+    }
+
+    public function educational_program_type()
+    {
+        return $this->belongsTo(
+            EducationalProgramTypesModel::class,
+            'educational_program_type_uid',
+            'uid'
+        );
+    }
+
+    public function course_documents()
+    {
+        return $this->hasMany(CourseDocumentsModel::class, 'course_uid', 'uid');
+    }
+
+    public function student_documents()
+    {
+        return $this->belongsToMany(
+            CourseDocumentsModel::class,
+            'courseS_students_documents',
+            'course_document_uid',
+            'uid',
+            'uid',
+            'course_uid'
+        )->withPivot('user_uid', 'document_path');
+    }
+
+    public function students()
+    {
+        return $this->belongsToMany(
+            UsersModel::class,
+            'courses_students',
+            'course_uid',
+            'user_uid'
+        )->withPivot(['acceptance_status', 'uid'])->as('course_student_info');
+    }
+
+    public function educationalProgram() {
+        return $this->hasOne(EducationalProgramsModel::class, 'uid', 'educational_program_uid');
+    }
+
+    public function paymentTerms() {
+        return $this->hasMany(
+            CoursesPaymentTermsModel::class,
+            'course_uid',
+            'uid'
         );
     }
 }

@@ -22,4 +22,14 @@ class CategoriesModel extends Model
     {
         return $this->hasMany(CategoriesModel::class, 'parent_category_uid', 'uid')->with('subcategories');
     }
+
+    public function courses()
+    {
+        return $this->belongsToMany(CoursesModel::class, 'course_categories', 'category_uid', 'course_uid');
+    }
+
+    public function getCourseCountAttribute()
+    {
+        return $this->courses()->count();
+    }
 }

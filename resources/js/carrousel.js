@@ -1,3 +1,8 @@
+import Swiper from 'swiper';
+import { Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+
 document.addEventListener("DOMContentLoaded", function () {
     var swiper = new Swiper(".swiper-container", {
         navigation: {
@@ -15,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
             el: ".swiper-pagination",
             clickable: true,
         },
+        modules: [Navigation],
         breakpoints: {
             640: {
                 slidesPerView: 2,

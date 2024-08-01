@@ -1,3 +1,5 @@
-*
-!public/
-!.gitignore
+/files_downloaded_temp/*
+!/files_downloaded_temp/index
+
+/files/*
+!/files/index

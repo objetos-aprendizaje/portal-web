@@ -14,7 +14,7 @@ class EducationalResourcesAssessmentsModel extends Model {
     protected $keyType = 'string';
 
     protected $fillable = [
-        'user_uid', 'calification', 'educational_resource_uid'
+        'user_uid', 'calification', 'educational_resources_uid'
     ];
 
 

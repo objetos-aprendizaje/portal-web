@@ -8,14 +8,19 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: "var(--primary-color)",
-                secondary: "var(--secondary-color)",
+                color_1: "var(--color_1)",
+                color_2: "var(--color_2)",
+                color_3: "var(--color_3)",
+                color_4: "var(--color_4)",
+                color_background_elements: "var(--color_background_elements)",
+                color_hover: "var(--color_hover)",
+                color_hover_2: "var(--color_hover_2)",
                 danger: "#E74C3C",
             },
             fontFamily: {
-                "roboto-medium": ["roboto-medium", "sans-serif"],
-                "roboto-regular": ["roboto-regular", "sans-serif"],
-                "roboto-bold": ["roboto-bold", "sans-serif"],
+                "medium": ["font-medium", "sans-serif"],
+                "regular": ["font-regular", "sans-serif"],
+                "bold": ["font-bold", "sans-serif"],
             },
         },
     },
