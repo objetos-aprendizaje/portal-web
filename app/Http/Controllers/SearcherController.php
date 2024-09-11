@@ -137,7 +137,7 @@ class SearcherController extends Controller
             'inscription_finish_date',
             DB::raw("null as realization_start_date"),
             DB::raw("null as realization_finish_date"),
-            DB::raw("null as status_code"),
+            "educational_program_statuses.code as status_code",
             DB::raw("'educational_program' as learning_object_type"),
             'image_path',
         ])

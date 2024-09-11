@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Profile\MyEducationalPrograms;
 use App\Exceptions\OperationFailedException;
 use App\Models\CoursesAccessesModel;
 use App\Models\CoursesModel;
-use App\Models\EducationalProgramsAccessesModel;
-use App\Models\EducationalProgramsModel;
+use App\Models\EducationalProgramsPaymentTermsModel;
+use App\Models\EducationalProgramsPaymentTermsUsersModel;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 
@@ -32,7 +32,11 @@ class EnrolledEducationalProgramsController extends BaseController
         $educationalProgramsStudentQuery = $user->educationalPrograms()
             ->with([
                 'status',
-                'courses'
+                'courses',
+                'paymentTerms',
+                'paymentTerms.userPayment' => function ($query) use ($user) {
+                    $query->where('user_uid', $user->uid);
+                }
             ])
             ->wherePivot('status', 'ENROLLED')
             ->whereHas('status', function ($query) {
@@ -46,6 +50,58 @@ class EnrolledEducationalProgramsController extends BaseController
         $educationalProgramsStudent = $educationalProgramsStudentQuery->paginate($items_per_page);
 
         return response()->json($educationalProgramsStudent);
+    }
+
+    public function payTerm(Request $request)
+    {
+        $paymentTermUid = $request->input("paymentTermUid");
+
+        $paymentTerm = EducationalProgramsPaymentTermsModel::where('uid', $paymentTermUid)->with("educationalProgram")->first();
+
+        if ($paymentTerm->start_date > now() || $paymentTerm->finish_date < now()) {
+            throw new OperationFailedException("El plazo de pago no está activo");
+        }
+
+        $paymentTermUser = $this->createOrRetrievePaymentTermUser($paymentTermUid);
+
+        $descriptionPaymentTermUser = 'Pago de plazo del programa formativo ' . $paymentTerm->educationalProgram->name;
+
+        $merchantData = json_encode([
+            "learningObjectType" => "educationalProgram",
+            "paymentType" => "paymentTerm",
+        ]);
+
+        $urlOk = route("my-educational-programs-enrolled") . '?payment_success=true';
+        $urlKo = route("my-educational-programs-enrolled") . '?payment_success=false';
+
+        $redsysParams = generateRedsysObject($paymentTerm->cost, $paymentTermUser->order_number, $merchantData, $descriptionPaymentTermUser, $urlOk, $urlKo);
+
+        return response()->json([
+            "redsysParams" => $redsysParams,
+        ]);
+    }
+
+    private function createOrRetrievePaymentTermUser($paymentTermUid)
+    {
+        $paymentTermUser = EducationalProgramsPaymentTermsUsersModel::where('educational_program_payment_term_uid', $paymentTermUid)
+            ->where('user_uid', auth()->user()->uid)
+            ->first();
+
+
+        if ($paymentTermUser) {
+            $paymentTermUser->order_number = generateRandomNumber(12);
+            $paymentTermUser->save();
+            return $paymentTermUser;
+        }
+
+        $paymentTermUser = EducationalProgramsPaymentTermsUsersModel::create([
+            "uid" => generate_uuid(),
+            "educational_program_payment_term_uid" => $paymentTermUid,
+            "user_uid" => auth()->user()->uid,
+            "order_number" => generateRandomNumber(12),
+        ]);
+
+        return $paymentTermUser;
     }
 
     public function accessCourse(Request $request)

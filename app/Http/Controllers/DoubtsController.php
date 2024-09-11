@@ -115,7 +115,7 @@ class DoubtsController extends Controller
         ])->first();
 
         if (!$educational_program) {
-            return response()->json(['message' => 'El programa educativo no existe'], 404);
+            return response()->json(['message' => 'El programa formativo no existe'], 404);
         }
 
         $emails_to_send = $this->extractEmails($educational_program);

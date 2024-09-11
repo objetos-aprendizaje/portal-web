@@ -40,6 +40,7 @@ class Kernel extends HttpKernel
             //\App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\GeneralNotificationsUserMiddleware::class,
+
         ],
 
         'api' => [
@@ -78,5 +79,6 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'combined.auth' => \App\Http\Middleware\CombinedAuthMiddleware::class,
         'verifyApiKey' => \App\Http\Middleware\VerifyApiKey::class,
+        'policies' => \App\Http\Middleware\UserPoliciesMiddleware::class,
     ];
 }

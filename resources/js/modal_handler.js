@@ -35,3 +35,44 @@ export function hideModal(modalId) {
         document.body.classList.remove('modal-open');
     }, 300);
 }
+
+export function showModalConfirmation(title, description, action, params) {
+    return new Promise((resolve) => {
+        const confirmationModal = document.getElementById("confirmation-modal");
+
+        confirmationModal.querySelector("#modal-title").textContent = title;
+        confirmationModal.querySelector("#modal-description").textContent =
+            description;
+        confirmationModal.setAttribute("data-action", action);
+
+        const paramsContainer = confirmationModal.querySelector(".params");
+        paramsContainer.innerHTML = "";
+
+        if (params && params.length) {
+            params.forEach((param) => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.className = param.key;
+                input.value = param.value;
+                paramsContainer.appendChild(input);
+            });
+        }
+
+        // Asociar los eventos para los botones de Confirmar y Cancelar
+        confirmationModal
+            .querySelector("#confirm-button")
+            .addEventListener("click", function () {
+                resolve(true);
+                hideModal("confirmation-modal");
+            });
+
+        confirmationModal
+            .querySelector("#cancel-button")
+            .addEventListener("click", function () {
+                resolve(false);
+                hideModal("confirmation-modal");
+            });
+
+        showModal("confirmation-modal");
+    });
+}

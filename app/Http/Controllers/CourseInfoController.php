@@ -13,24 +13,7 @@ class CourseInfoController extends BaseController
 {
     public function index($uid)
     {
-        $course = CoursesModel::select('courses.*', 'califications_avg.average_calification')->where('uid', $uid)->with([
-            'status', 'tags', 'teachers', 'course_type', 'paymentTerms',
-            'blocks.competences' => function ($query) {
-                $query->where('is_multi_select', 0);
-            }
-
-        ])
-            ->leftJoinSub(
-                CoursesAssessmentsModel::select('course_uid', DB::raw('ROUND(AVG(calification), 1) as average_calification'))
-                    ->groupBy('course_uid'),
-                'califications_avg', // Alias de la subconsulta
-                'califications_avg.course_uid',
-                '=',
-                'courses.uid'
-            )
-            ->first();
-
-        if (!$course) abort(404);
+        $course = $this->getCourse($uid);
 
         // Extraemos un array con las competencias
         $competences = [];
@@ -62,6 +45,28 @@ class CourseInfoController extends BaseController
         return response()->json([
             'calification' => $calification_number
         ]);
+    }
+
+    private function getCourse($uid) {
+        $course = CoursesModel::select('courses.*', 'califications_avg.average_calification')->where('uid', $uid)->with([
+            'status', 'tags', 'teachers', 'course_type', 'paymentTerms',
+            'blocks.competences' => function ($query) {
+                $query->where('is_multi_select', 0);
+            }
+        ])
+            ->leftJoinSub(
+                CoursesAssessmentsModel::select('course_uid', DB::raw('ROUND(AVG(calification), 1) as average_calification'))
+                    ->groupBy('course_uid'),
+                'califications_avg', // Alias de la subconsulta
+                'califications_avg.course_uid',
+                '=',
+                'courses.uid'
+            )
+            ->first();
+
+        if (!$course) abort(404);
+
+        return $course;
     }
 
 

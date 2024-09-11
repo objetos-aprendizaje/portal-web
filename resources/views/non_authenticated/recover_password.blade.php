@@ -22,7 +22,7 @@
                         <div class="mb-[25px]">
                             <div class="flex flex-col mb-[20px]">
                                 <label class="px-3 mb-[8px]">Correo</label>
-                                <input
+                                <input aria-label="email"
                                     class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[60px]"
                                     type="text" name="email" />
                             </div>
@@ -60,7 +60,7 @@
 
                     <div class="flex flex-col mb-[20px]">
                         <label class="px-3 mb-[8px]">Correo</label>
-                        <input
+                        <input aria-label="email"
                             class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[60px]"
                             type="text" name="email" />
                     </div>

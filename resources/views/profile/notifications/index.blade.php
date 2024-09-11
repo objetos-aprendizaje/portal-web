@@ -1,4 +1,4 @@
-@extends('profile.layouts.app')
+@extends('layouts.app')
 @section('content')
     <div class="poa-container">
         <h3>Configuración de notificaciones generales</h3>

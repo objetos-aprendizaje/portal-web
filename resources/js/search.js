@@ -285,6 +285,7 @@ function initializeTreeSelect() {
         isIndependentNodes: true,
         iconElements: {},
         placeholder: "Categorías",
+        ariaLabel: "categorias",
 
         inputCallback: function (categories) {
             selectedCategories = categories;
@@ -304,6 +305,7 @@ function initializeTreeSelect() {
         iconElements: {},
         placeholder: "Competencias",
         value: [],
+        ariaLabel: "competencias",
         inputCallback: function (competences) {
             selectedCompetences = competences;
             searchLearningObjects();
@@ -562,19 +564,31 @@ function fillLearningObjectsContainer(
                 learning_object.realization_start_date
             )} - ${formatDate(learning_object.realization_finish_date)}`;
 
-            const classIndicator =
-                learning_object.status_code == "ACCEPTED_PUBLICATION"
-                    ? "soon"
-                    : "openned";
+            let classIndicator = "";
+            if (
+                ["DEVELOPMENT", "ENROLLING", "FINISHED"].includes(
+                    learning_object.status_code
+                )
+            ) {
+                classIndicator = "soon";
+            } else {
+                classIndicator = "openned";
+            }
 
             templateCloned
                 .querySelector(".learning-object-status-indicator")
                 .classList.add(classIndicator);
 
-            const textIndicator =
-                learning_object.status_code == "ACCEPTED_PUBLICATION"
-                    ? "Próximamente"
-                    : "En inscripción";
+            const statusTextMap = {
+                INSCRIPTION: "En inscripción",
+                DEVELOPMENT: "En realización",
+                ENROLLING: "En matriculación",
+                FINISHED: "Finalizado",
+            };
+
+            let textIndicator =
+                statusTextMap[learning_object.status_code] || "";
+
             templateCloned.querySelector(
                 ".learning-object-status-text"
             ).innerHTML = textIndicator;

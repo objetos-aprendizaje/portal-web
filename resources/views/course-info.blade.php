@@ -68,16 +68,17 @@
             <div class="lg:min-w-[475px] lg:max-w-[475px] mb-[31px] lg:mb-0">
 
                 <div class="shadow-xl pb-[20px] mb-[50px]">
-                    <img class="mb-[30px] w-full h-[425px]"
+                    <img alt="{{ $course->title }}" class="mb-[30px] w-full h-[425px]"
                         src="{{ $course->image_path ? env('BACKEND_URL') . '/' . $course->image_path : '/images/articulo0.png' }}">
 
-                    <div class="text-center mb-[30px]">
-                        <a class="no-effect-hover" href="/cart/course/{{ $course->uid }}">
-                            <button type="button" class="btn btn-primary">Inscribirme ahora
-                                {{ e_heroicon('chevron-right', 'outline') }}</button>
-                        </a>
-                    </div>
-
+                    @if ($course->status->code == 'INSCRIPTION')
+                        <div class="text-center mb-[30px]">
+                            <a class="no-effect-hover" href="/cart/course/{{ $course->uid }}">
+                                <button type="button" class="btn btn-primary">Inscribirme ahora
+                                    {{ e_heroicon('chevron-right', 'outline') }}</button>
+                            </a>
+                        </div>
+                    @endif
 
                     <div class="px-[20px]">
                         <div class="flex justify-between items-center">

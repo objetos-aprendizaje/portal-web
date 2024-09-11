@@ -138,8 +138,14 @@ function guzzle_call($url, $data = null, $headers = null, $method = 'GET')
     }
 }
 
-function generateRedsysObject($amount, $orderNumber, $merchantData, $description = null)
+function generateRedsysObject($amount, $orderNumber, $merchantData, $description = null, $urlOk = null, $urlKo = null)
 {
+
+    // Comprobamos si los pagos están activos
+    if (!app('general_options')['payment_gateway']) {
+        throw new \Exception('Ha ocurrido un error. Por favor, contacte con el administrador de la plataforma');
+    }
+
     // Preparamos el objeto de la API de Redsys
     $miObj = new RedsysAPI;
 
@@ -159,8 +165,8 @@ function generateRedsysObject($amount, $orderNumber, $merchantData, $description
         $miObj->setParameter("DS_MERCHANT_PRODUCTDESCRIPTION", $description);
     }
 
-    $miObj->setParameter("DS_MERCHANT_URLOK", route('index'));
-    $miObj->setParameter("DS_MERCHANT_URLKO", route('error', ['code' => '001']));
+    $miObj->setParameter("DS_MERCHANT_URLOK", $urlOk ?? route('index'));
+    $miObj->setParameter("DS_MERCHANT_URLKO", $urlKo ?? route('error', ['code' => '001']));
 
     //Datos de configuración
     $version = "HMAC_SHA256_V1";

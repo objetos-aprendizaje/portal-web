@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoriesModel;
 use App\Models\CoursesAssessmentsModel;
-use App\Models\CoursesBigCarrouselsApprovalsModel;
 use App\Models\CoursesModel;
-use App\Models\CoursesSmallCarrouselsApprovalsModel;
 use App\Models\EducationalProgramsAssessmentsModel;
 use App\Models\EducationalProgramsModel;
 use App\Models\EducationalResourcesAssessmentsModel;
@@ -27,15 +25,34 @@ class HomeController extends BaseController
 
         $featured_courses = $this->getFeaturedCourses();
 
+        $featuredEducationalPrograms = $this->getFeaturedEducationalPrograms();
+
         $educational_resources = $this->getEducationalResources();
 
         $categories = $this->getCategories();
 
+        // Cursos y programas a destacar en el slider
+        $featuredCoursesSlider = $featured_courses->filter(function ($course) {
+            return $course->featured_big_carrousel && $course->featured_big_carrousel_approved;
+        });
+
+        $featuredEducationalProgramsSlider = $featuredEducationalPrograms->filter(function ($program) {
+            return $program->featured_slider && $program->featured_slider_approved;
+        });
+
+        // Cursos y programas a destacar en el carrousel
+        $featuredCoursesCarrousel = $featured_courses->filter(function ($course) {
+            return $course->featured_small_carrousel && $course->featured_small_carrousel_approved;
+        });
+
+        $featuredEducationalProgramsCarrousel = $featuredEducationalPrograms->filter(function ($program) {
+            return $program->featured_main_carrousel && $program->featured_main_carrousel_approved;
+        });
+
+        // Combina los cursos y programas destacados en el carrousel destacado
+        $featuredLearningObjectsCarrousel = $featuredCoursesCarrousel->merge($featuredEducationalProgramsCarrousel);
+
         $lanes_preferences = $this->getLanesPreferences();
-
-        $filtered_courses_carrousel = $this->filterFeaturedCoursesCarrousel($featured_courses);
-
-        $featuredEducationalPrograms = $this->getFeaturedEducationalPrograms();
 
         $sliderPrevisualization = $this->getPrevisualizationSlider();
 
@@ -50,10 +67,14 @@ class HomeController extends BaseController
             'general_options' => $general_options,
             'educational_resources' => $educational_resources,
             "categories" => $categories,
-            "lanes_preferences" => $lanes_preferences,
-            "filtered_courses_carrousel" => $filtered_courses_carrousel,
+            "featuredCoursesSlider" => $featuredCoursesSlider,
+            "featuredCoursesCarrousel" => $featuredCoursesCarrousel,
+            "featuredEducationalProgramsSlider" => $featuredEducationalProgramsSlider,
+            "featuredEducationalProgramsCarrousel" => $featuredEducationalProgramsCarrousel,
             "featuredEducationalPrograms" => $featuredEducationalPrograms,
-            "sliderPrevisualization" => $sliderPrevisualization
+            "lanes_preferences" => $lanes_preferences,
+            "sliderPrevisualization" => $sliderPrevisualization,
+            "featuredLearningObjectsCarrousel" => $featuredLearningObjectsCarrousel,
         ]);
     }
 
@@ -107,37 +128,45 @@ class HomeController extends BaseController
                 '=',
                 'educational_programs.uid'
             )
-            ->with('courses')
             ->addSelect([
                 'total_ects_workload' => CoursesModel::select(DB::raw('SUM(ects_workload)'))
                     ->whereColumn('educational_program_uid', 'educational_programs.uid')
             ])
+            ->with("status")
             ->whereHas('status', function ($query) {
-                $query->where('code', 'INSCRIPTION');
+                $query->whereIn('code', ['ACCEPTED_PUBLICATION', 'INSCRIPTION']);
             })
-            ->get();
+            ->select(
+                "uid",
+                "educational_program_status_uid",
+                "name as title",
+                "image_path",
+                "description",
+                "inscription_start_date",
+                "inscription_finish_date",
+                "realization_start_date",
+                "realization_finish_date",
+                "average_calification",
+                "featured_main_carrousel",
+                "featured_main_carrousel_approved",
+                "featured_slider",
+                "featured_slider_approved",
+                "featured_slider_image_path",
+                "featured_slider_title",
+                "featured_slider_description",
+                "featured_slider_color_font"
+            )
+            ->addSelect([
+                'ects_workload' => CoursesModel::select(DB::raw('SUM(ects_workload)'))
+                    ->whereColumn('educational_program_uid', 'educational_programs.uid')
+            ])
+            ->get()
+            ->map(function ($program) {
+                $program->type = 'educationalProgram';
+                return $program;
+            });
 
         return $featuredEducationalPrograms;
-    }
-
-    private function filterFeaturedCoursesCarrousel($featured_courses)
-    {
-        $coursesBigCarrouselApprovals = CoursesBigCarrouselsApprovalsModel::all()->pluck('course_uid')->toArray();
-        $coursesSmallCarrouselApprovals = CoursesSmallCarrouselsApprovalsModel::all()->pluck('course_uid')->toArray();
-
-        $filtered_courses_carrousel = array_reduce($featured_courses->toArray(), function ($carry, $course) use ($coursesBigCarrouselApprovals, $coursesSmallCarrouselApprovals) {
-            if ($course['featured_small_carrousel'] && in_array($course['uid'], $coursesSmallCarrouselApprovals)) {
-                $carry['small_carrousel'][] = $course;
-            }
-
-            if ($course['featured_big_carrousel'] && in_array($course['uid'], $coursesBigCarrouselApprovals)) {
-                $carry['big_carrousel'][] = $course;
-            }
-
-            return $carry;
-        }, ['small_carrousel' => [], 'big_carrousel' => []]);
-
-        return $filtered_courses_carrousel;
     }
 
     private function getLanesPreferences()
@@ -146,18 +175,17 @@ class HomeController extends BaseController
         if (Auth::check()) {
             $lanes_preferences = UserLanesModel::where('user_uid', Auth::user()->uid)->get()->pluck('active', 'code')->toArray();
 
-            if(!isset($lanes_preferences['courses'])) {
+            if (!isset($lanes_preferences['courses'])) {
                 $lanes_preferences['courses'] = true;
             }
 
-            if(!isset($lanes_preferences['resources'])) {
+            if (!isset($lanes_preferences['resources'])) {
                 $lanes_preferences['resources'] = true;
             }
 
-            if(!isset($lanes_preferences['programs'])) {
+            if (!isset($lanes_preferences['programs'])) {
                 $lanes_preferences['programs'] = true;
             }
-
         }
 
         if (!$lanes_preferences) {
@@ -226,10 +254,14 @@ class HomeController extends BaseController
                 'courses.uid'
             )->with('status')
             ->whereHas('status', function ($query) {
-                $query->where('code', 'INSCRIPTION');
+                $query->whereIn('code', ['ACCEPTED_PUBLICATION', 'INSCRIPTION']);
             })
             ->orderBy('califications_avg.average_calification', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($course) {
+                $course->type = 'course';
+                return $course;
+            });
 
         return $featured_courses;
     }

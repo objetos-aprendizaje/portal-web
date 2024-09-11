@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,12 +39,6 @@
 </head>
 
 <body>
-    @if ($errors->any())
-        @foreach ($errors->all() as $error)
-            {{ $error }}
-        @endforeach
-    @endif
-
     @if (session('success'))
         @foreach (session('success') as $message)
             {{ $message }}
@@ -52,6 +46,8 @@
     @endif
 
     @yield('content')
+
+    @include('partials.loading')
 
 </body>
 

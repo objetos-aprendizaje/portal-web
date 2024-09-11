@@ -84,7 +84,7 @@
                                     <h5>Tipo de licencia</h5>
                                 </div>
                                 <div>
-                                    <p>{{ $educational_resource->license_type ?? 'Ninguna' }}</p>
+                                    <p>{{ $educational_resource->licenseType->name ?? 'Ninguna' }}</p>
                                 </div>
                             </div>
 

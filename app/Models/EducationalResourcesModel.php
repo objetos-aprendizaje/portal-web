@@ -47,4 +47,9 @@ class EducationalResourcesModel extends Model
             'uid'
         );
     }
+
+    public function licenseType()
+    {
+        return $this->belongsTo(LicenseTypesModel::class, 'license_type_uid', 'uid');
+    }
 }

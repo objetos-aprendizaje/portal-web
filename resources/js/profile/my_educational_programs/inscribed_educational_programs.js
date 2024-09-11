@@ -5,8 +5,15 @@ import {
     updatePagination,
     handlePagination,
     accordionControls,
+    fillRedsysForm,
+    downloadFileBackend,
+    moreOptionsBtnHandler,
 } from "../../app.js";
-import { hideModal, showModal } from "../../modal_handler.js";
+import {
+    hideModal,
+    showModal,
+    showModalConfirmation,
+} from "../../modal_handler.js";
 
 let educationalProgramsDocuments = [];
 document.addEventListener("DOMContentLoaded", function () {
@@ -14,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     initHandlers();
     updateInputFile();
     handlePaginationEducationalPrograms();
+    moreOptionsBtnHandler();
 });
 
 function handlePaginationEducationalPrograms() {
@@ -22,14 +30,15 @@ function handlePaginationEducationalPrograms() {
     );
 
     handlePagination(containerPagination, (pageNumber) => {
-        console.log(pageNumber)
         const search = getSearchInput();
         getInscribedEducationalPrograms(pageNumber, undefined, search);
     });
 }
 
 function getSearchInput() {
-    const search = document.getElementById("search-educational-program-input").value;
+    const search = document.getElementById(
+        "search-educational-program-input"
+    ).value;
     return search;
 }
 
@@ -66,6 +75,19 @@ function initHandlers() {
             const educationalProgramUid =
                 event.target.dataset.educational_program_uid;
             enrollEducationalProgram(educationalProgramUid);
+        } else if (classClicked.contains("cancel-inscription-btn")) {
+            const educationalProgramUid =
+                event.target.closest(".more-options-btn").dataset
+                    .educational_program_uid;
+
+            showModalConfirmation(
+                "Cancelar inscripción",
+                "Vas a cancelar la inscripción a este programa formativo. ¿Deseas continuar?",
+                "cancelInscription",
+                []
+            ).then((resultado) => {
+                if (resultado) cancelInscription(educationalProgramUid);
+            });
         }
     });
 
@@ -75,8 +97,27 @@ function initHandlers() {
 }
 
 function handleSearchEducationalPrograms() {
-    const search = document.getElementById("search-educational-program-input").value;
+    const search = document.getElementById(
+        "search-educational-program-input"
+    ).value;
     getInscribedEducationalPrograms(1, 3, search);
+}
+
+function cancelInscription(educationalProgramUid) {
+    const params = {
+        method: "POST",
+        url: "/profile/my_educational_programs/inscribed/cancel_inscription",
+        body: {
+            educationalProgramUid: educationalProgramUid,
+        },
+        stringify: true,
+        loader: true,
+        toast: true,
+    };
+
+    apiFetch(params).then(() => {
+        getInscribedEducationalPrograms();
+    });
 }
 
 function saveDocumentsCourse() {
@@ -116,14 +157,72 @@ function enrollEducationalProgram(educationalProgramUid) {
     });
 }
 
-function fillRedsysForm(parametersRedsys) {
-    document.getElementById("Ds_SignatureVersion").value =
-        parametersRedsys.Ds_SignatureVersion;
-    document.getElementById("Ds_MerchantParameters").value =
-        parametersRedsys.Ds_MerchantParameters;
-    document.getElementById("Ds_Signature").value =
-        parametersRedsys.Ds_Signature;
-    document.getElementById("tpv_redsys_form").submit();
+function setPaymentTerms(template, course) {
+    // Mostrar el contenedor de términos de pago
+    const paymentTermsContainer = template.querySelector(
+        ".payment-terms-container"
+    );
+    paymentTermsContainer.classList.remove("hidden");
+
+    // Obtener la plantilla de términos de pago
+    const paymentTermsTemplate = document.getElementById("payment-terms");
+
+    // Iterar sobre los términos de pago del curso
+    course.payment_terms.forEach((paymentTerm) => {
+        // Clonar la plantilla de términos de pago
+        const paymentTermsCloned = paymentTermsTemplate.content.cloneNode(true);
+
+        // Rellenar los datos del término de pago
+        const paymentTermsNames =
+            paymentTermsCloned.querySelectorAll(".payment-term-name");
+        paymentTermsNames.forEach((paymentTermName) => {
+            paymentTermName.textContent = paymentTerm.name;
+        });
+
+        paymentTermsCloned.querySelector(
+            ".payment-term-date"
+        ).textContent = `${getDateShort(
+            paymentTerm.start_date
+        )} - ${getDateShort(paymentTerm.finish_date)}`;
+
+        paymentTermsCloned.querySelector(
+            ".payment-term-date-mobile"
+        ).textContent = `${formatDate(paymentTerm.start_date)} - ${formatDate(
+            paymentTerm.finish_date
+        )}`;
+
+        const paymentTermsCosts =
+            paymentTermsCloned.querySelectorAll(".payment-term-cost");
+        paymentTermsCosts.forEach((paymentTermCost) => {
+            paymentTermCost.textContent = paymentTerm.cost;
+        });
+
+        const startDate = new Date(paymentTerm.start_date);
+        const finishDate = new Date(paymentTerm.finish_date);
+        const currentDate = new Date();
+
+        if (paymentTerm.user_payment) {
+            const paymentTermsLabels = paymentTermsCloned.querySelectorAll(
+                ".payment-term-label"
+            );
+            paymentTermsLabels.forEach((paymentTermLabel) => {
+                paymentTermLabel.classList.remove("hidden");
+            });
+        } else if (startDate < currentDate && finishDate > currentDate) {
+            const payTermsBtns =
+                paymentTermsCloned.querySelectorAll(".pay-term-btn");
+
+            payTermsBtns.forEach((payTermBtn) => {
+                payTermBtn.classList.remove("hidden");
+                payTermBtn.dataset.payment_term_uid = paymentTerm.uid;
+            });
+        }
+
+        // Añadir el término de pago clonado al contenedor
+        paymentTermsContainer
+            .querySelector(".payment-terms-list")
+            .appendChild(paymentTermsCloned);
+    });
 }
 
 function getInscribedEducationalPrograms(
@@ -231,12 +330,20 @@ function fillEducationalProgramTemplate(template, educationalProgram) {
     setEducationalProgramDocumentsBtn(template, educationalProgram);
     setEducationalProgramEnrollingBtn(template, educationalProgram);
     setIndicatorsStatuses(template, educationalProgram);
+
+    if (educationalProgram.payment_mode == "INSTALLMENT_PAYMENT") {
+        setPaymentTerms(template, educationalProgram);
+    }
 }
 
 function fillEducationalProgramDetails(template, educationalProgram) {
     template.querySelector(".educational-program-uid").value =
         educationalProgram.uid;
-    template.querySelector(".title").innerHTML = educationalProgram.name;
+
+    template.querySelectorAll(".title").forEach((title) => {
+        title.innerHTML = educationalProgram.name;
+    });
+
     template.querySelector(".image").src =
         window.backendUrl + "/" + educationalProgram.image_path;
 
@@ -272,6 +379,10 @@ function fillEducationalProgramDetails(template, educationalProgram) {
 
     template.querySelector(
         ".documentation-btn"
+    ).dataset.educational_program_uid = educationalProgram.uid;
+
+    template.querySelector(
+        ".more-options-btn"
     ).dataset.educational_program_uid = educationalProgram.uid;
 }
 
@@ -334,6 +445,44 @@ function setEducationalProgramEnrollingBtn(template, educationalProgram) {
 }
 
 function setIndicatorsStatuses(template, educationalProgram) {
+    if (educationalProgram.validate_student_registrations) {
+        setIndicatorStudentStatus(template, educationalProgram);
+    } else {
+        setIndicatorEducationalProgramStatus(template, educationalProgram);
+    }
+}
+
+function setIndicatorStudentStatus(template, educationalProgram) {
+    template
+        .querySelector(".indicator-student-status-section")
+        .classList.remove("hidden");
+
+    let indicatorStudentStatus = template.querySelector(
+        ".indicator-student-status"
+    );
+
+    let indicatorStudentStatusLabel = template.querySelector(
+        ".indicator-student-status-label"
+    );
+
+    if (educationalProgram.pivot.acceptance_status === "ACCEPTED") {
+        indicatorStudentStatus.classList.add("openned");
+        indicatorStudentStatusLabel.innerHTML = "Aprobado";
+        setIndicatorEducationalProgramStatus(template, educationalProgram);
+    } else if (educationalProgram.pivot.acceptance_status === "PENDING") {
+        indicatorStudentStatus.classList.add("pending");
+        indicatorStudentStatusLabel.innerHTML = "Pendiente de aprobación";
+    } else if (educationalProgram.pivot.acceptance_status === "REJECTED") {
+        indicatorStudentStatus.classList.add("soon");
+        indicatorStudentStatusLabel.innerHTML = "No aprobado";
+    }
+}
+
+function setIndicatorEducationalProgramStatus(template, educationalProgram) {
+    template
+        .querySelector(".indicator-educational-program-status-section")
+        .classList.remove("hidden");
+
     let indicatorEducationalProgramStatus = template.querySelector(
         ".indicator-educational-program-status"
     );
@@ -341,6 +490,7 @@ function setIndicatorsStatuses(template, educationalProgram) {
     let indicatorEducationalProgramStatusLabel = template.querySelector(
         ".indicator-educational-program-status-label"
     );
+
     if (educationalProgram.status.code == "ENROLLING") {
         indicatorEducationalProgramStatus.classList.add("openned");
         indicatorEducationalProgramStatusLabel.innerHTML =
@@ -349,31 +499,6 @@ function setIndicatorsStatuses(template, educationalProgram) {
         indicatorEducationalProgramStatus.classList.add("pending");
         indicatorEducationalProgramStatusLabel.innerHTML =
             "Pendiente de matriculación";
-    }
-
-    if (educationalProgram.validate_student_registrations) {
-        template
-            .querySelector(".indicator-student-status-section")
-            .classList.remove("hidden");
-
-        let indicatorStudentStatus = template.querySelector(
-            ".indicator-student-status"
-        );
-
-        let indicatorStudentStatusLabel = template.querySelector(
-            ".indicator-student-status-label"
-        );
-
-        if (educationalProgram.pivot.acceptance_status === "ACCEPTED") {
-            indicatorStudentStatus.classList.add("openned");
-            indicatorStudentStatusLabel.innerHTML = "Aprobado";
-        } else if (educationalProgram.pivot.acceptance_status === "PENDING") {
-            indicatorStudentStatus.classList.add("pending");
-            indicatorStudentStatusLabel.innerHTML = "Pendiente de aprobación";
-        } else if (educationalProgram.pivot.acceptance_status === "REJECTED") {
-            indicatorStudentStatus.classList.add("soon");
-            indicatorStudentStatusLabel.innerHTML = "No aprobado";
-        }
     }
 }
 
@@ -441,6 +566,11 @@ function fillDocumentTemplate(template, document) {
     return template;
 }
 
+/**
+ *
+ * @param {*} documentUid
+ * creación del token para la descarga del documento
+ */
 function downloadDocumentEducationalProgram(documentUid) {
     const params = {
         method: "POST",
@@ -449,9 +579,10 @@ function downloadDocumentEducationalProgram(documentUid) {
             educational_program_document_uid: documentUid,
         },
         stringify: true,
-        download: true,
         loader: true,
     };
 
-    apiFetch(params);
+    apiFetch(params).then((response) => {
+        downloadFileBackend(response.token);
+    });
 }

@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Webhooks;
 
+use App\Exceptions\OperationFailedException;
 use App\Libraries\RedsysAPI;
 use App\Models\CoursesPaymentsModel;
+use App\Models\CoursesPaymentTermsUsersModel;
 use App\Models\CoursesStudentsModel;
 use App\Models\EducationalProgramsPaymentsModel;
+use App\Models\EducationalProgramsPaymentTermsUsersModel;
 use App\Models\EducationalProgramsStudentsModel;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
@@ -29,10 +32,14 @@ class ProcessPaymentRedsys extends BaseController
 
         $decodedData = $this->decodeData($data);
 
-        $order_number = $decodedData->Ds_Order;
-        $learning_object_type = $decodedData->Ds_MerchantData;
+        // Si el pago ha sido denegado
+        $this->validatePayment($decodedData);
 
-        $this->processPayment($learning_object_type, $order_number, $decodedData);
+        // Datos de pago. Si es de curso o programa formativo y si es plazo o pago único
+        $paymentData = json_decode(urldecode($decodedData->Ds_MerchantData));
+        $order_number = $decodedData->Ds_Order;
+
+        $this->processPayment($paymentData, $order_number, $decodedData);
 
         return response()->json(["message" => "OK"]);
     }
@@ -43,15 +50,44 @@ class ProcessPaymentRedsys extends BaseController
         return json_decode($decodedData);
     }
 
-    private function processPayment($learning_object_type, $order_number, $decodedData)
+    // Si el pago ha sido denegado
+    private function validatePayment($decodedData)
     {
-        DB::transaction(function () use ($learning_object_type, $order_number, $decodedData) {
-            if ($learning_object_type == "course") {
-                $this->saveCourseEnrolled($order_number, $decodedData);
-            } else if ($learning_object_type == "educational_program") {
-                $this->saveEducationalProgramEnrolled($order_number, $decodedData);
+        $dsResponse = intval($decodedData->Ds_Response);
+        if ($dsResponse > 99) throw new OperationFailedException("Error en el pago", 406);
+    }
+
+
+    private function processPayment($paymentData, $order_number, $decodedData)
+    {
+        DB::transaction(function () use ($paymentData, $order_number, $decodedData) {
+            if ($paymentData->learningObjectType == "course") {
+                if ($paymentData->paymentType == "singlePayment") {
+                    $this->saveCourseEnrolled($order_number, $decodedData);
+                } else if ($paymentData->paymentType == "paymentTerm") {
+                    $this->savePaymentTerm($order_number, $decodedData, "course");
+                }
+            } else if ($paymentData->learningObjectType == "educationalProgram") {
+                if ($paymentData->paymentType == "singlePayment") {
+                    $this->saveEducationalProgramEnrolled($order_number, $decodedData);
+                } else if ($paymentData->paymentType == "paymentTerm") {
+                    $this->savePaymentTerm($order_number, $decodedData, "educationalProgram");
+                }
             }
         });
+    }
+
+    private function savePaymentTerm($orderNumber, $decodedData, $learningObjectType)
+    {
+        $model = $learningObjectType == "course" ? CoursesPaymentTermsUsersModel::class : EducationalProgramsPaymentTermsUsersModel::class;
+
+        $paymentTerm = $model::where('order_number', $orderNumber)->first();
+
+        if ($paymentTerm->is_paid) return;
+        $paymentTerm->is_paid = true;
+        $paymentTerm->info = json_encode($decodedData);
+        $paymentTerm->payment_date = now();
+        $paymentTerm->save();
     }
 
     private function saveCourseEnrolled($orderNumber, $decodedData)

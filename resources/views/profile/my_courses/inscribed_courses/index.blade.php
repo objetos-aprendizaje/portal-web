@@ -1,4 +1,4 @@
-@extends('profile.layouts.app')
+@extends('layouts.app')
 @section('content')
     <div class="poa-container">
 
@@ -47,9 +47,23 @@
             </div>
 
             <div class="flex-grow w-full ">
-                <a class="course-link" href="#">
-                    <h2 class="title line-clamp line-clamp-2 mb-[12px]"></h2>
-                </a>
+                <div class="flex justify-between gap-1">
+                    <a class="course-link" href="#">
+                        <div class="hidden lg:block">
+                            <h2 class="title line-clamp line-clamp-2 mb-[12px] text-color_1"></h2>
+                        </div>
+
+                        <div class="lg:hidden block">
+                            <h5 class="title line-clamp line-clamp-2 mb-[12px] text-color_1"></h5>
+                        </div>
+                    </a>
+
+                    <div class="lg:hidden relative more-options-btn">
+                        <div class="cursor-pointer">
+                            {{ e_heroicon('ellipsis-vertical', 'outline') }}
+                        </div>
+                    </div>
+                </div>
 
                 <div class="mb-[12px]">
                     <section class="enrolling-dates-section hidden">
@@ -67,12 +81,14 @@
                     </p>
                 </div>
 
-                <div class="flex gap-[19px]">
+                <div class="flex lg:gap-[19px] lg:flex-row flex-col">
                     <div>
-                        <div class="block-status">
-                            <div class="indicator-course-status indicator"></div>
-                            <div class="indicator-course-status-label text-[14px] text-color_4">En matriculación</div>
-                        </div>
+                        <section class="indicator-course-status-section hidden">
+                            <div class="block-status">
+                                <div class="indicator-course-status indicator"></div>
+                                <div class="indicator-course-status-label text-[14px] text-color_4"></div>
+                            </div>
+                        </section>
 
                         <section class="indicator-student-status-section hidden">
                             <div class="block-status">
@@ -96,7 +112,22 @@
             <div class="border-t-[1px] lg:border-l-[1px] border-dashed w-full lg:w-auto lg:h-3/4"></div>
 
             <div
-                class="h-full flex-none w-full lg:w-[180px] xl:w-[335px] flex flex-col lg:pr-[18px] lg:py-[8px] gap-[10px] justify-center">
+                class="relative h-full flex-none w-full lg:w-[180px] xl:w-[335px] flex flex-col lg:pr-[18px] lg:py-[8px] gap-[10px] justify-center">
+
+                <div class="absolute top-[8px] right-[8px] hidden lg:block more-options-btn">
+                    <div class="cursor-pointer">
+                        {{ e_heroicon('ellipsis-vertical', 'outline') }}
+                    </div>
+                    <div
+                        class="absolute right-[8px] top-[30px] p-[12px] bg-white rounded-[8px] shadow-lg hidden options-list">
+                        <ul>
+                            <li
+                                class="cancel-inscription-btn select-none p-[10px] hover:bg-[#2b4c7e0d] rounded-[8px] cursor-pointer whitespace-nowrap">
+                                Cancelar inscripción</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <div class="w-full">
                     <input type="hidden" name="course_uid" class="course_uid" value="">
                     <button type="button" class="btn btn-primary w-full btn-action-course">Matricularse</button>
@@ -112,7 +143,17 @@
         </div>
     </template>
 
+    <template id="options-list">
+        <div class="absolute right-[8px] top-[30px] p-[12px] bg-white rounded-[8px] shadow-lg options-list">
+            <ul>
+                <li
+                    class="cancel-inscription-btn select-none p-[10px] hover:bg-[#2b4c7e0d] rounded-[8px] cursor-pointer whitespace-nowrap">
+                    Cancelar inscripción</li>
+            </ul>
+        </div>
+    </template>
 
+    @include('profile.partials.modal-confirmation')
     @include('profile.partials.upload-documents-modal')
-    @include('profile.my_courses.redsys')
+    @include('profile.partials.redsys')
 @endsection

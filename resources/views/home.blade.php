@@ -26,28 +26,44 @@
                 'colorFont' => $general_options['main_slider_color_font'],
             ])
 
-            <!-- SLIDERS DE CURSOS -->
-            @foreach ($filtered_courses_carrousel['big_carrousel'] as $course)
+            <!-- SLIDERS DE CURSOS Y PROGRAMAS FORMATIVOS -->
+            @foreach ($featuredCoursesSlider as $course)
                 @include('partials.slider', [
                     'image_path' => env('BACKEND_URL') . '/' . $course['featured_big_carrousel_image_path'],
                     'title' => $course['featured_big_carrousel_title'],
                     'description' => $course['featured_big_carrousel_description'],
                     'registerButton' => true,
-                    'colorFont' => $general_options['main_slider_color_font'],
+                    'registerLink' => "/course/" . $course->uid,
+                    'colorFont' => $course['featured_slider_color_font'],
+                ])
+            @endforeach
+
+            @foreach ($featuredEducationalProgramsSlider as $educationalProgram)
+                @include('partials.slider', [
+                    'image_path' => env('BACKEND_URL') . '/' . $educationalProgram['featured_slider_image_path'],
+                    'title' => $educationalProgram['featured_slider_title'],
+                    'description' => $educationalProgram['featured_slider_description'],
+                    'registerButton' => true,
+                    'registerLink' => "/educational_program/" . $educationalProgram->uid,
+                    'colorFont' => $educationalProgram['featured_slider_color_font'],
                 ])
             @endforeach
 
             <!-- Next and previous buttons -->
-            <a class="prev">&#10094;</a>
-            <a class="next">&#10095;</a>
+            <a title="anterior" class="prev">
+                {{e_heroicon("chevron-left", "outline", "white", 20, 20)}}
+            </a>
+            <a title="siguiente" class="next">
+                {{e_heroicon("chevron-right", "outline", "white", 20, 20)}}
+            </a>
 
         </div>
     </div>
 
     <!-- CARROUSEL FLOTANTE -->
-    @if (!empty($filtered_courses_carrousel['small_carrousel']))
+    @if (!$featuredLearningObjectsCarrousel->isEmpty())
         <section class="floating-carrousel container mx-auto relative mb-[48px] lg:mb-[149px]">
-            <x-carrousel-component :items="$filtered_courses_carrousel['small_carrousel']" type="courses"></x-carrousel-component>
+            <x-carrousel-component :items="$featuredLearningObjectsCarrousel" type="courseOrEducationalProgram"></x-carrousel-component>
         </section>
     @endif
 
@@ -110,7 +126,7 @@
 
     <!-- BOTONES DE CONTROL -->
     <section
-        class="container mx-auto items-end  mb-[48px] lg:mb-[109px] flex gap-[26px] flex-row flex-wrap justify-center ">
+        class="container mx-auto items-end  mb-[48px] lg:mb-[110px] flex gap-[26px] flex-row flex-wrap justify-center ">
         @if ($general_options['lane_featured_courses'])
             <label id="cursoButton" class="btn-lane-home text-white">
                 <x-checkbox id="courses-lane-checkbox" label="Cursos" :classLabel="'text-white'" :checked="$lanes_preferences['courses']" />
@@ -141,14 +157,14 @@
                 </h1>
                 <div
                     class="flex gap-[10px] text-color_1 arrow-see-more items-center hover:scale-110 cursor-pointer mx-auto md:mx-0">
-                    <p class="leading-[150%] text-center text-color_1"><a href="/searcher?resources=courses">Ver todos los
+                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los objeto de aprendizaje" href="/searcher?resources=courses">Ver todos los
                             cursos</a></p>
                     {{ e_heroicon('chevron-right', 'outline', 'black') }}
                 </div>
             </div>
 
             @if (!$featured_courses->isEmpty())
-                <x-carrousel-component :items="$featured_courses" type="courses"></x-carrousel-component>
+                <x-carrousel-component :items="$featured_courses" type="courseOrEducationalProgram"></x-carrousel-component>
             @else
                 <div class="flex justify-center">
                     <h2>No hay cursos destacados</h2>
@@ -168,14 +184,14 @@
                 </h1>
                 <div
                     class="flex gap-[10px] text-color_1 arrow-see-more items-center hover:scale-110 cursor-pointer mx-auto md:mx-0">
-                    <p class="leading-[150%] text-center text-color_1"><a href="/searcher?resources=programs">Ver todos los
+                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los programas" href="/searcher?resources=programs">Ver todos los
                             programas</a></p>
                     {{ e_heroicon('chevron-right', 'outline', 'black') }}
                 </div>
             </div>
 
             @if (!$featuredEducationalPrograms->isEmpty())
-                <x-carrousel-component :items="$featuredEducationalPrograms" type="educational_programs"></x-carrousel-component>
+                <x-carrousel-component :items="$featuredEducationalPrograms" type="courseOrEducationalProgram"></x-carrousel-component>
             @else
                 <div class="flex justify-center">
                     <h2>No hay programas formativos destacados</h2>
@@ -195,7 +211,7 @@
                 </h1>
                 <div
                     class="flex gap-[10px] text-color_1 arrow-see-more items-center hover:scale-110 cursor-pointer mx-auto md:mx-0">
-                    <p class="leading-[150%] text-center text-color_1"><a href="/searcher?resources=resources">Ver todos los
+                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los recursos" href="/searcher?resources=resources">Ver todos los
                             recursos</a></p>
                     {{ e_heroicon('chevron-right', 'outline', 'black') }}
                 </div>
@@ -220,7 +236,7 @@
 
             <div class="grid lg:grid-cols-3 lg:grid-flow-row gap-[14px] lg:gap-[29px]">
                 @foreach ($categories as $category)
-                    <a class="no-effect-hover" href="/searcher?category_uid={{ $category['uid'] }}">
+                    <a title="categoría" class="no-effect-hover" href="/searcher?category_uid={{ $category['uid'] }}">
                         <div style="background-color: {{ $category['color'] }}"
                             class="flex p-[17px] gap-[17px] rounded-[8px] cursor-pointer h-[135px] items-center">
                             <img class="w-[88px] h-[88px] rounded-[4px]"
@@ -242,11 +258,13 @@
     <template id="learning-object-template">
         <div class="learning-object-block shadow-lg">
             <div class="learning-object-img-container">
-                <a class="no-effect-hover block-url" href="#"><img src="" class="learning-object-image"></a>
+                <a title="objeto de aprendizaje" class="no-effect-hover block-url" href="#"><img alt="objeto de aprendizaje" src="" class="learning-object-image"></a>
             </div>
             <div class="block-container">
                 <div class="block-container-title">
-                    <a class="no-effect-hover block-url" href="#"><h2 class="block-title"></h2></a>
+                    <a title="objeto de aprendizaje" class="no-effect-hover block-url" href="#">
+                        <h2 class="block-title"></h2>
+                    </a>
                 </div>
                 <p class="block-description block-description-small"></p>
 

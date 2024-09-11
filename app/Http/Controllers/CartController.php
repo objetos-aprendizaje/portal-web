@@ -225,7 +225,7 @@ class CartController extends BaseController
         $miObj->setParameter("DS_MERCHANT_MERCHANTURL", route('webhook_process_payment_redsys'));
 
         if ($learning_object_type == "course") $description = "COMPRA DE CURSO";
-        else if ($learning_object_type == "educational_program") $description = "COMPRA DE PROGRAMA EDUCATIVO";
+        else if ($learning_object_type == "educational_program") $description = "COMPRA DE PROGRAMA FORMATIVO";
 
         $miObj->setParameter("DS_MERCHANT_PRODUCTDESCRIPTION", $description);
 

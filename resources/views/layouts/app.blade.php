@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,13 @@
         @endif
     </title>
 
-    @vite(['resources/css/app.css', 'resources/scss/app.scss', 'resources/js/app.js', 'resources/js/carrousel.js', 'resources/css/toastify.css', 'resources/js/header.js', 'resources/js/modal_handler.js'])
+    @vite(['resources/css/app.css', 'resources/scss/app.scss', 'resources/js/app.js', 'resources/css/toastify.css', 'resources/js/header.js', 'resources/js/modal_handler.js'])
+
+
+    @if (Request::is('profile*'))
+        @vite(['resources/js/profile/menu.js'])
+    @endif
+
 
     @if (Auth::check())
         @vite(['resources/js/notifications_handler.js'])
@@ -137,14 +143,14 @@
 <body>
     @include('partials.header')
 
-    <div class="lg:p-0 mt-[110px] overflow-auto">
-        @yield('content')
-    </div>
+    @if (Request::is('profile*'))
+        @include('layouts.app-profile')
+    @else
+        @include('layouts.app-main')
+    @endif
 
     @include('partials.loading')
-
     @include('partials.notification-info-modal')
-
 </body>
 
 </html>

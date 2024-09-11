@@ -1,4 +1,4 @@
-<form name="frm" id="tpv_redsys_form" action="{{ env('REDSYS_ACTION_URL') }}" method="POST">
+<form name="tpv_redsys_form" id="tpv_redsys_form" action="{{ env('REDSYS_ACTION_URL') }}" method="POST">
     <!-- Ds_Merchant_SignatureVersion-->
     <input type="hidden" name="Ds_SignatureVersion" id="Ds_SignatureVersion" value="" /></br>
     <!--Ds_Merchant_MerchantParameters-->

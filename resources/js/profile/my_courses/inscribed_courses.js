@@ -4,8 +4,15 @@ import {
     getDateShort,
     updatePagination,
     handlePagination,
+    downloadFileBackend,
+    fillRedsysForm,
+    moreOptionsBtnHandler,
 } from "../../app.js";
-import { hideModal, showModal } from "../../modal_handler.js";
+import {
+    hideModal,
+    showModal,
+    showModalConfirmation,
+} from "../../modal_handler.js";
 
 let courseDocuments = [];
 
@@ -14,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     getInscribedCourses();
     updateInputFile();
     handlePaginationCourses();
+    moreOptionsBtnHandler();
 });
 
 function initHandlers() {
@@ -47,12 +55,41 @@ function initHandlers() {
         } else if (classClicked.contains("btn-action-course")) {
             const courseUid = event.target.dataset.course_uid;
             enrollCourse(courseUid);
+        } else if (classClicked.contains("cancel-inscription-btn")) {
+            const courseUid =
+                event.target.closest(".more-options-btn").dataset.course_uid;
+
+            showModalConfirmation(
+                "Cancelar inscripción",
+                "Vas a cancelar la inscripción a este curso. ¿Deseas continuar?",
+                "cancelInscription",
+                []
+            ).then((resultado) => {
+                if (resultado) cancelInscription(courseUid);
+            });
         }
     });
 
     document
         .getElementById("upload-documents-form")
         .addEventListener("submit", saveDocumentsCourse);
+}
+
+function cancelInscription(courseUid) {
+    const params = {
+        method: "POST",
+        url: "/profile/my_courses/inscribed/cancel_inscription",
+        body: {
+            course_uid: courseUid,
+        },
+        stringify: true,
+        loader: true,
+        toast: true,
+    };
+
+    apiFetch(params).then(() => {
+        getInscribedCourses();
+    });
 }
 
 function saveDocumentsCourse() {
@@ -99,16 +136,6 @@ function handleSearchCourses() {
     getInscribedCourses(1, 3, search);
 }
 
-function fillRedsysForm(parametersRedsys) {
-    document.getElementById("Ds_SignatureVersion").value =
-        parametersRedsys.Ds_SignatureVersion;
-    document.getElementById("Ds_MerchantParameters").value =
-        parametersRedsys.Ds_MerchantParameters;
-    document.getElementById("Ds_Signature").value =
-        parametersRedsys.Ds_Signature;
-    document.getElementById("tpv_redsys_form").submit();
-}
-
 function getSearchInput() {
     const search = document.getElementById("search-course-input").value;
     return search;
@@ -139,7 +166,6 @@ function getInscribedCourses(page = 1, items_per_page = 3, search = null) {
     };
 
     apiFetch(params).then((response) => {
-        console.log(response)
         const containerInscribedCoursesPagination = document.getElementById(
             "pagination-inscribed-courses"
         );
@@ -215,7 +241,11 @@ function fillCourseTemplate(template, course) {
 
 function fillCourseDetails(template, course) {
     template.querySelector(".course-uid").value = course.uid;
-    template.querySelector(".title").innerHTML = course.title;
+
+    template.querySelectorAll(".title").forEach((title) => {
+        title.innerHTML = course.title;
+    });
+
     template.querySelector(".image").src =
         window.backendUrl + "/" + course.image_path;
 
@@ -243,6 +273,8 @@ function fillCourseDetails(template, course) {
     template.querySelectorAll(".course-link").forEach((link) => {
         link.href = `/course/${course.uid}`;
     });
+
+    template.querySelector(".more-options-btn").dataset.course_uid = course.uid;
 }
 
 function setCourseDocumentsBtn(template, course) {
@@ -282,6 +314,44 @@ function setCourseEnrollingBtn(template, course) {
 }
 
 function setIndicatorsStatuses(template, course) {
+    if (course.validate_student_registrations) {
+        setIndicatorStudentStatus(template, course);
+    } else {
+        setIndicatorCourseStatus(template, course);
+    }
+}
+
+function setIndicatorStudentStatus(template, course) {
+    template
+        .querySelector(".indicator-student-status-section")
+        .classList.remove("hidden");
+
+    let indicatorStudentStatus = template.querySelector(
+        ".indicator-student-status"
+    );
+
+    let indicatorStudentStatusLabel = template.querySelector(
+        ".indicator-student-status-label"
+    );
+
+    if (course.pivot.acceptance_status === "ACCEPTED") {
+        indicatorStudentStatus.classList.add("openned");
+        indicatorStudentStatusLabel.innerHTML = "Aprobado";
+        setIndicatorCourseStatus(template, course);
+    } else if (course.pivot.acceptance_status === "PENDING") {
+        indicatorStudentStatus.classList.add("pending");
+        indicatorStudentStatusLabel.innerHTML = "Pendiente de aprobación";
+    } else if (course.pivot.acceptance_status === "REJECTED") {
+        indicatorStudentStatus.classList.add("soon");
+        indicatorStudentStatusLabel.innerHTML = "No aprobado";
+    }
+}
+
+function setIndicatorCourseStatus(template, course) {
+    template
+        .querySelector(".indicator-course-status-section")
+        .classList.remove("hidden");
+
     let indicatorCourseStatus = template.querySelector(
         ".indicator-course-status"
     );
@@ -289,37 +359,13 @@ function setIndicatorsStatuses(template, course) {
     let indicatorCourseStatusLabel = template.querySelector(
         ".indicator-course-status-label"
     );
+
     if (course.status.code == "ENROLLING") {
         indicatorCourseStatus.classList.add("openned");
         indicatorCourseStatusLabel.innerHTML = "Listo para matriculación";
     } else if (course.status.code == "INSCRIPTION") {
         indicatorCourseStatus.classList.add("pending");
         indicatorCourseStatusLabel.innerHTML = "Pendiente de matriculación";
-    }
-
-    if (course.validate_student_registrations) {
-        template
-            .querySelector(".indicator-student-status-section")
-            .classList.remove("hidden");
-
-        let indicatorStudentStatus = template.querySelector(
-            ".indicator-student-status"
-        );
-
-        let indicatorStudentStatusLabel = template.querySelector(
-            ".indicator-student-status-label"
-        );
-
-        if (course.pivot.acceptance_status === "ACCEPTED") {
-            indicatorStudentStatus.classList.add("openned");
-            indicatorStudentStatusLabel.innerHTML = "Aprobado";
-        } else if (course.pivot.acceptance_status === "PENDING") {
-            indicatorStudentStatus.classList.add("pending");
-            indicatorStudentStatusLabel.innerHTML = "Pendiente de aprobación";
-        } else if (course.pivot.acceptance_status === "REJECTED") {
-            indicatorStudentStatus.classList.add("soon");
-            indicatorStudentStatusLabel.innerHTML = "No aprobado";
-        }
     }
 }
 
@@ -379,6 +425,11 @@ function fillDocumentTemplate(template, document) {
     return template;
 }
 
+/**
+ *
+ * @param {*} documentCourseUid
+ * Creación del token para la descarga del documento
+ */
 function downloadDocumentCourse(documentCourseUid) {
     const params = {
         method: "POST",
@@ -387,10 +438,11 @@ function downloadDocumentCourse(documentCourseUid) {
             course_document_uid: documentCourseUid,
         },
         stringify: true,
-        download: true,
         loader: true,
         toast: true,
     };
 
-    apiFetch(params).then();
+    apiFetch(params).then((response) => {
+        downloadFileBackend(response.token);
+    });
 }
