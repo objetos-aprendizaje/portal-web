@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\OperationFailedException;
 use App\Models\GeneralOptionsModel;
 use App\Models\UserRolesModel;
 use App\Models\UsersModel;
@@ -10,6 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Saml2TenantsModel;
+use Illuminate\Support\Facades\URL;
+use App\Jobs\SendEmailJob;
+use App\Models\EmailVerifyModel;
 
 
 class RegisterController extends BaseController
@@ -40,10 +44,11 @@ class RegisterController extends BaseController
         ]);
     }
 
-    private function getCasUrl() {
+    private function getCasUrl()
+    {
         $loginCas = app('general_options')['cas_active'];
 
-        if($loginCas) {
+        if ($loginCas) {
             $loginCasUrl = Saml2TenantsModel::where('key', 'cas')->first();
             $urlCas = url('saml2/' . $loginCasUrl->uuid . '/login');
         } else $urlCas = false;
@@ -51,10 +56,11 @@ class RegisterController extends BaseController
         return $urlCas;
     }
 
-    private function getRedirisUrl() {
+    private function getRedirisUrl()
+    {
         $loginRediris = app('general_options')['rediris_active'];
 
-        if($loginRediris) {
+        if ($loginRediris) {
             $loginRedirisUrl = Saml2TenantsModel::where('key', 'rediris')->first();
             $urlRediris = url('saml2/' . $loginRedirisUrl->uuid . '/login');
         } else $urlRediris = false;
@@ -62,16 +68,45 @@ class RegisterController extends BaseController
         return $urlRediris;
     }
 
+    private function validateUser($request)
+    {
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8',
+            'password_confirmation' => 'required|same:password'
+        ], [
+            'first_name.required' => 'El nombre es obligatorio.',
+            'first_name.string' => 'El nombre debe ser una cadena de texto.',
+            'first_name.max' => 'El nombre no puede tener más de 255 caracteres.',
+            'last_name.required' => 'El apellido es obligatorio.',
+            'last_name.string' => 'El apellido debe ser una cadena de texto.',
+            'last_name.max' => 'El apellido no puede tener más de 255 caracteres.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El correo electrónico debe ser una dirección válida.',
+            'email.max' => 'El correo electrónico no puede tener más de 255 caracteres.',
+            'email.unique' => 'El correo electrónico ya está registrado.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.string' => 'La contraseña debe ser una cadena de texto.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'password_confirmation.required' => 'La confirmación de la contraseña es obligatoria.',
+            'password_confirmation.same' => 'La confirmación de la contraseña no coincide.'
+        ]);
+    }
+
     public function submit(Request $request)
     {
+        $this->validateUser($request);
 
-        DB::transaction(function () use ($request) {
-            $user = new UsersModel();
-            $user->uid = generate_uuid();
-            $user->first_name = $request->first_name;
-            $user->last_name = $request->last_name;
-            $user->email = $request->email;
-            $user->password = password_hash($request->password, PASSWORD_BCRYPT);
+        $user = new UsersModel();
+        $user->uid = generate_uuid();
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->email = $request->email;
+        $user->password = password_hash($request->password, PASSWORD_BCRYPT);
+
+        DB::transaction(function () use ($user) {
             $user->save();
 
             // Rol de estudiante
@@ -81,7 +116,107 @@ class RegisterController extends BaseController
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
+
+            $this->sendEmail($user);
         });
 
+        return redirect("/login")->with([
+            'account_created' => $user->email,
+            'email' => $user->email,
+        ]);
+    }
+
+    public function verifyEmail(Request $request)
+    {
+        $verify = EmailVerifyModel::where('token', $request->token)->first();
+
+        if (!$verify) return redirect('/error/002');
+
+        $user_bd = UsersModel::where('uid', $verify->user_uid)->with('roles')->first();
+
+        if ($verify->expires_at <=  now()) {
+            return redirect('/login')->with([
+                'verify_link_expired' => true,
+                'email' => $user_bd->email
+            ]);
+        }
+
+        $user_bd->verified = true;
+
+        DB::transaction(function () use ($verify, $user_bd, $request) {
+            $user_bd->save();
+            EmailVerifyModel::where('token', $request->token)->delete();
+        });
+
+        return redirect('/login')->with([
+            'email_verified' => $user_bd->email
+        ]);
+    }
+
+    public function resendEmailConfirmation(Request $request)
+    {
+        $email = $request->email;
+
+        $user = UsersModel::where('email', $email)->first();
+
+        if (!$user) {
+            throw new OperationFailedException('No se ha encontrado ninguna cuenta con esa dirección de correo', 404);
+        }
+
+        if ($user->verified) {
+            throw new OperationFailedException('Su cuenta ya está verificada', 405);
+        }
+
+        DB::transaction(function () use ($user) {
+            // Inhabilitamos todos los tokens anteriores
+            EmailVerifyModel::where('user_uid', $user->uid)->delete();
+            $this->sendEmail($user);
+        });
+
+        return response()->json(['message' => 'Se ha reenviado el email']);
+    }
+
+    private function sendEmail($user)
+    {
+        $token = generateToken(12);
+
+        // Generar el enlace de verificación
+        $verificationUrl = $this->generateVerificationUrl($user->uid, $token);
+
+        //guardar token y enviarlo en parametros para devolverlo con el botón del email
+        $this->saveEmailVerification($user->uid, $token);
+
+        // Enviar la notificación
+        $this->sendEmailVerification($verificationUrl, $token, $user->email);
+    }
+
+    private function saveEmailVerification($userUid, $token)
+    {
+        $emailverify = new EmailVerifyModel();
+        $emailverify->user_uid = $userUid;
+        $emailverify->token = $token;
+        $emailverify->expires_at = now()->addMinutes(60);
+        $emailverify->save();
+    }
+
+    private function generateVerificationUrl($userUid, $token)
+    {
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $userUid, 'token' => $token]
+        );
+
+        return $verificationUrl;
+    }
+
+    private function sendEmailVerification($verificationUrl, $token, $userEmail)
+    {
+        $parameters = [
+            'url' => $verificationUrl,
+            'token' => $token
+        ];
+
+        dispatch(new SendEmailJob($userEmail, 'Verificación de contraseña', $parameters, 'emails.email_verify'));
     }
 }

@@ -12,6 +12,9 @@ class ErrorController extends BaseController
             case "001":
                 $errorMessage = "Ha ocurrido un error con el pago";
                 break;
+            case "002":
+                $errorMessage = "El enlace de verificación es incorrecto";
+                break;
             default:
                 $errorMessage = "Ha ocurrido un error";
         }

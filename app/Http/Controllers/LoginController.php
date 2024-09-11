@@ -44,10 +44,11 @@ class LoginController extends BaseController
         ]);
     }
 
-    private function getCasUrl() {
+    private function getCasUrl()
+    {
         $loginCas = app('general_options')['cas_active'];
 
-        if($loginCas) {
+        if ($loginCas) {
             $loginCasUrl = Saml2TenantsModel::where('key', 'cas')->first();
             $urlCas = url('saml2/' . $loginCasUrl->uuid . '/login');
         } else $urlCas = false;
@@ -55,10 +56,11 @@ class LoginController extends BaseController
         return $urlCas;
     }
 
-    private function getRedirisUrl() {
+    private function getRedirisUrl()
+    {
         $loginRediris = app('general_options')['rediris_active'];
 
-        if($loginRediris) {
+        if ($loginRediris) {
             $loginRedirisUrl = Saml2TenantsModel::where('key', 'rediris')->first();
             $urlRediris = url('saml2/' . $loginRedirisUrl->uuid . '/login');
         } else $urlRediris = false;
@@ -72,19 +74,18 @@ class LoginController extends BaseController
 
         $user = UsersModel::where('email', $credentials['email'])->first();
 
-        if ($user && Hash::check($credentials['password'], $user->password)) {
-            Auth::login($user);
-
-            $urlIntended = $request->session()->get('url.intended');
-
-            if($urlIntended) {
-                return response()->json(['urlIntended' => $urlIntended]);
-            }
-
-            return response()->json(['message' => 'Inicio de sesión correcto'], 200);
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            return redirect('/login')->with(['user_not_found' => true]);
         }
 
-        return response()->json(['message' => 'No se ha encontrado ninguna cuenta con esas credenciales'], 400);
+        if (!$user->verified) {
+            return redirect('/login')->with(['user_not_verified' => true, 'email' => $user->email]);
+        }
+
+        Auth::login($user);
+        $redirectUrl = $this->getRedirectUrlAfterLogin($request);
+
+        return redirect($redirectUrl);
     }
 
     public function redirectToGoogle()
@@ -210,21 +211,33 @@ class LoginController extends BaseController
         return redirect('/');
     }
 
-    public function tokenLogin($token){
+    public function tokenLogin($token)
+    {
 
         $user = UsersModel::where('token_x509', $token)->first();
 
-        if ($user){
+        if ($user) {
             Auth::login($user);
             $this->deleteTokenLogin($user);
-            return redirect("https://".env('DOMINIO_PRINCIPAL'));
-        }else{
+            return redirect("https://" . env('DOMINIO_PRINCIPAL'));
+        } else {
             $this->deleteTokenLogin($user);
-            return redirect("https://".env('DOMINIO_PRINCIPAL')."/login?e=certificate-error");
+            return redirect("https://" . env('DOMINIO_PRINCIPAL') . "/login?e=certificate-error");
         }
     }
-    private function deleteTokenLogin($user){
+
+    private function deleteTokenLogin($user)
+    {
         $user->token_x509 = "";
         $user->save();
+    }
+
+    private function getRedirectUrlAfterLogin($request)
+    {
+        $urlCurrent = $request->session()->get('url.current');
+        if ($urlCurrent) {
+            $request->session()->forget('url.current');
+            return $urlCurrent;
+        } else return '/';
     }
 }

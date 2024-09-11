@@ -46,6 +46,15 @@ select {
     @apply p-8 bg-white rounded-3xl
 }
 
+input[type="checkbox"]:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+input[type="checkbox"] {
+    @apply text-color_1
+}
+
 .btn {
     svg {
         @apply w-[18px] h-[18px] fill-transparent
@@ -89,6 +98,11 @@ select {
     @apply bg-color_1 w-7 h-7 rounded-full flex items-center justify-center p-0
 }
 
+.more-options-btn {
+    svg {
+        @apply text-color_1;
+    }
+}
 /******************************* FORMS ********************/
 .poa-form {
     & .field.no-visible {
@@ -142,15 +156,23 @@ select {
 .slideshow-container {
 
     .mySlides {
-        @apply hidden h-[600px] items-center justify-center;
+        @apply hidden h-[500px] lg:h-[600px] items-center justify-center;
     }
 
     .prev, .next {
-        @apply cursor-pointer absolute top-[50%] w-auto p-[16px] text-color_1 font-bold text-[18px] transition-[0.6s] rounded-[3px] select-none;
+        @apply cursor-pointer absolute top-[50%] p-[10px] text-white font-bold text-[18px] transition-[0.6s] select-none rounded-full;
+    }
+
+    .prev {
+        @apply left-4;
     }
 
     .next {
-        @apply right-0;
+        @apply right-4;
+    }
+
+    .prev, .next {
+        backdrop-filter: blur(10px);
     }
 
     .bg-image {
@@ -158,10 +180,10 @@ select {
     }
 
     .img-slider {
-        @apply w-full h-[600px] object-cover;
+        @apply w-full  h-[500px] lg:h-[600px] object-cover;
     }
 
-    @apply relative m-auto h-[600px];
+    @apply relative m-auto h-[500px] lg:h-[600px];
 }
 
 /* Fading animation */
@@ -218,7 +240,7 @@ select {
 }
 
 .modal.open {
-    @apply block;
+    @apply block opacity-100;
 }
 
 .modal-body {
@@ -267,7 +289,7 @@ body.modal-open {
     }
 
     .menu-mobile {
-        @apply bg-white w-full rounded-md z-50 p-[24px] flex-col flex  ;
+        @apply bg-white w-full z-50 p-[24px] flex-col flex  ;
     }
 
     .option-label {
@@ -278,7 +300,7 @@ body.modal-open {
         @apply p-0;
     }
 
-    @apply w-full z-50 lg:hidden top-[110px] fixed border-y;
+    @apply w-full z-50 lg:hidden top-[60px] lg:top-[110px] fixed;
 }
 
 .overlay-layer-menu {
@@ -540,7 +562,7 @@ body.modal-open {
 }
 .checkbox-container.categories {
     .checkbox-icon {
-        @apply w-[22px] h-[22px];
+        @apply min-w-[22px] min-h-[22px];
     }
 
     .checkbox-icon.checked {
@@ -553,8 +575,10 @@ body.modal-open {
     }
 
     label {
-        @apply p-[12px];
+        @apply text-left
     }
+
+    @apply p-[12px];
 }
 
 .checkbox-container.categories.subcategories {
@@ -596,6 +620,7 @@ body.modal-open {
 
     @apply bg-color_background_elements rounded-[8px] w-[86px] justify-between p-[8px] flex-none hidden lg:flex;
 }
+
 
 /******************************* BLOQUE OBJETO APRENDIZAJE ********************/
 .learning-object-block {
@@ -802,7 +827,7 @@ body.modal-open {
         }
     }
 
-    @apply select-none text-black pb-6 top-0 overflow-y-auto mt-[109px] h-[calc(100%-109px)] w-[270px] bg-white fixed left-0  lg:block hidden;
+    @apply select-none text-black pb-6 top-0 overflow-y-auto mt-[110px] h-[calc(100%-110px)] w-[270px] bg-white fixed left-0  lg:block hidden;
 }
 
 
@@ -1265,6 +1290,10 @@ body.modal-open {
     }
 }
 
+.btn.btn-primary.btn-save-policies {
+    @apply px-[40px] py-[10px]
+}
+
   /* Personalización de las bolas de paginación */
   .swiper-pagination-bullet {
     @apply w-[8px] h-[8px] rounded-[50%] bg-[#D9D9D9] opacity-70 inline-block;
@@ -1318,4 +1347,6 @@ body.modal-open {
   .line-clamp.line-clamp-3 {
     -webkit-line-clamp: 3;
 }
-
+#sendVerify{
+    @apply cursor-pointer;
+}

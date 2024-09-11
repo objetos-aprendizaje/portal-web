@@ -4,6 +4,8 @@ import {
     getDateShort,
     handlePagination,
     accordionControls,
+    formatDate,
+    fillRedsysForm
 } from "../../app.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -33,6 +35,11 @@ function initHandlers() {
         if(classClicked.contains("btn-action-course")) {
             const courseUid = event.target.dataset.course_uid;
             accessCourse(courseUid);
+        }
+
+        if(classClicked.contains("pay-term-btn")) {
+            const paymentTermUid = event.target.dataset.payment_term_uid;
+            payTerm(paymentTermUid);
         }
     });
 }
@@ -172,6 +179,28 @@ function fillEducationalProgramTemplate(template, educationalProgram) {
     fillEducationalProgramDetails(template, educationalProgram);
     fillEducationalProgramCourses(template, educationalProgram);
     setEducationalProgramIndicators(template, educationalProgram);
+
+    if (educationalProgram.payment_mode == "INSTALLMENT_PAYMENT") {
+        setPaymentTerms(template, educationalProgram.payment_terms);
+    }
+}
+
+function payTerm(paymentTermUid) {
+
+    const params = {
+        method: "POST",
+        url: "/profile/my_educational_programs/enrolled/pay_term",
+        body: {
+            paymentTermUid,
+        },
+        stringify: true,
+        loader: true,
+        toast: true,
+    };
+
+    apiFetch(params).then((response) => {
+        fillRedsysForm(response.redsysParams);
+    });
 }
 
 function fillEducationalProgramDetails(template, educationalProgram) {
@@ -252,4 +281,72 @@ function setEducationalProgramIndicators(template, educationalProgram) {
         indicator.classList.add("openned");
         indicatorLabel.innerHTML = "En realización";
     }
+}
+
+function setPaymentTerms(template, paymentTerms) {
+    // Mostrar el contenedor de términos de pago
+    const paymentTermsContainer = template.querySelector(
+        ".payment-terms-container"
+    );
+    paymentTermsContainer.classList.remove("hidden");
+
+    // Obtener la plantilla de términos de pago
+    const paymentTermsTemplate = document.getElementById("payment-terms");
+
+    // Iterar sobre los términos de pago del curso
+    paymentTerms.forEach((paymentTerm) => {
+        // Clonar la plantilla de términos de pago
+        const paymentTermsCloned = paymentTermsTemplate.content.cloneNode(true);
+
+        // Rellenar los datos del término de pago
+        const paymentTermsNames =
+            paymentTermsCloned.querySelectorAll(".payment-term-name");
+        paymentTermsNames.forEach((paymentTermName) => {
+            paymentTermName.textContent = paymentTerm.name;
+        });
+
+        paymentTermsCloned.querySelector(
+            ".payment-term-date"
+        ).textContent = `${getDateShort(
+            paymentTerm.start_date
+        )} - ${getDateShort(paymentTerm.finish_date)}`;
+
+        paymentTermsCloned.querySelector(
+            ".payment-term-date-mobile"
+        ).textContent = `${formatDate(paymentTerm.start_date)} - ${formatDate(
+            paymentTerm.finish_date
+        )}`;
+
+        const paymentTermsCosts =
+            paymentTermsCloned.querySelectorAll(".payment-term-cost");
+        paymentTermsCosts.forEach((paymentTermCost) => {
+            paymentTermCost.textContent = paymentTerm.cost;
+        });
+
+        const startDate = new Date(paymentTerm.start_date);
+        const finishDate = new Date(paymentTerm.finish_date);
+        const currentDate = new Date();
+
+        if (paymentTerm.user_payment && paymentTerm.user_payment.is_paid) {
+            const paymentTermsLabels = paymentTermsCloned.querySelectorAll(
+                ".payment-term-label"
+            );
+            paymentTermsLabels.forEach((paymentTermLabel) => {
+                paymentTermLabel.classList.remove("hidden");
+            });
+        } else if (startDate < currentDate && finishDate > currentDate) {
+            const payTermsBtns =
+                paymentTermsCloned.querySelectorAll(".pay-term-btn");
+
+            payTermsBtns.forEach((payTermBtn) => {
+                payTermBtn.classList.remove("hidden");
+                payTermBtn.dataset.payment_term_uid = paymentTerm.uid;
+            });
+        }
+
+        // Añadir el término de pago clonado al contenedor
+        paymentTermsContainer
+            .querySelector(".payment-terms-list")
+            .appendChild(paymentTermsCloned);
+    });
 }

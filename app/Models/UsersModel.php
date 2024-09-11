@@ -13,7 +13,7 @@ class UsersModel extends Authenticatable
 
     protected $keyType = 'string';
 
-    protected $fillable = ['first_name', 'last_name', 'nif', 'email', 'user_rol_uid', 'curriculum', 'uid'];
+    protected $fillable = ['first_name', 'last_name', 'nif', 'email', 'user_rol_uid', 'curriculum', 'uid', 'verified'];
 
     protected $casts = [
         'uid' => 'string',
@@ -132,6 +132,15 @@ class UsersModel extends Authenticatable
             'user_learning_results_preferences',
             'user_uid',
             'learning_result_uid'
+        );
+    }
+
+    public function userPoliciesAccepted() {
+        return $this->belongsToMany(
+            FooterPagesModel::class,
+            'user_policies_accepted',
+            'user_uid',
+            'footer_page_uid'
         );
     }
 }

@@ -17,19 +17,32 @@ document.addEventListener("DOMContentLoaded", function () {
 function controlSearch() {
     const searchInput = document.querySelector(".searcher input");
     const searchButton = document.querySelector(".searcher button");
+    const searchButtonFooter = document.querySelector(".searcher-footer button");
 
     function redirectToSearcher() {
         const query = searchInput.value.trim();
         if (query) {
-            window.location.href = `/searcher?text=${encodeURIComponent(query)}`;
+            window.location.href = `/searcher?text=${encodeURIComponent(
+                query
+            )}`;
         }
     }
 
-    searchButton.addEventListener("click", function() {
+    searchButton.addEventListener("click", function () {
         redirectToSearcher();
     });
 
-    searchInput.addEventListener("keydown", function(event) {
+    searchInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            redirectToSearcher();
+        }
+    });
+
+    searchButtonFooter.addEventListener("click", function () {
+        redirectToSearcher();
+    });
+
+    searchButtonFooter.addEventListener("keydown", function (event) {
         if (event.key === "Enter") {
             redirectToSearcher();
         }
@@ -63,6 +76,18 @@ function controlSubmenus() {
         submenu.addEventListener("mouseleave", () => {
             submenu.classList.add("hidden");
         });
+
+        //control para manejo con teclado
+        item.addEventListener('focusin', () => {
+            hideAllSubmenus(); // Oculta todos los submenús
+            submenu.classList.remove('hidden'); // Muestra el submenú correspondiente
+        });
+
+        submenu.addEventListener('focusout', () => {
+            hideAllSubmenus(); // Oculta todos los submenús
+            submenu.classList.add('hidden'); // Muestra el submenú correspondiente
+        });
+
     });
 
     // Añade el manejador de eventos al header
@@ -255,7 +280,8 @@ function controlCustomCheckboxs() {
                 let parentOfParent = icon.parentElement.parentElement;
 
                 // Obtener el .custom-checkbox dentro del padre del padre
-                let customCheckbox = parentOfParent.querySelector('.custom-checkbox');
+                let customCheckbox =
+                    parentOfParent.querySelector(".custom-checkbox");
 
                 // Obtener el valor del .custom-checkbox
                 let checkboxValue = customCheckbox.checked;
@@ -263,8 +289,7 @@ function controlCustomCheckboxs() {
                 // Cambiar el valor del .custom-checkbox
                 customCheckbox.checked = !checkboxValue;
 
-                customCheckbox.dispatchEvent(new Event('change'));
-
+                customCheckbox.dispatchEvent(new Event("change"));
             });
         });
 }
@@ -709,4 +734,60 @@ export function getDateShort(dateStr) {
     let formattedDate = date.toLocaleDateString("es-ES", options);
 
     return formattedDate;
+}
+
+export function fillRedsysForm(parametersRedsys) {
+    document.getElementById("Ds_SignatureVersion").value =
+        parametersRedsys.Ds_SignatureVersion;
+    document.getElementById("Ds_MerchantParameters").value =
+        parametersRedsys.Ds_MerchantParameters;
+    document.getElementById("Ds_Signature").value =
+        parametersRedsys.Ds_Signature;
+    document.getElementById("tpv_redsys_form").submit();
+}
+
+/**
+ *
+ * @param {*} token
+ * Descarga un archivo desde el backend.
+ */
+export function downloadFileBackend(token) {
+    const params = {
+        method: "POST",
+        url: `${window.backendUrl}/download_file_token`,
+        body: {
+            token,
+        },
+        stringify: true,
+        download: true,
+        loader: true,
+        toast: true,
+    };
+
+    apiFetch(params);
+}
+
+/**
+ * Controla el botón de más opciones situado en la parte superior derecha de los contenedores de los cursos
+ */
+export function moreOptionsBtnHandler() {
+
+    function deleteAllOptionsList() {
+        const optionsList = document.querySelectorAll(".options-list");
+        optionsList.forEach((list) => {
+            list.remove();
+        });
+    }
+
+    document.body.addEventListener("click", function (event) {
+        const moreOptionsBtn = event.target.closest(".more-options-btn");
+
+        deleteAllOptionsList();
+        if (moreOptionsBtn) {
+            const optionsListTemplate = document.getElementById("options-list");
+
+            const optionsList = optionsListTemplate.content.cloneNode(true);
+            moreOptionsBtn.appendChild(optionsList);
+        }
+    });
 }

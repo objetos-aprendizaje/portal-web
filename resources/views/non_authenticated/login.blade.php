@@ -15,21 +15,72 @@
                             src="{{ env('BACKEND_URL') . '/' . app('general_options')['poa_logo_1'] }}" />
                     @endif
 
-                    <div class="text-[28px] font-bold text-center mb-[15px]">Inicia sesión</div>
+                    <h1 class="text-[32px] text-center mb-[15px]">Inicia sesión</h1>
 
-                    <form id="loginFormDesktop" action="/login/authenticate" method="POST" prevent-default>
+                    <p class="text-center mb-[20px]">¿No tienes cuenta? <a class="text-color_1"
+                            href="/register">Regístrate</a></p>
+
+                    @if (session('account_created'))
+                        <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                            <p>Su cuenta ha sido creada correctamente. Por favor, verifíquela con el email de confirmación
+                                que acaba de recibir. Si no lo encuentra, revise la carpeta de spam. </p>
+                            <p>¿No has recibido el email?
+                                <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                                    class="text-color_1 resend-email-confirmation">Reenviar
+                                    email de
+                                    confirmación</a>
+                            </p>
+                        </div>
+                    @endif
+
+                    @if (session('verify_link_expired'))
+                        <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                            <p>El link de confirmación ha expirado</p>
+                            <p>
+                                <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                                    class="text-color_1 resend-email-confirmation">Reenviar email de
+                                    confirmación</a>
+                            </p>
+                        </div>
+                    @endif
+
+                    @if (session('email_verified'))
+                        <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                            <p>Has verificado correctamente tu cuenta. Ahora puedes iniciar sesión.</p>
+                        </div>
+                    @endif
+
+                    @if (session('user_not_found'))
+                        <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                            <p>No existe ninguna cuenta con esas credenciales</p>
+                        </div>
+                    @endif
+
+                    @if (session('user_not_verified'))
+                        <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                            <p>Su cuenta no está verificada</p>
+                            <p>¿No has recibido el email?
+                                <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                                    class="text-color_1 resend-email-confirmation">Reenviar
+                                    email de
+                                    confirmación</a>
+                            </p>
+                        </div>
+                    @endif
+
+                    <form id="loginFormDesktop" action="/login/authenticate" method="POST">
                         @csrf
                         <div class="mb-[25px]">
                             <div class="flex flex-col mb-[20px]">
                                 <label class="px-3 mb-[8px]">Correo</label>
-                                <input
+                                <input aria-label="email"
                                     class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[60px]"
                                     type="text" name="email" />
                             </div>
 
                             <div class="flex flex-col mb-[8px]">
                                 <label class="px-3 mb-[8px]">Contraseña</label>
-                                <input class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3"
+                                <input aria-label="contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3"
                                     name="password" type="password" />
                             </div>
 
@@ -39,7 +90,8 @@
                                     contraseña?</a>
                             </div>
 
-                            <button class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Iniciar sesión
+                            <button title="acceder" type="submit"
+                                class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Iniciar sesión
                                 {{ e_heroicon('arrow-up-right', 'outline') }}</button>
 
                         </div>
@@ -82,7 +134,7 @@
                         <div class="flex justify-center gap-[32px]">
                             @if ($parameters_login_systems['facebook_login_active'])
                                 <a class="no-effect-hover" href="/auth/facebook">
-                                    <button type="button"
+                                    <button title="facebook login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                                         <img class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
                                     </button>
@@ -91,7 +143,7 @@
 
                             @if ($parameters_login_systems['twitter_login_active'])
                                 <a class="no-effect-hover" href="/auth/twitter">
-                                    <button type="button"
+                                    <button title="twitter login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
                                     </button>
@@ -100,7 +152,7 @@
 
                             @if ($parameters_login_systems['linkedin_login_active'])
                                 <a class="no-effect-hover" href="/auth/linkedin">
-                                    <button type="button"
+                                    <button title="linkedin login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
                                     </button>
@@ -109,7 +161,7 @@
 
                             @if ($parameters_login_systems['google_login_active'])
                                 <a class="no-effect-hover" href="/auth/google">
-                                    <button type="button"
+                                    <button title="google login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
                                     </button>
@@ -118,7 +170,7 @@
 
                             @if ($urlRediris)
                                 <a class="no-effect-hover" href="{{ $urlRediris }}">
-                                    <button type="button"
+                                    <button title="rediris login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
                                     </button>
@@ -150,19 +202,69 @@
 
         <div class="text-[28px] font-bold text-center mb-[15px]">Inicia sesión</div>
 
+        <p class="text-center mb-[20px]">¿No tienes cuenta? <a class="text-color_1" href="/register">Regístrate</a></p>
+
+        @if (session('account_created'))
+            <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                <p>Su cuenta ha sido creada correctamente. Por favor, verifíquela con el email de confirmación
+                    que acaba de recibir. Si no lo encuentra, revise la carpeta de spam. </p>
+                <p>¿No has recibido el email?
+                    <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                        class="text-color_1 resend-email-confirmation">Reenviar
+                        email de
+                        confirmación</a>
+                </p>
+            </div>
+        @endif
+
+        @if (session('verify_link_expired'))
+            <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                <p>El link de confirmación ha expirado</p>
+                <p>
+                    <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                        class="text-color_1 resend-email-confirmation">Reenviar email de
+                        confirmación</a>
+                </p>
+            </div>
+        @endif
+
+        @if (session('email_verified'))
+            <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                <p>Has verificado correctamente tu cuenta. Ahora puedes iniciar sesión.</p>
+            </div>
+        @endif
+
+        @if (session('user_not_found'))
+            <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                <p>No existe ninguna cuenta con esas credenciales</p>
+            </div>
+        @endif
+
+        @if (session('user_not_verified'))
+            <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                <p>Su cuenta no está verificada</p>
+                <p>¿No has recibido el email?
+                    <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                        class="text-color_1 resend-email-confirmation">Reenviar
+                        email de
+                        confirmación</a>
+                </p>
+            </div>
+        @endif
+
         <div class="mb-[25px]">
             <form id="loginFormMobile" action="/login/authenticate" method="POST" prevent-default>
                 @csrf
                 <div class="flex flex-col mb-[20px]">
                     <label class="px-3 mb-[8px]">Correo</label>
-                    <input
+                    <input aria-label="email"
                         class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3 focus:border-color_1 "
                         type="text" />
                 </div>
 
                 <div class="flex flex-col mb-[8px]">
                     <label class="px-3 mb-[8px]">Contraseña</label>
-                    <input class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3" type="password" />
+                    <input aria-label="contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3" type="password" />
                 </div>
 
                 <div class="block px-3 mb-[20px]">
@@ -171,7 +273,7 @@
                         contraseña?</a>
                 </div>
 
-                <button class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Iniciar sesión
+                <button title="iniciar sesión" class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Iniciar sesión
                     {{ e_heroicon('arrow-up-right', 'outline') }}</button>
 
             </form>
@@ -215,7 +317,7 @@
         <div class="flex justify-center gap-[32px] flex-wrap">
             @if ($parameters_login_systems['facebook_login_active'])
                 <a class="no-effect-hover" href="/auth/facebook">
-                    <button type="button"
+                    <button title="facebook login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                         <img class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
                     </button>
@@ -224,7 +326,7 @@
 
             @if ($parameters_login_systems['twitter_login_active'])
                 <a class="no-effect-hover" href="/auth/twitter">
-                    <button type="button"
+                    <button title="twitter login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
                     </button>
@@ -233,7 +335,7 @@
 
             @if ($parameters_login_systems['linkedin_login_active'])
                 <a class="no-effect-hover" href="/auth/linkedin">
-                    <button type="button"
+                    <button title="linkedin login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
                     </button>
@@ -242,7 +344,7 @@
 
             @if ($parameters_login_systems['google_login_active'])
                 <a class="no-effect-hover" href="/auth/google">
-                    <button type="button"
+                    <button title="google login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
                     </button>
@@ -251,7 +353,7 @@
 
             @if ($urlRediris)
                 <a class="no-effect-hover" href="{{ $urlRediris }}">
-                    <button type="button"
+                    <button title="rediris login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
                     </button>

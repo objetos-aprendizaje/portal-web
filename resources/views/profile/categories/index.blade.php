@@ -1,9 +1,9 @@
-@extends('profile.layouts.app')
+@extends('layouts.app')
 @section('content')
     <div class="poa-container">
 
         <h3>Listado de categorías</h3>
-
+        <p class="mb-4">Selecciona las categorías de tu interés para recibir notificaciones sobre cursos o programas formativos relacionados y mantenerte al tanto de todas las novedades.</p>
         @foreach ($categories as $category)
             @include('profile.categories.category', ['category' => $category, 'level' => 0])
         @endforeach

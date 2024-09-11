@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\FooterPagesModel;
+use App\Models\UserPoliciesAcceptedModel;
 use App\Models\UsersModel;
 use Closure;
 use Illuminate\Http\Request;
@@ -14,13 +16,17 @@ class CombinedAuthMiddleware
     public function handle(Request $request, Closure $next)
     {
 
-        if (!str_contains(URL::previous(), 'login')) {
-            $request->session()->put('url.intended', URL::previous());
+        // url a la que intenta acceder
+        $urlCurrent = URL::current();
+
+        if(!str_contains($urlCurrent, 'login')) {
+            $request->session()->put('url.current', $urlCurrent);
         }
 
         $request->session()->regenerate();
         // Comprobamos si tenemos usuario
         if (Auth::check()) {
+
             try {
                 $this->loadUserData(Auth::user()->email);
             } catch (\Exception $e) {
@@ -41,6 +47,7 @@ class CombinedAuthMiddleware
         // Redirigir a la página de inicio de sesión o mostrar un mensaje de error
         return redirect('login');
     }
+
 
     protected function isAuthenticatedWithGoogle($request)
     {

@@ -24,7 +24,7 @@
                 <input type="text"
                     class="w-full rounded-lg py-[8px] border-none bg-color_background_elements pl-[46px] focus:ring-0 focus:border-color_1 focus:outline-none searcher"
                     placeholder="Buscar..." id="search">
-                <button type="button"
+                <button title="buscar" type="button"
                     class="absolute h-[32px] w-[32px] p-1.5 top-0 bottom-0 m-auto rounded-lg bg-white left-[8px] flex items-center justify-center"
                     id="search-btn">
                     {{ e_heroicon('magnifying-glass', 'solid', 16, 16) }}
@@ -37,7 +37,7 @@
 
                 <div id="order-by-btn" class="flex gap-4 items-center relative cursor-pointer">
                     <div class="flex-none">
-                        <button
+                        <button title="ordenar"
                             class="w-[32px] h-[32px] bg-color_background_elements p-2 rounded-lg flex justify-center items-center"
                             type="button">
                             {{ e_heroicon('bars-3-bottom-left', 'solid', 16, 16) }}
@@ -64,11 +64,11 @@
                 <div class="border-l border-2 h-[16px] flex-none hidden lg:block"></div>
 
                 <div class="control-view-searcher">
-                    <button class="control" id="view-vertical-btn">
+                    <button title="ver en vertical" class="control" id="view-vertical-btn">
                         {{ e_heroicon('squares-2x2', 'solid', null, false, false, 'text-color_1') }}
                     </button>
 
-                    <button class="control" id="view-horizontal-btn">
+                    <button title="ver en horizontal" class="control" id="view-horizontal-btn">
                         {{ e_heroicon('bars-4', 'solid') }}
                     </button>
                 </div>
@@ -83,7 +83,7 @@
             <div class="custom-treeselect" id="treeselect-competences"></div>
 
             <div class="h-[50px]">
-                <select class="rounded-[8px] w-full border-none" id="learning-object-status">
+                <select aria-label="estado de los objetos de aprendizaje" class="rounded-[8px] w-full border-none" id="learning-object-status">
                     <option value="">Estado</option>
                     <option value="INSCRIPTION">En inscripción</option>
                     <option value="DEVELOPMENT">En desarrollo</option>
@@ -103,7 +103,7 @@
             </div>
 
             <div>
-                <select class="rounded-[8px] w-full border-none" id="modality-payment">
+                <select aria-label="modalidad de pago" class="rounded-[8px] w-full border-none" id="modality-payment">
                     <option value="">Objeto gratuito o pago</option>
                     <option value="PAID">De pago</option>
                     <option value="FREE">Gratuitos</option>
@@ -111,7 +111,7 @@
             </div>
 
             <div>
-                <select class="rounded-[8px] w-full border-none" id="assessments">
+                <select aria-label="valoraciones" class="rounded-[8px] w-full border-none" id="assessments">
                     <option value="">Valoraciones</option>
                     <option value="5">5 estrellas</option>
                     <option value="4">4 estrellas</option>
@@ -128,7 +128,7 @@
                     <div>Mostrando <span id="filter-results-showing"></span> de <span id="filter-results-total"></span>
                         resultados</div>
                     <div class="border-l border h-[16px] flex-none hidden lg:block"></div>
-                    <div class="text-[#FF2954]" id="delete-all-filters-btn"><a href="javascript:void(0)">Limpiar</a></div>
+                    <div class="text-[#FF2954]" id="delete-all-filters-btn"><a title="limpiar" href="javascript:void(0)">Limpiar</a></div>
                 </div>
             </div>
         </section>
@@ -159,8 +159,8 @@
         <template id="learning-object-template">
             <div class="learning-object-block shadow-lg">
                 <div class="learning-object-img-container">
-                    <a class="no-effect-hover" class="learning-object-url" href="javascript:void(0)">
-                        <img src="" class="learning-object-image">
+                    <a title="objeto de aprendizaje" class="no-effect-hover" class="learning-object-url" href="javascript:void(0)">
+                        <img alt="objeto de aprendizaje" src="" class="learning-object-image">
                     </a>
                     <div class="learning-object-img-container-title learning-object-type"></div>
 
@@ -169,7 +169,7 @@
 
                     <div class="block-container-title">
                         <div>
-                            <a class="learning-object-url" href="javascript:void(0)">
+                            <a title="objeto de aprendizaje" class="learning-object-url" href="javascript:void(0)">
                                 <h2 class="block-title"></h2>
                             </a>
                         </div>
@@ -180,7 +180,7 @@
 
                     </div>
 
-                    <a class="learning-object-url" href="javascript:void(0)">
+                    <a title="objeto de aprendizaje" class="learning-object-url" href="javascript:void(0)">
                         <div class="block-description"></div>
                     </a>
 

@@ -121,6 +121,8 @@ class EducationalProgramInfoController extends BaseController
             ->addSelect(['total_cost' => CoursesModel::select(DB::raw('SUM(cost)'))
                 ->whereColumn('educational_program_uid', 'educational_programs.uid')
             ])
+            ->addSelect('educational_program_statuses.code as status_code')
+            ->leftJoin('educational_program_statuses', 'educational_programs.educational_program_status_uid', '=', 'educational_program_statuses.uid')
             ->where('educational_programs.uid', $uid)
             ->first();
 

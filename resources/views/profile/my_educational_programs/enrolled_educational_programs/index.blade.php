@@ -1,14 +1,16 @@
-@extends('profile.layouts.app')
+@extends('layouts.app')
 @section('content')
     <div class="poa-container">
 
+        @include('profile.partials.learning-object-payment-indicator')
+
         <div class="flex md:flex-row flex-col justify-between mb-8">
-            <h3>Programas educativos matriculados</h3>
+            <h3>Programas formativos matriculados</h3>
 
             <div class="relative ">
                 <input id="search-educational-program-input" type="text"
                     class="rounded-[10px] pr-[44px] border border-[#D9D9D9] md:w-[330px] placeholder:text-[#C4C4C4] input-border-focus w-full"
-                    placeholder="Buscar programa educativo" />
+                    placeholder="Buscar programa formativo" />
                 <button
                     class="absolute right-[4px] w-[32px] h-[32px] flex justify-center items-center top-[4px] bg-[#C7C7C7] p-2 cursor-pointer mx-1 rounded-[10px] input-search hover:bg-[#2B4C7E33] transition duration-300"
                     type="button" id="search-educational-program-btn">
@@ -18,7 +20,7 @@
         </div>
 
         <div id="no-educational-programs-enrolled" class="hidden">
-            <h2 class="text-center">Aún no te has matriculado en ningún programa educativo</h2>
+            <h2 class="text-center">Aún no te has matriculado en ningún programa formativo</h2>
         </div>
 
         <div id="educational-programs-enrolled-container" class="hidden">
@@ -30,7 +32,8 @@
             </div>
         </div>
 
-        <h2 class="text-center hidden" id="no-educational-programs-found">Aún no te has matriculado en ningún programa educativo</h2>
+        <h2 class="text-center hidden" id="no-educational-programs-found">Aún no te has matriculado en ningún programa
+            formativo</h2>
 
     </div>
 
@@ -81,7 +84,24 @@
 
             </div>
 
-            <div class="courses-container"></div>
+            <div class="courses-container mb-4"></div>
+
+            <div class="bg-[#F9F9F9] py-[10px] px-[15px] rounded-[6px] hidden accordion payment-terms-container mt-[12px] mb-4">
+                <div class="text-[14px] text-color_1 font-bold flex gap-[6px] items-center cursor-pointer accordion-header">
+                    <div>{{ e_heroicon('banknotes', 'outline') }}</div>
+                    <span>Información de pago</span>
+                    <div class="ml-auto">
+                        <div class="arrow-up hidden">{{ e_heroicon('chevron-up', 'outline', null, 12, 12) }}
+                        </div>
+                        <div class="arrow-down">{{ e_heroicon('chevron-down', 'outline', null, 12, 12) }}</div>
+                    </div>
+                </div>
+
+                <div class="accordion-uncollapsed">
+                    <div class="accordion-body payment-terms-list">
+                    </div>
+                </div>
+            </div>
 
             <input type="hidden" class="educational-program-uid" value="" />
         </div>
@@ -91,7 +111,8 @@
     <template id="course-template">
         <div class="accordion">
             <div class="group" tabindex="1">
-                <div class="accordion-header bg-[#F8F9FA] flex justify-between px-[12px] py-[10px] items-center mb-[12px] rounded-[8px] cursor-pointer">
+                <div
+                    class="accordion-header bg-[#F8F9FA] flex justify-between px-[12px] py-[10px] items-center mb-[12px] rounded-[8px] cursor-pointer">
                     <h5 class="course-title text-color_1"></h5>
                     <div class="arrow-up hidden">
                         {{ e_heroicon('chevron-up', 'outline', null, 14, 14) }}
@@ -105,12 +126,15 @@
                     <div class="accordion-body px-[12px]  mb-[12px]">
                         <p class="course-description text-color_4"></p>
 
-                        <div class="border-t-[1px] lg:border-l-[1px] border-dashed w-full lg:w-auto lg:h-3/4 my-[14px]"></div>
+                        <div class="border-t-[1px] lg:border-l-[1px] border-dashed w-full lg:w-auto lg:h-3/4 my-[14px]">
+                        </div>
 
                         <div class="flex justify-between items-center">
                             <div class="text-color_4"><span class="course-ects-workload"></span> ECT</div>
                             <div class="btn-action-container hidden">
-                                <button type="button" class="px-[10px] py-[6px] bg-color_1 text-white rounded-[6px] btn-action-course" data-course_uid>Ir al curso</button>
+                                <button type="button"
+                                    class="px-[10px] py-[6px] bg-color_1 text-white rounded-[6px] btn-action-course"
+                                    data-course_uid>Ir al curso</button>
                             </div>
                         </div>
                     </div>
@@ -118,4 +142,7 @@
             </div>
         </div>
     </template>
+
+    @include("profile.partials.redsys")
+    @include('profile.partials.payment-terms')
 @endsection

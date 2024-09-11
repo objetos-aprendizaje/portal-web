@@ -1,6 +1,6 @@
 <div class="learning-object-block shadow-lg">
     <div class="learning-object-img-container">
-        <img src="" class="learning-object-image">
+        <img alt="objeto de aprendizaje" src="" class="learning-object-image">
 
         <div class="learning-object-img-container-title learning-object-type"></div>
 

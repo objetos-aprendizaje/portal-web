@@ -6,9 +6,10 @@ use App\Exceptions\OperationFailedException;
 use App\Models\CoursesModel;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
-use App\Libraries\RedsysAPI;
+use App\Models\BackendFileDownloadTokensModel;
 use App\Models\CoursesPaymentsModel;
 use App\Models\CoursesStudentsDocumentsModel;
+use App\Models\CoursesStudentsModel;
 use Illuminate\Support\Facades\DB;
 
 class InscribedCoursesController extends BaseController
@@ -38,6 +39,10 @@ class InscribedCoursesController extends BaseController
                 'status',
                 'course_documents',
                 'course_documents.course_student_document' => function ($query) use ($user) {
+                    $query->where('user_uid', $user->uid);
+                },
+                'paymentTerms',
+                'paymentTerms.userPayment' => function ($query) use ($user) {
                     $query->where('user_uid', $user->uid);
                 }
             ])
@@ -79,9 +84,19 @@ class InscribedCoursesController extends BaseController
 
         // Comprobamos si el curso tiene coste y en ese caso, lo redirigimos a redsys
         if ($course->cost && $course->cost > 0) {
-            $orderNumber = generateRandomNumber(12);
-            $this->createCoursePayment($course->uid, $orderNumber);
-            $redsysParams = generateRedsysObject($course->cost, $orderNumber, "course", "Compra de curso");
+            $coursePayment = $this->createOrRetrieveCoursePayment($course->uid);
+
+            $merchantData = json_encode([
+                "learningObjectType" => "course",
+                "paymentType" => "singlePayment",
+            ]);
+
+            $urlOk = route("my-courses-enrolled") . '?payment_success=true';
+            $urlKo = route("my-courses-inscribed") . '?payment_success=false';
+
+            $descriptionPaymentTermUser = 'Pago de plazo del curso ' . $course->title;
+
+            $redsysParams = generateRedsysObject($course->cost, $coursePayment->order_number, $merchantData, $descriptionPaymentTermUser, $urlOk, $urlKo);
 
             $response = [
                 "requirePayment" => true,
@@ -102,16 +117,28 @@ class InscribedCoursesController extends BaseController
         return response()->json($response);
     }
 
-    private function createCoursePayment($courseUid, $orderNumber)
+    private function createOrRetrieveCoursePayment($courseUid)
     {
+        $coursePayment = CoursesPaymentsModel::where('course_uid', $courseUid)
+            ->where('user_uid', auth()->user()->uid)
+            ->first();
+
+        if ($coursePayment) {
+            $coursePayment->order_number = generateRandomNumber(12);
+            $coursePayment->save();
+            return $coursePayment;
+        }
+
         $course_payment = new CoursesPaymentsModel();
         $course_payment->uid = generate_uuid();
         $course_payment->user_uid = auth()->user()->uid;
         $course_payment->course_uid = $courseUid;
-        $course_payment->order_number = $orderNumber;
+        $course_payment->order_number = generateRandomNumber(12);
         $course_payment->is_paid = 0;
 
         $course_payment->save();
+
+        return $course_payment;
     }
 
     // Enviar la imagen al webhook del backend y nos devuelve la ruta asignada
@@ -167,21 +194,38 @@ class InscribedCoursesController extends BaseController
         $documentCourse = CoursesStudentsDocumentsModel::where('uid', $documentCourseUid)->firstOrFail();
 
         if (!$documentCourse) {
-            return response()->json(['message' => 'No se ha encontrado el documento'], 404);
+            throw new OperationFailedException('No se ha encontrado el documento', 404);
         }
 
         $documentPath = $documentCourse->document_path;
 
-        $header = ['API-KEY: ' . env('API_KEY_BACKEND_WEBHOOKS')];
+        // Este token será el que se enviará al backend para que ofrezca la descarga del fichero
+        // Una vez iniciada la descarga, el token se elimina
+        $backendFileDownloadToken = new BackendFileDownloadTokensModel();
+        $backendFileDownloadToken->uid = generate_uuid();
+        $backendFileDownloadToken->token = generateToken(255);
+        $backendFileDownloadToken->file = $documentPath;
 
-        $url = env('BACKEND_URL') . '/api/download_file';
+        $backendFileDownloadToken->save();
 
-        $postFields = ['file_path' => $documentPath];
+        return response()->json(['token' => $backendFileDownloadToken->token]);
+    }
 
-        $downloadPath = storage_path('/app/files_downloaded_temp/') . basename($documentPath);
+    public function cancelInscription(Request $request)
+    {
+        $courseUid = $request->course_uid;
 
-        downloadFileFromBackend($url, $postFields, $downloadPath, $header);
+        $courseStudent = CoursesStudentsModel::where('course_uid', $courseUid)
+            ->where('user_uid', auth()->user()->uid)
+            ->where('status', 'INSCRIBED')
+            ->first();
 
-        return response()->download($downloadPath);
+        if (!$courseStudent) {
+            throw new OperationFailedException('No estás inscrito en este curso', 406);
+        }
+
+        $courseStudent->delete();
+
+        return response()->json(['message' => 'Inscripción cancelada correctamente']);
     }
 }

@@ -80,6 +80,6 @@ class EducationalProgramsModel extends Model
             EducationalProgramsPaymentTermsModel::class,
             'educational_program_uid',
             'uid'
-        );
+        )->orderBy('start_date', 'asc');
     }
 }

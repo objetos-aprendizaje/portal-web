@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Profile\MyEducationalPrograms;
 
 use App\Exceptions\OperationFailedException;
+use App\Models\BackendFileDownloadTokensModel;
 use App\Models\EducationalProgramsModel;
 use App\Models\EducationalProgramsPaymentsModel;
 use App\Models\EducationalProgramsStudentsDocumentsModel;
@@ -10,7 +11,6 @@ use App\Models\EducationalProgramsStudentsModel;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class InscribedEducationalProgramsController extends BaseController
 {
@@ -21,7 +21,7 @@ class InscribedEducationalProgramsController extends BaseController
             "resources" => [
                 "resources/js/profile/my_educational_programs/inscribed_educational_programs.js"
             ],
-            "page_title" => "Mis programas educativos inscritos",
+            "page_title" => "Mis programas formativos inscritos",
             "currentPage" => "inscribedEducationalPrograms"
         ]);
     }
@@ -83,9 +83,19 @@ class InscribedEducationalProgramsController extends BaseController
 
         // Comprobamos si el curso tiene coste y en ese caso, lo redirigimos a redsys
         if ($educationalProgram->cost && $educationalProgram->cost > 0) {
-            $orderNumber = generateRandomNumber(12);
-            $this->createEducationalProgramPayment($educationalProgram->uid, $orderNumber);
-            $redsysParams = generateRedsysObject($educationalProgram->cost, $orderNumber,  "educational_program", "Compra de programa formativo");
+
+            $merchantData = json_encode([
+                "learningObjectType" => "educationalProgram",
+                "paymentType" => "singlePayment",
+            ]);
+
+            $urlOk = route("my-educational-programs-enrolled") . '?payment_success=true';
+            $urlKo = route("my-educational-programs-inscribed") . '?payment_success=false';
+
+            $descriptionPaymentTermUser = 'Pago de plazo del curso ' . $educationalProgram->name;
+
+            $educationalProgramPayment = $this->createOrRetrieveEducationalProgramPayment($educationalProgram->uid);
+            $redsysParams = generateRedsysObject($educationalProgram->cost, $educationalProgramPayment->order_number,  $merchantData, $descriptionPaymentTermUser, $urlOk, $urlKo);
 
             $response = [
                 "requirePayment" => true,
@@ -106,16 +116,29 @@ class InscribedEducationalProgramsController extends BaseController
         return response()->json($response);
     }
 
-    private function createEducationalProgramPayment($educationalProgramUid, $orderNumber)
+    private function createOrRetrieveEducationalProgramPayment($educationalProgramUid)
     {
-        $course_payment = new EducationalProgramsPaymentsModel();
-        $course_payment->uid = generate_uuid();
-        $course_payment->user_uid = auth()->user()->uid;
-        $course_payment->educational_program_uid = $educationalProgramUid;
-        $course_payment->order_number = $orderNumber;
-        $course_payment->is_paid = 0;
+        $educationalProgramPayment = EducationalProgramsPaymentsModel::where([
+            'user_uid' => auth()->user()->uid,
+            'educational_program_uid' => $educationalProgramUid
+        ])->first();
 
-        $course_payment->save();
+        if ($educationalProgramPayment) {
+            $educationalProgramPayment->order_number = generateRandomNumber(12);
+            $educationalProgramPayment->save();
+            return $educationalProgramPayment;
+        }
+
+        $educationalProgramPayment = new EducationalProgramsPaymentsModel();
+        $educationalProgramPayment->uid = generate_uuid();
+        $educationalProgramPayment->user_uid = auth()->user()->uid;
+        $educationalProgramPayment->educational_program_uid = $educationalProgramUid;
+        $educationalProgramPayment->order_number = generateRandomNumber(12);
+        $educationalProgramPayment->is_paid = 0;
+
+        $educationalProgramPayment->save();
+
+        return $educationalProgramPayment;
     }
 
     public function saveDocumentsEducationalProgram(Request $request)
@@ -168,24 +191,40 @@ class InscribedEducationalProgramsController extends BaseController
     {
         $documentEducationalProgramUid = $request->input('educational_program_document_uid');
 
-        $documentCourse = EducationalProgramsStudentsDocumentsModel::where('uid', $documentEducationalProgramUid)->firstOrFail();
+        $documentEducationalProgram = EducationalProgramsStudentsDocumentsModel::where('uid', $documentEducationalProgramUid)->firstOrFail();
 
-        if (!$documentCourse) {
+        if (!$documentEducationalProgram) {
             return response()->json(['message' => 'No se ha encontrado el documento'], 404);
         }
 
-        $documentPath = $documentCourse->document_path;
+        $documentPath = $documentEducationalProgram->document_path;
 
-        $header = ['API-KEY: ' . env('API_KEY_BACKEND_WEBHOOKS')];
+        $backendFileDownloadToken = new BackendFileDownloadTokensModel();
+        $backendFileDownloadToken->uid = generate_uuid();
+        $backendFileDownloadToken->token = generateToken(255);
+        $backendFileDownloadToken->file = $documentPath;
+        $backendFileDownloadToken->save();
 
-        $url = env('BACKEND_URL') . '/api/download_file';
+        return response()->json(['token' => $backendFileDownloadToken->token]);
+    }
 
-        $postFields = ['file_path' => $documentPath];
+    public function cancelInscription(Request $request)
+    {
+        $educationalProgramUid = $request->educationalProgramUid;
+        $user = auth()->user();
 
-        $downloadPath = storage_path('/app/files_downloaded_temp/') . basename($documentPath);
+        $educationalProgramStudent = EducationalProgramsStudentsModel::where([
+            'user_uid' => $user->uid,
+            'educational_program_uid' => $educationalProgramUid,
+            'status' => 'INSCRIBED'
+        ])->first();
 
-        downloadFileFromBackend($url, $postFields, $downloadPath, $header);
+        if (!$educationalProgramStudent) {
+            throw new OperationFailedException('No estás inscrito en este programa formativo', 406);
+        }
 
-        return response()->download($downloadPath);
+        $educationalProgramStudent->delete();
+
+        return response()->json(['message' => 'Inscripción cancelada correctamente']);
     }
 }

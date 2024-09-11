@@ -42,13 +42,14 @@
                     <img class="mb-[30px]  h-[425px]"
                         src="{{ env('BACKEND_URL') . '/' . $educational_program->image_path }}">
 
-                    <div class="text-center mb-[30px]">
-                        <a href="/cart/educational_program/{{ $educational_program->uid }}">
-                            <button type="button" class="btn btn-primary">Inscribirme ahora
-                                {{ e_heroicon('chevron-right', 'outline') }}</button>
-                        </a>
-                    </div>
-
+                    @if ($educational_program->status_code == 'INSCRIPTION')
+                        <div class="text-center mb-[30px]">
+                            <a href="/cart/educational_program/{{ $educational_program->uid }}">
+                                <button type="button" class="btn btn-primary">Inscribirme ahora
+                                    {{ e_heroicon('chevron-right', 'outline') }}</button>
+                            </a>
+                        </div>
+                    @endif
 
                     <div class="px-[20px]">
                         <div class="flex justify-between items-center gap-2">

@@ -1,14 +1,14 @@
-@extends('profile.layouts.app')
+@extends('layouts.app')
 @section('content')
     <div class="poa-container">
 
         <div class="flex md:flex-row flex-col justify-between mb-8">
-            <h3>Histórico de programas educativos</h3>
+            <h3>Histórico de programas formativos</h3>
 
             <div class="relative ">
                 <input id="search-educational-program-input" type="text"
                     class="rounded-[10px] pr-[44px] border border-[#D9D9D9] md:w-[330px] placeholder:text-[#C4C4C4] input-border-focus w-full"
-                    placeholder="Buscar programa educativo" />
+                    placeholder="Buscar programa formativo" />
                 <button
                     class="absolute right-[4px] w-[32px] h-[32px] flex justify-center items-center top-[4px] bg-[#C7C7C7] p-2 cursor-pointer mx-1 rounded-[10px] input-search hover:bg-[#2B4C7E33] transition duration-300"
                     type="button" id="search-educational-program-btn">
@@ -18,7 +18,7 @@
         </div>
 
         <div id="no-educational-programs-historic" class="hidden">
-            <h2 class="text-center">Aún no te has matriculado en ningún programa educativo</h2>
+            <h2 class="text-center">Aún no te has matriculado en ningún programa formativo</h2>
         </div>
 
         <div id="educational-programs-historic-container" class="hidden">
@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        <h2 class="text-center hidden" id="no-educational-programs-found">Aún no te has matriculado en ningún programa educativo</h2>
+        <h2 class="text-center hidden" id="no-educational-programs-found">Aún no te has matriculado en ningún programa formativo</h2>
 
     </div>
 

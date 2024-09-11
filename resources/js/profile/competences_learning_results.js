@@ -12,9 +12,12 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function initHandlers() {
-    document.getElementById("save-competences-learning-results-btn").addEventListener("click", saveLearningResults);
+    document
+        .getElementById("save-competences-learning-results-btn")
+        .addEventListener("click", saveLearningResults);
 }
 
+// Carga los resultados de aprendizaje seleccionados por el usuario que se encuenta en la BD
 function selectLearningResultsUser() {
     function openNode(node) {
         if (node.id) {
@@ -31,13 +34,18 @@ function selectLearningResultsUser() {
             treeCompetencesLearningResults.checkNode(n, true);
         }
     });
+
+    updateSelectedLearningResults(window.learningResultsUserSelected, true);
 }
 
 function instanceTreeCompetences() {
+
+    // Actualiza el estado indeterminate de los checkboxes de todos los nodos
     const updateCheckboxState = (treeCompetencesLearningResults) => {
-        const checkboxes = treeCompetencesLearningResults.contentElement.querySelectorAll(
-            'input[type="checkbox"]'
-        );
+        const checkboxes =
+            treeCompetencesLearningResults.contentElement.querySelectorAll(
+                'input[type="checkbox"]'
+            );
 
         // Si el bloque está deshabilitado, deshabilitamos todos los checkboxes
         for (let i = 0; i < checkboxes.length; ++i) {
@@ -50,6 +58,7 @@ function instanceTreeCompetences() {
         }
     };
 
+    // Instancia del nodo
     treeCompetencesLearningResults = new InfiniteTree(
         document.getElementById("tree-competences-learning-results"),
         {
@@ -62,13 +71,17 @@ function instanceTreeCompetences() {
         }
     );
 
+    // Click en cada checkbox de noto
     treeCompetencesLearningResults.on("click", (event) => {
-        const currentNode = treeCompetencesLearningResults.getNodeFromPoint(event.clientX, event.clientY);
+        const currentNode = treeCompetencesLearningResults.getNodeFromPoint(
+            event.clientX,
+            event.clientY
+        );
         if (!currentNode || event.target.className !== "checkbox") return;
         event.stopPropagation();
         treeCompetencesLearningResults.checkNode(currentNode);
 
-        // Llamada a la función con el nodo actual
+        // Actualizamos los resultados de aprendizaje seleccionados
         updateSelectedCompetencesAndLearningResults(currentNode);
     });
 
@@ -87,6 +100,11 @@ function instanceTreeCompetences() {
     treeCompetencesLearningResults.loadData(competencesLearningResultsCopy);
 }
 
+/**
+ *
+ * @param {*} currentNode
+ * Actualiza el set de resultados de aprendizaje seleccionados cada vez que se marca uno
+ */
 function updateSelectedCompetencesAndLearningResults(currentNode) {
     function getChildNodesLearningResults(node, resultSet = new Set()) {
         if (!node.children.length) return resultSet;
@@ -101,41 +119,39 @@ function updateSelectedCompetencesAndLearningResults(currentNode) {
         return resultSet;
     }
 
-    const { id, state } = currentNode;
-    const isSelected = state.checked;
-
-    function updateSet(set, items, add) {
-        if (add) {
-            set.add(id);
-            items.forEach(item => set.add(item));
-        } else {
-            set.delete(id);
-            items.forEach(item => set.delete(item));
-        }
-        return set;
-    }
+    const isSelected = currentNode.state.checked;
 
     const childLearningResults = getChildNodesLearningResults(currentNode);
+    updateSelectedLearningResults(childLearningResults, isSelected);
 
-    // Convertir selectedLearningResults a Set si aún no lo es
+    if (currentNode.type === "learningResult") {
+        updateSelectedLearningResults([currentNode.id], isSelected);
+    }
+}
+
+// Actualiza el set de resultados de aprendizaje seleccionados y el contador
+function updateSelectedLearningResults(learningResults, isSelected) {
     if (!selectedLearningResults instanceof Set) {
         selectedLearningResults = new Set(selectedLearningResults);
     }
 
-    selectedLearningResults = updateSet(
-        selectedLearningResults,
-        Array.from(childLearningResults),
-        isSelected
-    );
-
-    if (currentNode.type === "learningResult") {
-        selectedLearningResults = updateSet(selectedLearningResults, [id], isSelected);
+    if (isSelected) {
+        learningResults.forEach((lr) => selectedLearningResults.add(lr));
+    } else {
+        learningResults.forEach((lr) => selectedLearningResults.delete(lr));
     }
 
+    updateLearningResultsSelectedCounter();
+}
+
+// Actualiza el contador de resultados de aprendizaje seleccionados
+function updateLearningResultsSelectedCounter() {
+    document.getElementById("selected-learning-results").classList.remove("hidden");
+    document.getElementById("selected-learning-results-count").innerText =
+        selectedLearningResults.size;
 }
 
 function saveLearningResults() {
-
     const params = {
         url: "/profile/competences_learning_results/save_learning_results",
         method: "POST",
@@ -148,5 +164,6 @@ function saveLearningResults() {
     };
 
     apiFetch(params);
-
 }
+
+

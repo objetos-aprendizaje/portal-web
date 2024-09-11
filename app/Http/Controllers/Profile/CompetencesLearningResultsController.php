@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Profile;
 
+use App\Exceptions\OperationFailedException;
 use App\Models\CompetencesModel;
 use App\Models\LearningResultsModel;
 use Illuminate\Routing\Controller as BaseController;
@@ -72,6 +73,11 @@ class CompetencesLearningResultsController extends BaseController
 
     public function saveLearningResults(Request $request) {
         $learningResults = $request->input('learningResults');
+        $countLearningResults = count($learningResults);
+
+        if($countLearningResults > 100) {
+            throw new OperationFailedException('No puedes seleccionar más de 100 resultados de aprendizaje', 406);
+        }
 
         $learningResultsBd = LearningResultsModel::whereIn('uid', $learningResults)->get();
         Auth::user()->learningResultsPreferences()->sync($learningResultsBd->pluck('uid'));

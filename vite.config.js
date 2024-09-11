@@ -42,6 +42,7 @@ export default defineConfig({
                 'node_modules/infinite-tree/dist/infinite-tree.css',
                 "resources/js/recover_password.js",
                 "resources/js/register.js",
+                "resources/js/accept_policies.js"
             ],
             refresh: true,
         }),

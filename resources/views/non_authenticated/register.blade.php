@@ -3,8 +3,7 @@
     <section class="md:flex hidden">
 
         <div class="w-1/2">
-            <img id="image-background" src="{{ asset('data/images/background_login.png') }}"
-                class="object-cover w-full">
+            <img id="image-background" src="{{ asset('data/images/background_login.png') }}" class="object-cover w-full">
         </div>
 
         <div class="w-1/2 justify-center flex items-center">
@@ -20,40 +19,59 @@
                     <p class="text-center mb-[20px]">¿Ya tienes una cuenta? <a class="text-color_1" href="/login">Inicia
                             Sesión</a></p>
 
-                    <form id="registerFormDesktop" action="/register/submit" method="POST" prevent-default>
+                    <form id="registerFormDesktop" action="/register/submit" method="POST">
                         @csrf
                         <div class="mb-[25px]">
 
                             <div class="flex gap-[20px] mb-[20px]">
                                 <div class="flex flex-col w-1/2">
                                     <label class="px-3 mb-[8px]">Nombre</label>
-                                    <input
+                                    <input aria-label="Nombre"
                                         class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[50px]"
-                                        type="text" name="first_name" />
+                                        type="text" name="first_name" value="{{ old('first_name') }}" />
                                 </div>
 
                                 <div class="flex flex-col w-1/2">
                                     <label class="px-3 mb-[8px]">Apellidos</label>
-                                    <input
+                                    <input aria-label="apellidos"
                                         class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[50px]"
-                                        type="text" name="last_name" />
+                                        type="text" name="last_name" value="{{ old('last_name') }}" />
                                 </div>
                             </div>
 
                             <div class="flex flex-col mb-[20px]">
                                 <label class="px-3 mb-[8px]">Correo</label>
-                                <input
+                                <input aria-label="email"
                                     class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[50px]"
-                                    type="text" name="email" />
+                                    type="text" name="email" value="{{ old('email') }}" />
                             </div>
 
                             <div class="flex flex-col mb-[20px]">
                                 <label class="px-3 mb-[8px]">Contraseña</label>
-                                <input class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
+                                <input aria-label="contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
                                     name="password" type="password" />
                             </div>
 
-                            <button class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Registrarme
+                            <div class="flex flex-col mb-[20px]">
+                                <label class="px-3 mb-[8px]">Confirma la contraseña</label>
+                                <input aria-label="confirmar contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
+                                    name="password_confirmation" type="password" />
+                            </div>
+
+                            @if ($errors->any())
+                                <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px]">
+                                    <p>Los siguientes campos son erróneos:</p>
+                                    <ul class="list-disc">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+
+                                </div>
+                            @endif
+
+                            <button title="registrar" type="submit"
+                                class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Registrarme
                                 {{ e_heroicon('arrow-up-right', 'outline') }}</button>
 
                         </div>
@@ -96,7 +114,7 @@
                         <div class="flex justify-center gap-[32px]">
                             @if ($parameters_login_systems['facebook_login_active'])
                                 <a class="no-effect-hover" href="/auth/facebook">
-                                    <button type="button"
+                                    <button title="facebook login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                                         <img class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
                                     </button>
@@ -105,7 +123,7 @@
 
                             @if ($parameters_login_systems['twitter_login_active'])
                                 <a class="no-effect-hover" href="/auth/twitter">
-                                    <button type="button"
+                                    <button title="twitter login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
                                     </button>
@@ -114,7 +132,7 @@
 
                             @if ($parameters_login_systems['linkedin_login_active'])
                                 <a class="no-effect-hover" href="/auth/linkedin">
-                                    <button type="button"
+                                    <button title="linkedin login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
                                     </button>
@@ -123,7 +141,7 @@
 
                             @if ($parameters_login_systems['google_login_active'])
                                 <a class="no-effect-hover" href="/auth/google">
-                                    <button type="button"
+                                    <button title="google login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
                                     </button>
@@ -132,7 +150,7 @@
 
                             @if ($urlRediris)
                                 <a class="no-effect-hover" href="{{ $urlRediris }}">
-                                    <button type="button"
+                                    <button title="rediris login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
                                     </button>
@@ -165,36 +183,54 @@
         <div class="text-[28px] font-bold text-center mb-[15px]">Registrarme</div>
 
         <div class="mb-[25px]">
-            <form id="registerFormMobile" action="/register/submit" method="POST" prevent-default>
+            <form id="registerFormMobile" action="/register/submit" method="POST">
                 @csrf
 
                 <div class="flex flex-col mb-[20px]">
                     <label class="px-3 mb-[8px]">Nombre</label>
-                    <input
+                    <input aria-label="nombre"
                         class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3 focus:border-color_1 "
-                        type="text" name="first_name" />
+                        type="text" name="first_name" value="{{ old('first_name') }}" />
                 </div>
 
                 <div class="flex flex-col mb-[20px]">
                     <label class="px-3 mb-[8px]">Apellidos</label>
-                    <input
+                    <input aria-label="apellidos"
                         class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3 focus:border-color_1 "
-                        type="text" name="last_name"/>
+                        type="text" name="last_name" value="{{ old('last_name') }}" />
                 </div>
 
                 <div class="flex flex-col mb-[20px]">
                     <label class="px-3 mb-[8px]">Correo</label>
-                    <input
+                    <input aria-label="email"
                         class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3 focus:border-color_1 "
-                        type="text" />
+                        type="text" name="email" value="{{ old('email') }}" />
                 </div>
 
                 <div class="flex flex-col mb-[20px]">
                     <label class="px-3 mb-[8px]">Contraseña</label>
-                    <input class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3" type="password" />
+                    <input aria-label="contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3" name="password"
+                        type="password" />
                 </div>
 
-                <button class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Registrarme
+                <div class="flex flex-col mb-[20px]">
+                    <label class="px-3 mb-[8px]">Confirmar contraseña</label>
+                    <input aria-label="confirmar contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
+                        name="password_confirmation" type="password" />
+                </div>
+
+                @if ($errors->any())
+                    <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px]">
+                        <p>Los siguientes campos son erróneos:</p>
+                        <ul class="list-disc">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <button title="registro" type="submit" class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Registrarme
                     {{ e_heroicon('arrow-up-right', 'outline') }}</button>
             </form>
         </div>
@@ -237,7 +273,7 @@
         <div class="flex justify-center gap-[32px] flex-wrap">
             @if ($parameters_login_systems['facebook_login_active'])
                 <a class="no-effect-hover" href="/auth/facebook">
-                    <button type="button"
+                    <button title="facebook login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                         <img class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
                     </button>
@@ -246,7 +282,7 @@
 
             @if ($parameters_login_systems['twitter_login_active'])
                 <a class="no-effect-hover" href="/auth/twitter">
-                    <button type="button"
+                    <button title="twitter login"type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
                     </button>
@@ -255,7 +291,7 @@
 
             @if ($parameters_login_systems['linkedin_login_active'])
                 <a class="no-effect-hover" href="/auth/linkedin">
-                    <button type="button"
+                    <button title="linkedin login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
                     </button>
@@ -264,7 +300,7 @@
 
             @if ($parameters_login_systems['google_login_active'])
                 <a class="no-effect-hover" href="/auth/google">
-                    <button type="button"
+                    <button title="google login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
                     </button>
@@ -273,7 +309,7 @@
 
             @if ($urlRediris)
                 <a class="no-effect-hover" href="{{ $urlRediris }}">
-                    <button type="button"
+                    <button title="rediris login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
                     </button>
