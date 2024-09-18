@@ -17,6 +17,8 @@ class EducationalProgramsStudentsDocumentsModel extends Model
         'uid' => 'string',
     ];
 
+    protected $fillable = ['uid','user_uid','educational_program_document_uid','document_path'];
+
     public $incrementing = false;
 
     public function educationalProgramDocument()

@@ -182,6 +182,4 @@
     </div>
 
     <input type="hidden" id="educational_program_uid" value="{{ $educational_program->uid }}" />
-
-    @include('partials.footer')
 @endsection

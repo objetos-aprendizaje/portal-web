@@ -8,8 +8,8 @@
         <form type="POST" prevent-default id="submit-acceptance-policies">
             @csrf
             @foreach ($policiesMustAccept as $policy)
-                <div class="flex gap-2 items-center mb-[23px]"><input type="checkbox" class="text-color_1" id="{{ $policy->uid }}"
-                        name="{{ $policy->uid }}" />
+                <div class="flex gap-2 items-center mb-[23px]"><input type="checkbox" class="text-color_1"
+                        id="{{ $policy->uid }}" name="{{ $policy->uid }}" />
                     <label for="{{ $policy->uid }}">
                         <a class="text-color_1" href="/page/{{ $policy->slug }}" target="_blank">{{ $policy->name }}</a>
                     </label>
@@ -20,6 +20,4 @@
 
         </form>
     </div>
-
-    @include('partials.footer')
 @endsection

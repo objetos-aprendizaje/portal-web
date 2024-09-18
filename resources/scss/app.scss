@@ -1115,18 +1115,6 @@ body.modal-open {
     @apply bg-cover w-full bg-center bg-no-repeat;
 }
 
-.button-register-home {
-    &:hover{
-        @apply bg-color_4 bg-opacity-80;
-    }
-    div {
-        svg {
-          @apply w-[15px];
-        }
-    }
-}
-
-
 /******************************* DUDAS PAGE ********************/
 
 .dudas-img {

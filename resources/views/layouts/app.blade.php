@@ -16,8 +16,11 @@
 
     @vite(['resources/css/app.css', 'resources/scss/app.scss', 'resources/js/app.js', 'resources/css/toastify.css', 'resources/js/header.js', 'resources/js/modal_handler.js'])
 
+    @php
+        $isProfilePage = Request::is('profile*');
+    @endphp
 
-    @if (Request::is('profile*'))
+    @if ($isProfilePage)
         @vite(['resources/js/profile/menu.js'])
     @endif
 
@@ -143,7 +146,7 @@
 <body>
     @include('partials.header')
 
-    @if (Request::is('profile*'))
+    @if ($isProfilePage)
         @include('layouts.app-profile')
     @else
         @include('layouts.app-main')
@@ -151,6 +154,10 @@
 
     @include('partials.loading')
     @include('partials.notification-info-modal')
+
+    @if (!$isProfilePage)
+        @include('partials.footer')
+    @endif
 </body>
 
 </html>

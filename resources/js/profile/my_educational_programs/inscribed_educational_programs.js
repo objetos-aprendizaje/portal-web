@@ -381,9 +381,10 @@ function fillEducationalProgramDetails(template, educationalProgram) {
         ".documentation-btn"
     ).dataset.educational_program_uid = educationalProgram.uid;
 
-    template.querySelector(
-        ".more-options-btn"
-    ).dataset.educational_program_uid = educationalProgram.uid;
+    const moreOptionsButtons = template.querySelectorAll(".more-options-btn");
+    moreOptionsButtons.forEach((button) => {
+        button.dataset.educational_program_uid = educationalProgram.uid;
+    });
 }
 
 function fillEducationalProgramCourses(template, educationalProgram) {

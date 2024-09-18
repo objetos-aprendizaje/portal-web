@@ -240,6 +240,4 @@
     </div>
 
     <input type="hidden" id="course_uid" value="{{ $course->uid }}">
-
-    @include('partials.footer')
 @endsection
