@@ -5,5 +5,4 @@
         <h2 class="mt-4">{{ $errorMessage }}</h2>
 
     </div>
-    @include('partials.footer')
 @endsection

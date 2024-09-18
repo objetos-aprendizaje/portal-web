@@ -19,7 +19,9 @@ class EducationalResourceEmailsContactsModel extends Model
         'uid' => 'string',
     ];
 
-    protected $fillable = ['uid', 'course_uid', 'email'];
+    public $timestamps = false;
+
+    protected $fillable = ['uid', 'educational_resource_uid', 'email'];
 
     public $incrementing = false;
 }

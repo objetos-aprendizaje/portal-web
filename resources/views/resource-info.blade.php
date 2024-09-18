@@ -126,5 +126,4 @@
         </div>
 
         <input type="hidden" id="educational_resource_uid" value="{{ $educational_resource->uid }}">
-        @include('partials.footer')
     @endsection

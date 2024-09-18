@@ -10,7 +10,7 @@
                     'title' => $sliderPrevisualization->title,
                     'description' => $sliderPrevisualization->description,
                     'registerButton' => true,
-                    'colorFont' => $sliderPrevisualization->color,
+                    'colorFont' => $sliderPrevisualization->color ?? '#fff',
                 ])
             @endif
 
@@ -23,7 +23,7 @@
                 'description' =>
                     $general_options['carrousel_description'] ??
                     'Esta es la descripción de prueba. Puedes cambiarla en la configuración del portal',
-                'colorFont' => $general_options['main_slider_color_font'],
+                'colorFont' => $general_options['main_slider_color_font'] ?? '#fff',
             ])
 
             <!-- SLIDERS DE CURSOS Y PROGRAMAS FORMATIVOS -->
@@ -34,7 +34,7 @@
                     'description' => $course['featured_big_carrousel_description'],
                     'registerButton' => true,
                     'registerLink' => "/course/" . $course->uid,
-                    'colorFont' => $course['featured_slider_color_font'],
+                    'colorFont' => $course['featured_slider_color_font'] ?? '#fff',
                 ])
             @endforeach
 
@@ -45,7 +45,7 @@
                     'description' => $educationalProgram['featured_slider_description'],
                     'registerButton' => true,
                     'registerLink' => "/educational_program/" . $educationalProgram->uid,
-                    'colorFont' => $educationalProgram['featured_slider_color_font'],
+                    'colorFont' => $educationalProgram['featured_slider_color_font'] ?? '#fff',
                 ])
             @endforeach
 
@@ -288,7 +288,4 @@
             </div>
         </div>
     </template>
-
-
-    @include('partials.footer')
 @endsection

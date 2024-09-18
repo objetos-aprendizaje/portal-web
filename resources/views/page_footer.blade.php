@@ -12,9 +12,6 @@
             {!! $page->content !!}
         </section>
     </div>
-
-@include('partials.footer')
-
 @endsection
 
 

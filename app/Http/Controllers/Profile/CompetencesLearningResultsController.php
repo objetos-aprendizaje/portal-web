@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Exceptions\OperationFailedException;
-use App\Models\CompetencesModel;
+use App\Models\CompetenceFrameworksModel;
 use App\Models\LearningResultsModel;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
@@ -14,9 +14,15 @@ class CompetencesLearningResultsController extends BaseController
 
     public function index()
     {
-        $competencesLearningResults = CompetencesModel::whereNull('parent_competence_uid')->with(['subcompetences', 'learningResults'])->get(['uid', 'name']);
+        $competenceFrameworks = CompetenceFrameworksModel::with([
+            'levels',
+            'allSubcompetences',
+            'allSubcompetences.learningResults',
+            'allSubcompetences.allSubcompetences',
+            'allSubcompetences.allSubcompetences.learningResults'
+        ])->get();
 
-        $competencesLearningResultsMapped = $this->mapCompetences($competencesLearningResults->toArray());
+        $competencesLearningResultsMapped = $this->mapCompetences($competenceFrameworks->toArray());
 
         $learningResultsUserSelected = Auth::user()->learningResultsPreferences->pluck('uid')->toArray();
 
@@ -48,8 +54,8 @@ class CompetencesLearningResultsController extends BaseController
             ];
 
             // Si hay subcompetences, aplicar la función de manera recursiva
-            if (!empty($competence['subcompetences'])) {
-                $mappedCompetence['children'] = $this->mapCompetences($competence['subcompetences']);
+            if (!empty($competence['all_subcompetences'])) {
+                $mappedCompetence['children'] = $this->mapCompetences($competence['all_subcompetences']);
             }
 
             if (!empty($competence['learning_results'])) {

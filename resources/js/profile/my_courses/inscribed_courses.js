@@ -274,7 +274,10 @@ function fillCourseDetails(template, course) {
         link.href = `/course/${course.uid}`;
     });
 
-    template.querySelector(".more-options-btn").dataset.course_uid = course.uid;
+    const moreOptionsButtons = template.querySelectorAll(".more-options-btn");
+    moreOptionsButtons.forEach((button) => {
+        button.dataset.course_uid = course.uid;
+    });
 }
 
 function setCourseDocumentsBtn(template, course) {

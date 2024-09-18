@@ -17,7 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
 function controlSearch() {
     const searchInput = document.querySelector(".searcher input");
     const searchButton = document.querySelector(".searcher button");
-    const searchButtonFooter = document.querySelector(".searcher-footer button");
+    const searchButtonFooter = document.querySelector(
+        ".searcher-footer button"
+    );
 
     function redirectToSearcher() {
         const query = searchInput.value.trim();
@@ -38,15 +40,17 @@ function controlSearch() {
         }
     });
 
-    searchButtonFooter.addEventListener("click", function () {
-        redirectToSearcher();
-    });
-
-    searchButtonFooter.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
+    if (searchButtonFooter) {
+        searchButtonFooter.addEventListener("click", function () {
             redirectToSearcher();
-        }
-    });
+        });
+
+        searchButtonFooter.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                redirectToSearcher();
+            }
+        });
+    }
 }
 
 function controlSubmenus() {
@@ -78,16 +82,15 @@ function controlSubmenus() {
         });
 
         //control para manejo con teclado
-        item.addEventListener('focusin', () => {
+        item.addEventListener("focusin", () => {
             hideAllSubmenus(); // Oculta todos los submenús
-            submenu.classList.remove('hidden'); // Muestra el submenú correspondiente
+            submenu.classList.remove("hidden"); // Muestra el submenú correspondiente
         });
 
-        submenu.addEventListener('focusout', () => {
+        submenu.addEventListener("focusout", () => {
             hideAllSubmenus(); // Oculta todos los submenús
-            submenu.classList.add('hidden'); // Muestra el submenú correspondiente
+            submenu.classList.add("hidden"); // Muestra el submenú correspondiente
         });
-
     });
 
     // Añade el manejador de eventos al header
@@ -771,7 +774,6 @@ export function downloadFileBackend(token) {
  * Controla el botón de más opciones situado en la parte superior derecha de los contenedores de los cursos
  */
 export function moreOptionsBtnHandler() {
-
     function deleteAllOptionsList() {
         const optionsList = document.querySelectorAll(".options-list");
         optionsList.forEach((list) => {

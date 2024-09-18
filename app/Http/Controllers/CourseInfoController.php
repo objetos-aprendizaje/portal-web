@@ -49,10 +49,7 @@ class CourseInfoController extends BaseController
 
     private function getCourse($uid) {
         $course = CoursesModel::select('courses.*', 'califications_avg.average_calification')->where('uid', $uid)->with([
-            'status', 'tags', 'teachers', 'course_type', 'paymentTerms',
-            'blocks.competences' => function ($query) {
-                $query->where('is_multi_select', 0);
-            }
+            'status', 'tags', 'teachers', 'course_type', 'paymentTerms'
         ])
             ->leftJoinSub(
                 CoursesAssessmentsModel::select('course_uid', DB::raw('ROUND(AVG(calification), 1) as average_calification'))

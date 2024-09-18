@@ -13,6 +13,14 @@ class CategoriesModel extends Model
 
     protected $keyType = 'string';
 
+    protected $fillable = [
+        "uid",
+        "name",
+        "color",
+        "image_path",
+        "description",
+    ];
+
     public function parentCategory()
     {
         return $this->belongsTo(CategoriesModel::class, 'parent_category_uid')->with('parentCategory')->whereNull('parent_category_uid');

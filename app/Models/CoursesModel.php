@@ -14,10 +14,10 @@ class CoursesModel extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'title', 'description', 'course_type_uid', 'educational_program_type_uid',
+        'uid','title', 'description', 'course_type_uid', 'educational_program_type_uid',
         'call_uid', 'course_status_uid', 'min_required_students', 'center',
         'start_date', 'end_date', 'presentation_video_url', 'objectives', 'ects_workload',
-        'validate_student_registrations', 'lms_url', 'cost'
+        'validate_student_registrations', 'lms_url', 'cost','educational_program_uid'
     ];
 
     public function average_calification()

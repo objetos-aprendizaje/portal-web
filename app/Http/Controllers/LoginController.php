@@ -118,8 +118,6 @@ class LoginController extends BaseController
     {
         $user_twitter = Socialite::driver('twitter')->user();
 
-        $user_twitter->email = 'ja.cabello11@asesoresnt.com';
-
         $user = new stdClass();
         $user->email = $user_twitter->email;
         $user->first_name = $user_twitter->name;
