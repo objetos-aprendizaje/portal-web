@@ -13,6 +13,8 @@ export default defineConfig({
                 'resources/js/header.js',
                 'resources/js/search.js',
                 'node_modules/treeselectjs/dist/treeselectjs.css',
+                "node_modules/tom-select/dist/js/tom-select.complete.min.js",
+                "node_modules/tom-select/dist/css/tom-select.min.css",
                 'resources/js/course_info.js',
                 'resources/js/educational_resource_info.js',
                 "resources/js/toast.js",

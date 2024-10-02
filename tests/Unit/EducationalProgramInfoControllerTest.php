@@ -23,7 +23,7 @@ class EducationalProgramInfoControllerTest extends TestCase
         // Crear un programa educativo en la base de datos
         $program = EducationalProgramsModel::factory()
             ->withEducationalProgramType()->create([
-                'uid' => '1234-5678',
+                'uid' => generate_uuid(),
                 'name' => 'Programa educativo de prueba'
             ])->first();
 
@@ -79,7 +79,7 @@ class EducationalProgramInfoControllerTest extends TestCase
         // Crear un programa educativo en la base de datos
         $program = EducationalProgramsModel::factory()
             ->withEducationalProgramType()->create([
-                'uid' => '1234-5678',
+                'uid' => generate_uuid(),
                 'name' => 'Programa educativo de prueba'
             ])->first();
 
@@ -133,8 +133,8 @@ class EducationalProgramInfoControllerTest extends TestCase
      */
     public function testCalificateRegistersNewCalification()
     {
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Crear un usuario y autenticarlo      
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 
         // Crear un programa educativo en la base de datos
@@ -158,8 +158,8 @@ class EducationalProgramInfoControllerTest extends TestCase
         $response->assertStatus(200);
 
         // Verificar que se ha registrado la calificación correctamente en la base de datos
-        $this->assertDatabaseHas('educational_programs_assessments', [
-            'user_uid' => $user->uid,
+        $this->assertDatabaseHas('educational_programs_assessments', [    
+            'user_uid'=> $user->uid,     
             'educational_program_uid' => $program->uid,
             'calification' => 4,
         ]);
@@ -171,8 +171,8 @@ class EducationalProgramInfoControllerTest extends TestCase
      */
     public function testCalificateUpdatesExistingCalification()
     {
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Crear un usuario y autenticarlo    
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 
         // Crear un programa educativo en la base de datos
@@ -227,7 +227,7 @@ class EducationalProgramInfoControllerTest extends TestCase
         $program = EducationalProgramsModel::factory()
             ->withEducationalProgramType()
             ->create([
-                'uid' => '1234-5678',
+                'uid' => generate_uuid(),
                 'name' => 'Programa educativo de prueba',
             ])->first();
 

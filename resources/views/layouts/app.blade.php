@@ -8,7 +8,7 @@
 
     <title>
         @if (isset($page_title))
-            {{ $page_title }}
+            {{ $page_title }} - POA
         @else
             POA
         @endif
@@ -140,6 +140,10 @@
     @php
         echo $general_options['scripts'];
     @endphp
+
+    @if (isset($tomselect) && $tomselect)
+        @vite(['node_modules/tom-select/dist/css/tom-select.min.css'])
+    @endif
 
 </head>
 

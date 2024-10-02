@@ -47,14 +47,15 @@
                         <div class="text-center mb-[30px]">
 
                             @if ($educational_resource->resource_way == 'FILE')
-                                <a id="access-resource"
-                                    data-destination="{{ env('BACKEND_URL') . '/' . $educational_resource->resource_path }}"
-                                    class="no-effect-hover" href="javascrit:void(0)" target="_blank"><button type="button"
-                                        class="btn btn-primary">Descargar ahora
-                                        {{ e_heroicon('arrow-down-tray', 'outline') }}</button></a>
+                                <button id="download-button"
+                                    data-url="{{ env('BACKEND_URL') . '/' . $educational_resource->resource_path }}"
+                                    type="button" class="btn btn-primary">Descargar ahora
+                                    {{ e_heroicon('arrow-down-tray', 'outline') }}
+                                </button>
                             @elseif ($educational_resource->resource_way == 'URL')
-                                <a id="access-resource" data-destination="{{ $educational_resource->resource_url }}"
-                                    href="javascrit:void(0)" target="_blank"><button type="button" class="btn btn-primary">Ir
+                                <a data-destination="{{ $educational_resource->resource_url }}"
+                                    href="{{ $educational_resource->resource_url }}" target="_blank"><button type="button"
+                                        class="btn btn-primary">Ir
                                         al recurso
                                         {{ e_heroicon('arrow-top-right-on-square', 'outline') }}</button></a>
                             @endif

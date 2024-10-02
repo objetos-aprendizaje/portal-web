@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Profile;
 
+use App\Models\DepartmentsModel;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -12,6 +13,8 @@ class MyProfileController extends BaseController
     public function index()
     {
         $user = Auth::user();
+        $departments = DepartmentsModel::all();
+
         return view(
             'profile.my_profile.index',
             [
@@ -21,6 +24,7 @@ class MyProfileController extends BaseController
                     "resources/js/my_profile.js"
                 ],
                 "user" => $user,
+                "departments" => $departments,
                 "currentPage" => "myProfile"
             ]
         );
@@ -30,7 +34,7 @@ class MyProfileController extends BaseController
     {
         $user = Auth::user();
 
-        $this->updateUserDetails($request, $user);
+        $user->fill($request->all());
 
         // Guardar la imagen en el backend
         if ($request->file('photo_path')) {
@@ -46,16 +50,6 @@ class MyProfileController extends BaseController
         $user->save();
 
         return response()->json(['message' => 'Tu perfil se ha actualizado correctamente'], 200);
-    }
-
-    private function updateUserDetails($request, $user)
-    {
-        $user->first_name = $request->input('first_name');
-        $user->last_name = $request->input('last_name');
-        $user->nif = $request->input('nif');
-        $user->curriculum = $request->input('curriculum');
-        $user->department = $request->input('department');
-        $user->curriculum = $request->input('curriculum');
     }
 
     // Enviar la imagen al webhook del backend y nos devuelve la ruta asignada

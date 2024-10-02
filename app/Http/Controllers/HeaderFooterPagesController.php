@@ -8,30 +8,29 @@ use Illuminate\Routing\Controller as BaseController;
 
 class HeaderFooterPagesController extends BaseController
 {
-
     public function index($slug)
     {
-        // Buscamos en el header
+        $page = $this->findPageBySlug($slug);
+
+        if (!$page) {
+            abort(404);
+        }
+
+        return view("page_footer", [
+            'page' => $page,
+            'name' => $page->name,
+            'page_title' => $page->name
+        ]);
+    }
+
+    private function findPageBySlug($slug)
+    {
         $page = HeaderPagesModel::where('slug', $slug)->first();
 
-        if ($page) {
-            return view("page_footer", [
-                'page' => $page,
-                'title' => $page->title
-            ]);
+        if (!$page) {
+            $page = FooterPagesModel::where('slug', $slug)->first();
         }
 
-        // Buscamos en el footer
-        $page = FooterPagesModel::where('slug', $slug)->first();
-        if ($page) {
-            return view("page_footer", [
-                'resources' => ["resources/js/home.js", "resources/js/carrousel.js"],
-                'page' => $page,
-                'title' => $page->title
-            ]);
-        }
-
-        // Si no está en ninguno de los dos, devolvemos un 404
-        abort(404);
+        return $page;
     }
 }

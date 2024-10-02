@@ -34,7 +34,8 @@ class GeneralNotificationsUserMiddleware
     }
 
     // Combinamos las notificaciones generales y automáticas
-    private function getCombinedGeneralNotifications() {
+    private function getCombinedGeneralNotifications()
+    {
 
         $user = Auth::user();
         $userUid = $user->uid;
@@ -72,8 +73,7 @@ class GeneralNotificationsUserMiddleware
             ->where('start_date', '<=', now())
             ->where('end_date', '>=', now())
             ->addSelect([
-                'is_read' => UserGeneralNotificationsModel::select(DB::raw('IF(COUNT(*), 1, 0)'))
-                    ->whereColumn('user_general_notifications.general_notification_uid', 'general_notifications.uid')
+                'is_read' => UserGeneralNotificationsModel::select(DB::raw('CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS BOOLEAN)'))->whereColumn('user_general_notifications.general_notification_uid', 'general_notifications.uid')
                     ->where('user_general_notifications.user_uid', $userUid)
                     ->limit(1)
             ])

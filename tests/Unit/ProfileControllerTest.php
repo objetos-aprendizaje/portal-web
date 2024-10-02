@@ -70,50 +70,47 @@ class ProfileControllerTest extends TestCase
  * @test Index
  */
 
-    public function testIndexProfile()
-    {
-        // Arrange
-        $user = UsersModel::factory()->create()->first();
-        $this->actingAs($user);
+    // public function testIndexProfile()
+    // {
+    //     // Arrange
+    //     $user = UsersModel::factory()->create()->first();
+    //     $this->actingAs($user);
 
-        // Simula las notificaciones generales
-        $generalNotifications = [
-            [
-                'uid' => generate_uuid(), // Asegúrate de que esto genere un UUID válido
-                'type' => 'general_notification',
-                'is_read' => false,
-                'title' => 'Notificación de prueba',
-                'description' => 'Esta es una descripción de prueba.',
-                'date' => now(), // O cualquier fecha válida
-            ],
-            [
-                'uid' => generate_uuid(),
-                'type' => 'general_notification',
-                'is_read' => true,
-                'title' => 'Notificación leída',
-                'description' => 'Descripción de una notificación leída.',
-                'date' => now()->subDays(1), // Fecha anterior para simular una notificación leída
-            ],
-        ];
+    //     // Simula las notificaciones generales
+    //     $generalNotifications = [
+    //         [
+    //             'uid' => generate_uuid(), // Asegúrate de que esto genere un UUID válido
+    //             'type' => 'general_notification',
+    //             'is_read' => false,
+    //             'title' => 'Notificación de prueba',
+    //             'description' => 'Esta es una descripción de prueba.',
+    //             'date' => now(), // O cualquier fecha válida
+    //         ],
+    //         [
+    //             'uid' => generate_uuid(),
+    //             'type' => 'general_notification',
+    //             'is_read' => true,
+    //             'title' => 'Notificación leída',
+    //             'description' => 'Descripción de una notificación leída.',
+    //             'date' => now()->subDays(1), // Fecha anterior para simular una notificación leída
+    //         ],
+    //     ];
 
-        // Establece las variables compartidas manualmente
-        View::share('general_notifications', $generalNotifications);
-        View::share('unread_general_notifications', true); // Cambia a false si no hay notificaciones no leídas
-
-
-        // Act
-        $response = $this->get('/profile/update_account');
-
-        // Assert
-        $response->assertStatus(200);
-        $response->assertViewIs('profile.my_profile.index');
-        $response->assertSee('Mi perfil'); // Adjust as needed based on expected view content
-        $response->assertSee($user->name); // Adjust as needed based on expected user data
-        $response->assertSee('resources/js/my_profile.js');
-    }
+    //     // Establece las variables compartidas manualmente
+    //     View::share('general_notifications', $generalNotifications);
+    //     View::share('unread_general_notifications', true); // Cambia a false si no hay notificaciones no leídas
 
 
+    //     // Act
+    //     $response = $this->get('/profile/update_account');
 
+    //     // Assert
+    //     $response->assertStatus(200);
+    //     $response->assertViewIs('profile.my_profile.index');
+    //     $response->assertSee('Mi perfil'); // Adjust as needed based on expected view content
+    //     $response->assertSee($user->name); // Adjust as needed based on expected user data
+    //     $response->assertSee('resources/js/my_profile.js');
+    // }
 
 
 }

@@ -9,4 +9,8 @@ class FooterPagesModel extends Model
 {
     use HasFactory;
     protected $table = 'footer_pages';
+    protected $primaryKey = 'uid';
+    protected $keyType = 'string';
+
+    protected $fillable = ['name', 'content', 'slug', 'order', 'acceptance_required', 'version'];
 }

@@ -24,7 +24,8 @@ class DoubtsController extends Controller
                 "resources/js/doubts.js"
             ],
             "learning_object_type" => $learning_object_type,
-            "uid" => $uid
+            "uid" => $uid,
+            "page_title" => "Dudas"
         ]);
     }
 

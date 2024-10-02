@@ -8,7 +8,7 @@ use App\Models\EducationalResourcesModel;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 
 class ResourceInfoController extends BaseController
 {
@@ -19,11 +19,15 @@ class ResourceInfoController extends BaseController
 
         if (!$educational_resource) abort(404);
 
+        // Grabar acceso
+        if (Auth::check()) $this->storeResourceAccess($uid);
+
         return view("resource-info", [
             'educational_resource' => $educational_resource,
             "resources" => [
                 'resources/js/educational_resource_info.js'
-            ]
+            ],
+            'page_title' => $educational_resource->title,
         ]);
     }
 
@@ -87,16 +91,13 @@ class ResourceInfoController extends BaseController
         return response()->json(['message' => 'Se ha registrado correctamente la calificación'], 200);
     }
 
-    public function saveAccessResource(Request $request) {
-        $resourceUid = $request->input('educational_resource_uid');
-
-        EducationalResourceAccessModel::insert([
-            'uid' => generate_uuid(),
-            'user_uid' => auth()->user()->uid,
-            'educational_resource_uid' => $resourceUid,
-            'date' => now(),
-        ]);
-
-        return response()->json(['message' => 'Se ha registrado correctamente el acceso al recurso'], 200);
+    private function storeResourceAccess($resourceUid)
+    {
+        $educationalResourceAccess = new EducationalResourceAccessModel();
+        $educationalResourceAccess->uid = generate_uuid();
+        $educationalResourceAccess->user_uid = auth()->user()->uid;
+        $educationalResourceAccess->educational_resource_uid = $resourceUid;
+        $educationalResourceAccess->date = now();
+        $educationalResourceAccess->save();
     }
 }

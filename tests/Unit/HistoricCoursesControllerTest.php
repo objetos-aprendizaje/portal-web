@@ -103,7 +103,16 @@ class HistoricCoursesControllerTest extends TestCase
 
     public function testGetHistoricCourses()
     {
-        $user = UsersModel::factory()->create();
+        
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email'=>'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
         $this->actingAs($user);
 
         $response = $this->post(route('get-historic-courses'), [

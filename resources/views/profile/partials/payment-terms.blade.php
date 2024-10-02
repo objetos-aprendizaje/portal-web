@@ -3,10 +3,10 @@
 
     <!-- desktop -->
     <div class="lg:block hidden">
-        <div class="flex flex-wrap justify-between text-color_3 text-[14px] mb-[6px] gap-[6px]">
-            <div class="payment-term-name"></div>
-            <div class="payment-term-date"></div>
-            <div class="font-bold"><span class="payment-term-cost"></span>€</div>
+        <div class="flex flex-wrap text-color_3 text-[14px] mb-[6px] gap-[6px]">
+            <div class="payment-term-name flex-1"></div>
+            <div class="payment-term-date flex-1"></div>
+            <div class="font-bold flex-1"><span class="payment-term-cost"></span>€</div>
         </div>
         <div>
             <label

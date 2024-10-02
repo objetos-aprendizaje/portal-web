@@ -24,10 +24,16 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
     public function testIndexLoadsEnrolledEducationalProgramsPageWithCorrectData()
     {
 
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email'=>'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
         $this->actingAs($user);
-
 
         // Hacer una solicitud GET a la ruta de programas formativos matriculados
         $response = $this->get(route('my-educational-programs-enrolled'));
@@ -50,8 +56,15 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
      */
     public function testGetEnrolledEducationalProgramsReturnsCorrectData()
     {
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email'=>'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
         $this->actingAs($user);
 
         $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();
@@ -63,26 +76,27 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 [
                     'educational_program_status_uid' => $status->uid
                 ]
-            );            
+            );
 
         $educationalPrograms = EducationalProgramsModel::all();
 
         foreach ($educationalPrograms as $educationalProgram) {
 
             $user->educationalPrograms()->attach($educationalProgram->uid, [
-                'uid' =>generate_uuid(),
-                'status' => 'ENROLLED'
+                'uid' => generate_uuid(),
+                'status' => 'ENROLLED',
+                'acceptance_status' => 'ACCEPTED'
             ]);
         }
 
         CoursesModel::factory()
-        ->withCourseStatus()
-        ->withCourseType()
-        ->create([
-            'educational_program_uid' => $educationalPrograms[0]->uid,
-        ]);
+            ->withCourseStatus()
+            ->withCourseType()
+            ->create([
+                'educational_program_uid' => $educationalPrograms[0]->uid,
+            ]);
 
-        $paymentTerm =EducationalProgramsPaymentTermsModel::factory()->create(
+        $paymentTerm = EducationalProgramsPaymentTermsModel::factory()->create(
             [
                 'educational_program_uid' => $educationalPrograms[0]->uid
             ]
@@ -119,8 +133,15 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
      */
     public function testGetEnrolledEducationalProgramsSearchWorks()
     {
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email'=>'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
         $this->actingAs($user);
 
         $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();
@@ -132,26 +153,27 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 [
                     'educational_program_status_uid' => $status->uid
                 ]
-            );     
+            );
 
         $educationalPrograms = EducationalProgramsModel::all();
 
         foreach ($educationalPrograms as $educationalProgram) {
 
             $user->educationalPrograms()->attach($educationalProgram->uid, [
-                'uid' =>generate_uuid(),
-                'status' => 'ENROLLED'
+                'uid' => generate_uuid(),
+                'status' => 'ENROLLED',
+                'acceptance_status' => 'ACCEPTED'
             ]);
         }
 
         CoursesModel::factory()
-        ->withCourseStatus()
-        ->withCourseType()
-        ->create([
-            'educational_program_uid' => $educationalPrograms[0]->uid,
-        ]);
+            ->withCourseStatus()
+            ->withCourseType()
+            ->create([
+                'educational_program_uid' => $educationalPrograms[0]->uid,
+            ]);
 
-        $paymentTerm =EducationalProgramsPaymentTermsModel::factory()->create(
+        $paymentTerm = EducationalProgramsPaymentTermsModel::factory()->create(
             [
                 'educational_program_uid' => $educationalPrograms[0]->uid
             ]
@@ -162,7 +184,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 'educational_program_payment_term_uid' => $paymentTerm->uid,
                 'user_uid' => $user->uid
             ]
-        );        
+        );
         // Crear una solicitud simulada con búsqueda
         $requestData = [
             'items_per_page' => 2,
@@ -191,28 +213,35 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
      */
     public function testAccessCourseWhenProgramIsInDevelopment()
     {
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email'=>'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
         $this->actingAs($user);
 
         $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();
 
         // Crear un programa formativo con estado 'DEVELOPMENT'
         $program = EducationalProgramsModel::factory()
-        ->withEducationalProgramType()
-        ->create([
-            'educational_program_status_uid' => $status->uid
-        ])->first();
-        
+            ->withEducationalProgramType()
+            ->create([
+                'educational_program_status_uid' => $status->uid
+            ])->first();
+
 
         // Crear un curso asociado al programa
         $course = CoursesModel::factory()
-        ->withCourseStatus()
-        ->withCourseType()
-        ->create([
-            'educational_program_uid' => $program->uid,
-            'lms_url' => 'https://lms.example.com/course/123'
-        ])->first();
+            ->withCourseStatus()
+            ->withCourseType()
+            ->create([
+                'educational_program_uid' => $program->uid,
+                'lms_url' => 'https://lms.example.com/course/123'
+            ])->first();
 
         CoursesAccessesModel::factory()->create(
             [
@@ -252,8 +281,15 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email'=>'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
         $this->actingAs($user);
 
         // Buscar un programa formativo con estado diferente a 'DEVELOPMENT'
@@ -261,19 +297,19 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
 
         // Crear un programa formativo con estado diferente a 'DEVELOPMENT'
         $program = EducationalProgramsModel::factory()
-        ->withEducationalProgramType()
-        ->create([
-            'educational_program_status_uid' => $status->uid
-        ])->first();
-       
+            ->withEducationalProgramType()
+            ->create([
+                'educational_program_status_uid' => $status->uid
+            ])->first();
+
 
         // Crear un curso asociado al programa
         $course = CoursesModel::factory()
-        ->withCourseStatus()
-        ->withCourseType()
-        ->create([
-            'educational_program_uid' => $program->uid
-        ])->first();
+            ->withCourseStatus()
+            ->withCourseType()
+            ->create([
+                'educational_program_uid' => $program->uid
+            ])->first();
 
         // Crear una solicitud simulada para acceder al curso
         $requestData = [
@@ -287,5 +323,4 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         // Hacer la solicitud POST a la ruta de acceso al curso
         $this->post(route('my-educational-programs-enrolled-access-course'), $requestData);
     }
-
 }

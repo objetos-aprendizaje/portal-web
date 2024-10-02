@@ -23,7 +23,7 @@ class CompetencesLearningResultsControllerTest extends TestCase
     public function testIndexLoadsCompetencesLearningResultsPageWithCorrectData()
     {
         // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 
         // Crear un framework de competencias con niveles, subcompetencias y resultados de aprendizaje
@@ -129,8 +129,8 @@ class CompetencesLearningResultsControllerTest extends TestCase
      */
     public function testSaveLearningResultsSavesCorrectly()
     {
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Buscar un usuario y autenticarlo    
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 
         $competence = CompetencesModel::factory()->create()->first();
@@ -175,8 +175,8 @@ class CompetencesLearningResultsControllerTest extends TestCase
         // Desactivar el manejo automático de excepciones para capturar la excepción
         $this->withoutExceptionHandling();
 
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Buscar un usuario y autenticarlo    
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 
         // Crear más de 100 resultados de aprendizaje

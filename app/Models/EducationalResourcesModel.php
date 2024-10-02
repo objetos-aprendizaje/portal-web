@@ -16,7 +16,7 @@ class EducationalResourcesModel extends Model
     protected $fillable = [
         'name', 'description', 'image_path', 'resource_path',
         'status_uid', 'educational_resource_type_uid', 'license_type', 'resource_way',
-        'resource_url'
+        'resource_url', 'embeddings'
     ];
 
     public function status()
@@ -51,5 +51,15 @@ class EducationalResourcesModel extends Model
     public function licenseType()
     {
         return $this->belongsTo(LicenseTypesModel::class, 'license_type_uid', 'uid');
+    }
+
+    public function learningResults()
+    {
+        return $this->belongsToMany(
+            LearningResultsModel::class,
+            'educational_resources_learning_results',
+            'educational_resource_uid',
+            'learning_result_uid'
+        );
     }
 }

@@ -19,8 +19,16 @@ class GeneralNotificationsControllerTest extends TestCase
      */
     public function testGetGeneralNotificationUserMarksAsRead()
     {
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email'=>'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
         $this->actingAs($user);
 
         // Crear una notificación general en la base de datos
@@ -54,8 +62,16 @@ class GeneralNotificationsControllerTest extends TestCase
      */
     public function testGetGeneralNotificationAutomaticUserMarksAsRead()
     {
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email'=>'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
         $this->actingAs($user);
 
         // Verifica que el usuario se ha creado correctamente
@@ -95,12 +111,19 @@ class GeneralNotificationsControllerTest extends TestCase
      */
     public function testGetGeneralNotificationAutomaticUserReturnsErrorForNonExistingNotification()
     {
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email'=>'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
         $this->actingAs($user);
 
         // Hacer una solicitud GET con un UID de notificación automática inexistente
-        $response = $this->getJson('/notifications/general/get_general_notification_automatic_user/non-existing-uid');
+        $response = $this->getJson('/notifications/general/get_general_notification_automatic_user/' . generate_uuid());
 
         // Verificar que la respuesta devuelve un error 404
         $response->assertStatus(404);

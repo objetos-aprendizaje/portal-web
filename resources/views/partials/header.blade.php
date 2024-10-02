@@ -53,7 +53,7 @@
                         <div
                             class="submenu-header hidden absolute shadow top-full bg-white p-[12px] rounded-[8px] w-[260px]">
                             @foreach ($page->headerPagesChildren as $pageChildren)
-                                <a href="{{ $pageChildren->slug }}"
+                                <a href="/page/{{ $pageChildren->slug }}"
                                     class="flex gap-2 p-[10px] hover:bg-color_hover_2 rounded-[8px] mb-[12px]">{{ $pageChildren['name'] }}</a>
                             @endforeach
                         </div>

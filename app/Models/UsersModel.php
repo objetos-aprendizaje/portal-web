@@ -13,7 +13,7 @@ class UsersModel extends Authenticatable
 
     protected $keyType = 'string';
 
-    protected $fillable = ['first_name', 'last_name', 'nif', 'email', 'user_rol_uid', 'curriculum', 'uid', 'verified'];
+    protected $fillable = ['first_name', 'last_name', 'nif', 'email', 'user_rol_uid', 'curriculum', 'uid', 'verified', 'department_uid'];
 
     protected $casts = [
         'uid' => 'string',
@@ -96,6 +96,16 @@ class UsersModel extends Authenticatable
         )->withPivot("acceptance_status", "status");
     }
 
+    public function educationalResources()
+    {
+        return $this->belongsToMany(
+            EducationalResourcesModel::class,
+            'educational_resource_access',
+            'user_uid',
+            'educational_resource_uid'
+        );
+    }
+
     public function educationalPrograms()
     {
         return $this->belongsToMany(
@@ -126,7 +136,8 @@ class UsersModel extends Authenticatable
         );
     }
 
-    public function learningResultsPreferences() {
+    public function learningResultsPreferences()
+    {
         return $this->belongsToMany(
             LearningResultsModel::class,
             'user_learning_results_preferences',
@@ -135,7 +146,8 @@ class UsersModel extends Authenticatable
         );
     }
 
-    public function userPoliciesAccepted() {
+    public function userPoliciesAccepted()
+    {
         return $this->belongsToMany(
             FooterPagesModel::class,
             'user_policies_accepted',

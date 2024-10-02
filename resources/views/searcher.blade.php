@@ -77,13 +77,12 @@
         </section>
 
         <section id="filters"
-            class="p-[24px] bg-color_background_elements grid grid-cols-1 lg:grid-cols-4 gap-[8px] rounded-[8px] mb-[16px] filters-search">
+            class="p-[24px] bg-color_background_elements grid grid-cols-1 lg:grid-cols-3 gap-[8px] rounded-[8px] mb-[16px] filters-search">
             <div class="custom-treeselect" id="treeselect-categories"></div>
 
-            <div class="custom-treeselect" id="treeselect-competences"></div>
-
             <div class="h-[50px]">
-                <select aria-label="estado de los objetos de aprendizaje" class="rounded-[8px] w-full border-none" id="learning-object-status">
+                <select aria-label="estado de los objetos de aprendizaje" class="rounded-[8px] w-full border-none"
+                    id="learning-object-status">
                     <option value="">Estado</option>
                     <option value="INSCRIPTION">En inscripción</option>
                     <option value="DEVELOPMENT">En desarrollo</option>
@@ -120,6 +119,12 @@
                     <option value="1">1 estrellas</option>
                 </select>
             </div>
+
+            <div class="col-span-full learning-results-filter">
+                <select id="learning-results-filter" name="learning_results[]" multiple
+                    placeholder="Selecciona resultados de aprendizaje">
+                </select>
+            </div>
         </section>
 
         <section class="flex justify-between mb-[54px]">
@@ -128,7 +133,8 @@
                     <div>Mostrando <span id="filter-results-showing"></span> de <span id="filter-results-total"></span>
                         resultados</div>
                     <div class="border-l border h-[16px] flex-none hidden lg:block"></div>
-                    <div class="text-[#FF2954]" id="delete-all-filters-btn"><a title="limpiar" href="javascript:void(0)">Limpiar</a></div>
+                    <div class="text-[#FF2954]" id="delete-all-filters-btn"><a title="limpiar"
+                            href="javascript:void(0)">Limpiar</a></div>
                 </div>
             </div>
         </section>
@@ -159,7 +165,8 @@
         <template id="learning-object-template">
             <div class="learning-object-block shadow-lg">
                 <div class="learning-object-img-container">
-                    <a title="objeto de aprendizaje" class="no-effect-hover" class="learning-object-url" href="javascript:void(0)">
+                    <a title="objeto de aprendizaje" class="no-effect-hover" class="learning-object-url"
+                        href="javascript:void(0)">
                         <img alt="objeto de aprendizaje" src="" class="learning-object-image">
                     </a>
                     <div class="learning-object-img-container-title learning-object-type"></div>

@@ -27,6 +27,7 @@ class EducationalProgramInfoController extends BaseController
             ],
             "educational_program" => $educational_program,
             "teachers" => $teachers,
+            'page_title' => $educational_program->name,
         ]);
     }
 
@@ -114,10 +115,8 @@ class EducationalProgramInfoController extends BaseController
                 },
                 'courses.teachers',
                 'educational_program_type'
-            ])->addSelect([
-                'total_ects_workload' => CoursesModel::select(DB::raw('SUM(ects_workload)'))
-                    ->whereColumn('educational_program_uid', 'educational_programs.uid')
             ])
+            ->addSelect(DB::raw('(SELECT SUM(CAST(ects_workload AS numeric)) FROM courses WHERE courses.educational_program_uid = educational_programs.uid) as total_ects_workload'))
             ->addSelect(['total_cost' => CoursesModel::select(DB::raw('SUM(cost)'))
                 ->whereColumn('educational_program_uid', 'educational_programs.uid')
             ])

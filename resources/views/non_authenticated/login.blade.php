@@ -151,7 +151,7 @@
                             @endif
 
                             @if ($parameters_login_systems['linkedin_login_active'])
-                                <a class="no-effect-hover" href="/auth/linkedin">
+                                <a class="no-effect-hover" href="/auth/linkedin-openid">
                                     <button title="linkedin login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
@@ -334,7 +334,7 @@
             @endif
 
             @if ($parameters_login_systems['linkedin_login_active'])
-                <a class="no-effect-hover" href="/auth/linkedin">
+                <a class="no-effect-hover" href="/auth/linkedin-openid">
                     <button title="linkedin login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
                         <img class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />

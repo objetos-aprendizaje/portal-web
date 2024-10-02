@@ -50,7 +50,7 @@ class InscribedEducationalProgramsController extends BaseController
 
 
         if ($search) {
-            $coursesStudentsQuery->where('name', 'like', '%' . $search . '%')->orWhere('description', 'like', '%' . $search . '%');
+            $coursesStudentsQuery->where('name', 'ilike', '%' . $search . '%')->orWhere('description', 'ilike', '%' . $search . '%');
         }
 
         $coursesStudents = $coursesStudentsQuery->paginate($items_per_page);

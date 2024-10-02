@@ -4,39 +4,14 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.userUid) {
         fillStarsHover();
         handleCalificateResource();
-
-        document
-            .getElementById("access-resource")
-            .addEventListener("click", function (event) {
-                event.preventDefault();
-                const dataDestination = this.dataset.destination;
-
-                const educationalResourceUid = document.getElementById(
-                    "educational_resource_uid"
-                ).value;
-
-                accessEducationalResource(dataDestination);
-            });
     }
+
+    document
+        .getElementById("download-button")
+        .addEventListener("click", function () {
+            forceDownload(this.dataset.url);
+        });
 });
-
-function accessEducationalResource(dataDestination) {
-    const params = {
-        method: "POST",
-        url: "/resource/access_resource",
-        stringify: true,
-        body: {
-            educational_resource_uid: document.getElementById(
-                "educational_resource_uid"
-            ).value,
-        },
-        loader: true,
-    };
-
-    apiFetch(params).then((response) => {
-        window.open(dataDestination, "_blank");
-    });
-}
 
 /**
  * Función que se encarga de rellenar las estrellas de la calificación al hacer hover sobre ellas.
@@ -57,6 +32,20 @@ function fillStarsHover() {
             fillStars(avgCalification);
         });
     });
+}
+
+function forceDownload(url) {
+    fetch(url)
+        .then(response => response.blob())
+        .then(blob => {
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = url.split("/").pop();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        })
+        .catch(console.error);
 }
 
 /**

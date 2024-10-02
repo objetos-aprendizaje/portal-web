@@ -22,8 +22,16 @@ class NotificationsControllerTest extends TestCase
     public function testIndexLoadsNotificationPageWithCorrectData()
     {
         // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
-        $this->actingAs($user);
+       // Buscamos un usuario  
+       $user = UsersModel::where('email', 'admin@admin.com')->first();
+       // Si no existe el usuario lo creamos
+       if (!$user) {
+           $user = UsersModel::factory()->create([
+               'email'=>'admin@admin.com'
+           ])->first();
+       }
+       // Lo autenticarlo         
+       $this->actingAs($user);
 
         $roles = $user->roles()->get();
 
@@ -41,7 +49,7 @@ class NotificationsControllerTest extends TestCase
 
         // dd($automaticNotificationTypes);
         // Hacer una solicitud GET a la ruta de notificaciones del perfil
-        $response = $this->get(route('notifications'));     
+        $response = $this->get(route('notifications'));
 
         // Verificar que la respuesta es exitosa
         $response->assertStatus(200);
@@ -55,7 +63,7 @@ class NotificationsControllerTest extends TestCase
             return $viewNotificationTypes->pluck('uid')->sort()->values()->all() === $notificationTypes->pluck('uid')->sort()->values()->all();
         });
         // Verificar que los tipos de notificaciones automáticas existen en la vista, verificando los uids
-        // $response->assertViewHas('automaticNotificationTypes', $automaticNotificationTypes);       
+        // $response->assertViewHas('automaticNotificationTypes', $automaticNotificationTypes);
         $response->assertViewHas('user', $user);
         $response->assertViewHas('currentPage', 'notifications');
         $response->assertViewHas('page_title', 'Configuración de notificaciones | POA');
@@ -69,7 +77,15 @@ class NotificationsControllerTest extends TestCase
     public function testSaveNotificationsUpdatesUserPreferences()
     {
         // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Buscar un usuario y autenticarlo          
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        //Si no existe el usuario lo creamos
+        if(!$user){
+            $user = UsersModel::factory()->create([
+                'email' => 'admin@admin.com'
+            ])->first();            
+        }
+        // Lo autenticarlo         
         $this->actingAs($user);
 
         // Crear algunos tipos de notificaciones y notificaciones automáticas
@@ -81,7 +97,7 @@ class NotificationsControllerTest extends TestCase
         // Datos simulados enviados desde el formulario de notificaciones
         $requestData = [
             'general_notifications_allowed' => true,
-            'email_notifications_allowed' => 0,
+            'email_notifications_allowed' => true,
             'general_notification_types_disabled' => $notificationTypes->pluck('uid')->toArray(),
             'email_notification_types_disabled' => [],
             'automatic_general_notification_types_disabled' => $automaticNotificationTypes->pluck('uid')->toArray(),
@@ -101,7 +117,7 @@ class NotificationsControllerTest extends TestCase
         $this->assertDatabaseHas('users', [
             'uid' => $user->uid,
             'general_notifications_allowed' => true,
-            'email_notifications_allowed' => false,
+            'email_notifications_allowed' => true,
         ]);
 
         // Verificar que los tipos de notificaciones generales deshabilitadas se han sincronizado
@@ -121,7 +137,7 @@ class NotificationsControllerTest extends TestCase
         // }
     }
 
-    
 
-   
+
+
 }

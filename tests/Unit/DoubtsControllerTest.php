@@ -26,7 +26,7 @@ class DoubtsControllerTest extends TestCase
     {
         // Definir un tipo de objeto de aprendizaje y un UID válido
         $learning_object_type = 'course';
-        $uid = '1234-5678-91011';
+        $uid = generate_uuid();
 
         // Hacer una solicitud GET a la ruta
         $response = $this->get("/doubts/{$learning_object_type}/{$uid}");
@@ -51,7 +51,7 @@ class DoubtsControllerTest extends TestCase
     {
         // Definir un tipo de objeto de aprendizaje inválido y un UID válido
         $learning_object_type = 'invalid_type';
-        $uid = '1234-5678-91011';
+        $uid = generate_uuid();
 
         // Hacer una solicitud GET a la ruta
         $response = $this->get("/doubts/{$learning_object_type}/{$uid}");
@@ -72,7 +72,7 @@ class DoubtsControllerTest extends TestCase
 
         $educationProgramType = EducationalProgramTypesModel::factory()->create()->first();
 
-        //Crear Factory para esto 
+        //Crear Factory para esto
         RedirectionQueriesEducationalProgramTypesModel::factory()->create([
             'educational_program_type_uid' => $educationProgramType->uid,
             'type' => 'email',
@@ -156,7 +156,7 @@ class DoubtsControllerTest extends TestCase
 
         $educationProgramType = EducationalProgramTypesModel::factory()->create()->first();
 
-        //Crear Factory para esto 
+        //Crear Factory para esto
         RedirectionQueriesEducationalProgramTypesModel::factory()->create([
             'educational_program_type_uid' => $educationProgramType->uid,
             'type' => 'email',
@@ -166,7 +166,7 @@ class DoubtsControllerTest extends TestCase
         // Crear un programa formativo en la base de datos
         $program = EducationalProgramsModel::factory()
             ->create([
-                'uid' => '9876-5432',
+                'uid' => generate_uuid(),
                 'name' => 'Programa educativo de prueba',
                 'educational_program_type_uid' => $educationProgramType->uid,
             ])->first();
@@ -208,7 +208,7 @@ class DoubtsControllerTest extends TestCase
             ->withEducationalResourceType()
             ->withCreatorUser()
             ->create([
-                'uid' => '5678-1234',
+                'uid' => generate_uuid(),
                 'title' => 'Recurso educativo de prueba',
             ])->first();
 

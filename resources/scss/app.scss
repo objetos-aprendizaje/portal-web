@@ -968,6 +968,14 @@ body.modal-open {
     fill: var(--color_1) !important;
 }
 
+.learning-results-filter .ts-control {
+    @apply min-h-[50px] rounded-[8px] border-none;
+}
+
+.learning-results-filter .ts-control input, .learning-results-filter .ts-control input::placeholder {
+    @apply text-base ;
+}
+
 /******************************* HOME ********************/
 
 /******************************* HEADER ********************/

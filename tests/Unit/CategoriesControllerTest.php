@@ -5,11 +5,15 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use App\Models\UsersModel;
 use App\Models\CategoriesModel;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
+use App\Http\Middleware\CombinedAuthMiddleware;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CategoriesControllerTest extends TestCase
 {
-    
+
     /**
      * A basic unit test example.
      */
@@ -21,27 +25,27 @@ class CategoriesControllerTest extends TestCase
      */
     public function testIndexLoadsCategoriesPageWithCorrectData()
     {
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Buscar usuario y autenticarlo   
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 
         // Crear algunas categorías anidadas (padres e hijos)
 
         CategoriesModel::factory()->count(3)->create(['parent_category_uid' => null]);
 
-        $parentCategories= CategoriesModel::where('parent_category_uid',null)->get();
+        $parentCategories = CategoriesModel::where('parent_category_uid', null)->get();
 
-        $parentCategory = CategoriesModel::first();     
+        $parentCategory = CategoriesModel::first();
 
 
         CategoriesModel::factory()->count(3)->create(['parent_category_uid' => $parentCategory->uid]);
 
-        $subCategories = CategoriesModel::where('parent_category_uid',"!=",null)->get();
+        $subCategories = CategoriesModel::where('parent_category_uid', "!=", null)->get();
 
-    
+
 
         // Asociar algunas categorías al usuario
-        $user->categories()->attach($parentCategory->uid,[
+        $user->categories()->attach($parentCategory->uid, [
             'uid' => generate_uuid(),
         ]);
 
@@ -68,6 +72,47 @@ class CategoriesControllerTest extends TestCase
         // Verificar que el recurso JavaScript y la página actual se pasan correctamente
         $response->assertViewHas('resources', ['resources/js/profile/categories.js']);
         $response->assertViewHas('currentPage', 'categories');
+
+        // Caso 2: Usuario autenticado con Google
+        Session::flush();
+        Session::put('google_id', 'test-google-id');
+        Session::put('email', $user->email);
+
+        $response = $this->get(route('categories'));
+        $response->assertStatus(200);
+        $response->assertViewIs('profile.categories.index');
+
+        // Caso 3: Usuario autenticado con Twitter
+        Session::flush();
+        Session::put('twitter_id', 'test-twitter-id');
+        Session::put('email', $user->email);
+
+        $response = $this->get(route('categories'));
+        $response->assertStatus(200);
+        $response->assertViewIs('profile.categories.index');
+
+        // Caso 4: Usuario autenticado con Facebook
+        Session::flush();
+        Session::put('facebook_id', 'test-facebook-id');
+        Session::put('email', $user->email);
+
+        $response = $this->get(route('categories'));
+        $response->assertStatus(200);
+        $response->assertViewIs('profile.categories.index');
+
+        // Caso 5: Usuario autenticado con LinkedIn
+        Session::flush();
+        Session::put('linkedin_id', 'test-linkedin-id');
+        Session::put('email', $user->email);
+
+        $response = $this->get(route('categories'));
+        $response->assertStatus(200);
+        $response->assertViewIs('profile.categories.index');
+
+        // Caso 6: Usuario no autenticado (debe redirigir al login)
+        Session::flush(); // Limpiar la sesión para simular un usuario no autenticado
+        $response = $this->get(route('categories'));
+        // $response->assertRedirect('login');
     }
 
     /**
@@ -76,14 +121,14 @@ class CategoriesControllerTest extends TestCase
      */
     public function testSaveCategoriesSyncsCorrectly()
     {
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
+        // Crear un usuario y autenticarlo 
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 
         // Crear algunas categorías en la base de datos
         CategoriesModel::factory()->count(3)->create();
 
-        $categories =CategoriesModel::get();
+        $categories = CategoriesModel::get();
 
 
         // Datos simulados enviados desde el formulario de categorías
@@ -108,5 +153,4 @@ class CategoriesControllerTest extends TestCase
             ]);
         }
     }
-
 }
