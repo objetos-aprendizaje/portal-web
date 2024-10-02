@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\GeneralOptionsModel;
 use App\Models\Saml2TenantsModel;
 use App\Models\UserRolesModel;
+use App\Models\UsersAccessesModel;
 use App\Models\UsersModel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -88,81 +89,6 @@ class LoginController extends BaseController
         return redirect($redirectUrl);
     }
 
-    public function redirectToGoogle()
-    {
-        return Socialite::driver('google')->redirect();
-    }
-
-    public function handleGoogleCallback()
-    {
-        $user_google = Socialite::driver('google')->user();
-
-        $user = new stdClass();
-        $user->email = $user_google->email;
-        $user->first_name = $user_google->user['given_name'];
-        $user->last_name = $user_google->user['family_name'];
-
-        $this->loginUser($user);
-
-        session(['email' => $user_google->email, 'google_id' => $user_google->id, 'token_google' => $user_google->token]);
-
-        return redirect('/');
-    }
-
-    public function redirectToTwitter()
-    {
-        return Socialite::driver('twitter')->redirect();
-    }
-
-    public function handleTwitterCallback()
-    {
-        $user_twitter = Socialite::driver('twitter')->user();
-
-        $user = new stdClass();
-        $user->email = $user_twitter->email;
-        $user->first_name = $user_twitter->name;
-
-        $this->loginUser($user);
-
-        session(['email' => $user_twitter->email, 'twitter_id' => $user_twitter->id, 'token_twitter' => $user_twitter->token]);
-
-        return redirect('/');
-    }
-
-    public function redirectToFacebook()
-    {
-        return Socialite::driver('facebook')->redirect();
-    }
-
-    public function handleFacebookCallback()
-    {
-        $user_facebook = Socialite::driver('facebook')->user();
-
-        session(['email' => $user_facebook->email, 'facebook_id' => $user_facebook->id, 'token_facebook' => $user_facebook->token]);
-
-        return redirect('/#');
-    }
-
-    public function redirectToLinkedin()
-    {
-        return Socialite::driver('linkedin-openid')->redirect();
-    }
-
-    public function handleLinkedinCallback()
-    {
-        $user_linkedin = Socialite::driver('linkedin-openid')->user();
-
-        $user = new stdClass();
-        $user->email = $user_linkedin->email;
-        $user->name = $user_linkedin->name;
-
-        $this->loginUser($user);
-
-        session(['email' => $user_linkedin->email, 'linkedin_id' => $user_linkedin->id, 'token_linkedin' => $user_linkedin->token]);
-
-        return redirect('/');
-    }
-
     private function loginUser($user)
     {
 
@@ -185,28 +111,61 @@ class LoginController extends BaseController
             if (!in_array('STUDENT', $role_codes)) abort(404);
         }
 
+        $this->saveUserAccess($user_bd);
         Auth::login($user_bd);
     }
 
     public function logout()
     {
-        if (Session::get('google_id')) {
-            $token = Session::get('token_google');
-
-            $client = new \GuzzleHttp\Client();
-
-            try {
-                $client->post('https://oauth2.googleapis.com/revoke', [
-                    'form_params' => ['token' => $token]
-                ]);
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
-            }
-        }
-
         Session::flush();
         Auth::logout();
 
         return redirect('/');
+    }
+
+    public function handleSocialCallback($loginMethod)
+    {
+        $this->validateLoginMethod($loginMethod);
+
+        $userSocialLogin = Socialite::driver($loginMethod)->user();
+
+        $user = new stdClass();
+        if ($loginMethod == "google") {
+            $user->email = $userSocialLogin->email;
+            $user->first_name = $userSocialLogin->user['given_name'];
+            $user->last_name = $userSocialLogin->user['family_name'];
+        } else if ($loginMethod == "facebook") {
+            $user->email = $userSocialLogin->email;
+            $user->first_name = $userSocialLogin->email;
+        } else if ($loginMethod == "twitter") {
+            $user->email = $userSocialLogin->email;
+            $user->first_name = $userSocialLogin->name;
+        } else if ($loginMethod == "linkedin-openid") {
+            $user->email = $userSocialLogin->email;
+            $user->first_name = $userSocialLogin->user['given_name'];
+            $user->last_name = $userSocialLogin->user['family_name'];
+        }
+
+        try {
+            $this->loginUser($user);
+        } catch (\Exception $e) {
+            return redirect('login')->withErrors($e->getMessage());
+        }
+
+        return redirect('/');
+    }
+
+    public function redirectToSocialLogin($loginMethod)
+    {
+        $this->validateLoginMethod($loginMethod);
+        return Socialite::driver($loginMethod)->redirect();
+    }
+
+    private function validateLoginMethod($loginMethod)
+    {
+        if (!in_array($loginMethod, ['google', 'twitter', 'facebook', 'linkedin-openid'])) {
+            throw new \Exception('Método de login no válido');
+        }
     }
 
     public function tokenLogin($token)
@@ -219,7 +178,7 @@ class LoginController extends BaseController
             $this->deleteTokenLogin($user);
             return redirect("https://" . env('DOMINIO_PRINCIPAL'));
         } else {
-            $this->deleteTokenLogin($user);
+            // $this->deleteTokenLogin($user); // Se comento esta linea ya que nunca obtendremos el valor de $user
             return redirect("https://" . env('DOMINIO_PRINCIPAL') . "/login?e=certificate-error");
         }
     }
@@ -237,5 +196,14 @@ class LoginController extends BaseController
             $request->session()->forget('url.current');
             return $urlCurrent;
         } else return '/';
+    }
+
+    private function saveUserAccess($user)
+    {
+        UsersAccessesModel::insert([
+            'uid' => generate_uuid(),
+            'user_uid' => $user->uid,
+            'date' => date('Y-m-d H:i:s')
+        ]);
     }
 }

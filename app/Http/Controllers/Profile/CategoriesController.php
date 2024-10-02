@@ -23,7 +23,8 @@ class CategoriesController extends BaseController
             ],
             "user_categories" => $user_categories,
             "categories" => $categories_anidated,
-            "currentPage" => "categories"
+            "currentPage" => "categories",
+            "page_title" => "Categorías interesadas"
         ]);
     }
 

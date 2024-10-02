@@ -29,7 +29,7 @@ class CourseInfoController extends BaseController
             "resources" => [
                 'resources/js/course_info.js'
             ],
-            'page_title' => $course->title . ' | POA',
+            'page_title' => $course->title,
         ]);
     }
 

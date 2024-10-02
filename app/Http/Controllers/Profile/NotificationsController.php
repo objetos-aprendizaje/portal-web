@@ -32,7 +32,7 @@ class NotificationsController extends BaseController
             'notification_types' => $notification_types,
             'user' => $user,
             'currentPage' => 'notifications',
-            "page_title" => "Configuración de notificaciones | POA",
+            "page_title" => "Configuración de notificaciones",
             "automaticNotificationTypes" => $automaticNotificationTypes
         ]);
     }

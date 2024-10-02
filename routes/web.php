@@ -12,7 +12,6 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\Profile\CategoriesController;
 use App\Http\Controllers\Profile\MyProfileController;
 use App\Http\Controllers\Profile\NotificationsController;
-use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SearcherController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecoverPasswordController;
@@ -55,6 +54,7 @@ Route::middleware('policies')->group(function () {
 
     Route::get('/searcher', [SearcherController::class, 'index'])->name("searcher");
     Route::post('/searcher/get_learning_objects', [SearcherController::class, 'getLearningObjects']);
+    Route::get('/searcher/get_learning_results/{query}', [SearcherController::class, 'searchLearningResults']);
 
     Route::get('/course/{uid}', [CourseInfoController::class, 'index']);
 
@@ -63,12 +63,16 @@ Route::middleware('policies')->group(function () {
 
     Route::get('/resource/{uid}', [ResourceInfoController::class, 'index']);
     Route::get('/resource/get_resource/{uid}', [ResourceInfoController::class, 'getResource']);
-    Route::post('/resource/access_resource', [ResourceInfoController::class, 'saveAccessResource']);
 
     Route::middleware(['combined.auth'])->group(function () {
         Route::post('/home/get_active_courses', [HomeController::class, 'getActiveCourses'])->name('get-active-courses');
         Route::post('/home/get_inscribed_courses', [HomeController::class, 'getInscribedCourses'])->name('get-inscribed-courses');
+        Route::post('/home/get_my_educational_resources', [HomeController::class, 'getMyEducationalResources'])->name('get-my-educational-resources');
+        Route::post('/home/get_recommended_itinerary', [HomeController::class, 'getRecommendedItinerary'])->name('get-recommended-itinerary');
+
         Route::post('/home/get_teacher_courses', [HomeController::class, 'getTeacherCourses'])->name('get-teacher-courses');
+        Route::post('/home/get_recommended_courses', [HomeController::class, 'getRecommendedCourses'])->name('get-recommended-courses');
+        Route::post('/home/get_recommended_educational_resources', [HomeController::class, 'getRecommendedEducationalResources'])->name('get-recommended-educational-resources');
 
         Route::post('/course/calificate', [CourseInfoController::class, 'calificate']);
         Route::post('/course/get_course_calification', [CourseInfoController::class, 'getCourseCalification']);
@@ -168,17 +172,8 @@ Route::middleware('guest')->group(function () {
 
     Route::post('/login/authenticate', [LoginController::class, 'authenticate']);
 
-    Route::get('/auth/google', [LoginController::class, 'redirectToGoogle']);
-    Route::get('/auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
-
-    Route::get('/auth/twitter', [LoginController::class, 'redirectToTwitter']);
-    Route::get('/auth/twitter/callback', [LoginController::class, 'handleTwitterCallback']);
-
-    Route::get('/auth/linkedin',  [LoginController::class, 'redirectToLinkedin']);
-    Route::get('/auth/linkedin/callback',  [LoginController::class, 'handleLinkedinCallback']);
-
-    Route::get('/auth/facebook', [LoginController::class, 'redirectToFacebook']);
-    Route::get('/auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
+    Route::get('auth/{login_method}', [LoginController::class, 'redirectToSocialLogin']);
+    Route::get('/auth/callback/{login_method}', [LoginController::class, 'handleSocialCallback']);
 });
 
 // Webhooks

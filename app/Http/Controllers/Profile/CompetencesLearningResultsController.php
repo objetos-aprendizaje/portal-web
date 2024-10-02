@@ -32,7 +32,7 @@ class CompetencesLearningResultsController extends BaseController
                 "resources/js/renderer_infinite_tree.js"
             ],
             'currentPage' => 'competences_learning_results',
-            "page_title" => "Configuración de competencias y resultados de aprendizaje | POA",
+            "page_title" => "Configuración de competencias y resultados de aprendizaje",
             "variables_js" => [
                 "competencesLearningResults" => $competencesLearningResultsMapped,
                 "learningResultsUserSelected" => $learningResultsUserSelected

@@ -70,8 +70,13 @@
                         <label for="department">Departamento</label>
                     </div>
                     <div class="content-container little">
-                        <input value="{{ $user->department }}" class="poa-input" placeholder="Dirección" type="text"
-                            id="department" name="department" />
+                        <select name="department_uid" class="poa-input">
+                            <option value="">No especificado</option>
+                            @foreach ($departments as $department)
+                                <option value="{{ $department->uid }}" @selected($user->department_uid == $department->uid)>{{ $department->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
 

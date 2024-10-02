@@ -33,7 +33,7 @@
                     'title' => $course['featured_big_carrousel_title'],
                     'description' => $course['featured_big_carrousel_description'],
                     'registerButton' => true,
-                    'registerLink' => "/course/" . $course->uid,
+                    'registerLink' => '/course/' . $course->uid,
                     'colorFont' => $course['featured_slider_color_font'] ?? '#fff',
                 ])
             @endforeach
@@ -44,17 +44,17 @@
                     'title' => $educationalProgram['featured_slider_title'],
                     'description' => $educationalProgram['featured_slider_description'],
                     'registerButton' => true,
-                    'registerLink' => "/educational_program/" . $educationalProgram->uid,
+                    'registerLink' => '/educational_program/' . $educationalProgram->uid,
                     'colorFont' => $educationalProgram['featured_slider_color_font'] ?? '#fff',
                 ])
             @endforeach
 
             <!-- Next and previous buttons -->
             <a title="anterior" class="prev">
-                {{e_heroicon("chevron-left", "outline", "white", 20, 20)}}
+                {{ e_heroicon('chevron-left', 'outline', 'white', 20, 20) }}
             </a>
             <a title="siguiente" class="next">
-                {{e_heroicon("chevron-right", "outline", "white", 20, 20)}}
+                {{ e_heroicon('chevron-right', 'outline', 'white', 20, 20) }}
             </a>
 
         </div>
@@ -85,6 +85,16 @@
 
                     <h2 data-lane="courses-recommended" class="m-0 lane-tab row-button whitespace-nowrap">Cursos
                         Recomendados</h2>
+
+                    <h2 data-lane="educational-resources-recommended" class="m-0 lane-tab row-button whitespace-nowrap">
+                        Recursos
+                        Recomendados</h2>
+
+                    <h2 data-lane="my-educational-resources" class="m-0 lane-tab row-button whitespace-nowrap">
+                        Mis Recursos</h2>
+
+                    <h2 data-lane="recommended-itinerary" class="m-0 lane-tab row-button whitespace-nowrap">
+                        Itinerario recomendado</h2>
                 </div>
 
                 <div id="scroll-buttons-custom-lanes" class="flex gap-[13px]">
@@ -157,7 +167,8 @@
                 </h1>
                 <div
                     class="flex gap-[10px] text-color_1 arrow-see-more items-center hover:scale-110 cursor-pointer mx-auto md:mx-0">
-                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los objeto de aprendizaje" href="/searcher?resources=courses">Ver todos los
+                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los objeto de aprendizaje"
+                            href="/searcher?resources=courses">Ver todos los
                             cursos</a></p>
                     {{ e_heroicon('chevron-right', 'outline', 'black') }}
                 </div>
@@ -184,7 +195,8 @@
                 </h1>
                 <div
                     class="flex gap-[10px] text-color_1 arrow-see-more items-center hover:scale-110 cursor-pointer mx-auto md:mx-0">
-                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los programas" href="/searcher?resources=programs">Ver todos los
+                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los programas"
+                            href="/searcher?resources=programs">Ver todos los
                             programas</a></p>
                     {{ e_heroicon('chevron-right', 'outline', 'black') }}
                 </div>
@@ -211,7 +223,8 @@
                 </h1>
                 <div
                     class="flex gap-[10px] text-color_1 arrow-see-more items-center hover:scale-110 cursor-pointer mx-auto md:mx-0">
-                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los recursos" href="/searcher?resources=resources">Ver todos los
+                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los recursos"
+                            href="/searcher?resources=resources">Ver todos los
                             recursos</a></p>
                     {{ e_heroicon('chevron-right', 'outline', 'black') }}
                 </div>
@@ -258,7 +271,8 @@
     <template id="learning-object-template">
         <div class="learning-object-block shadow-lg">
             <div class="learning-object-img-container">
-                <a title="objeto de aprendizaje" class="no-effect-hover block-url" href="#"><img alt="objeto de aprendizaje" src="" class="learning-object-image"></a>
+                <a title="objeto de aprendizaje" class="no-effect-hover block-url" href="#"><img
+                        alt="objeto de aprendizaje" src="" class="learning-object-image"></a>
             </div>
             <div class="block-container">
                 <div class="block-container-title">
@@ -268,7 +282,7 @@
                 </div>
                 <p class="block-description block-description-small"></p>
 
-                <hr class="border-t border-dashed">
+                <hr class="separator-dates border-t border-dashed">
 
                 <div class="learning-objects-dates-container">
                     <div class="learning-object-dates-block">

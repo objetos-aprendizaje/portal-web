@@ -5,9 +5,11 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use App\Models\UsersModel;
 use App\Models\HeaderPagesModel;
+use Illuminate\Http\UploadedFile;
 use App\Models\GeneralOptionsModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Storage;
 use App\Models\EducationalProgramsModel;
 use App\Models\EducationalProgramStatusesModel;
 use App\Models\EducationalProgramsStudentsModel;
@@ -20,14 +22,15 @@ use App\Models\EducationalProgramsStudentsDocumentsModel;
 class InscribedEducationalProgramsControllerTest extends TestCase
 {
     /**
- * @group configdesistema
- */
+     * @group configdesistema
+     */
     use RefreshDatabase;
 
-/**
- * @testdox Inicialización de inicio de sesión
- */
-    public function setUp(): void {
+    /**
+     * @testdox Inicialización de inicio de sesión
+     */
+    public function setUp(): void
+    {
         parent::setUp();
         $this->withoutMiddleware();
         $general_options = GeneralOptionsModel::all()->pluck('option_value', 'option_name')->toArray();
@@ -68,11 +71,10 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         // Comparte la variable $header_pages para esta prueba
         View::share('header_pages', $headerPages);
-
     }
-/**
- * @test Index Inscritos Programa formativo
- */
+    /**
+     * @test Index Inscritos Programa formativo
+     */
 
     public function testIndexViewInscribedPrograms()
     {
@@ -96,7 +98,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         $response->assertViewHas('currentPage', 'inscribedEducationalPrograms');
     }
 
-/** @test */
+    /** @test */
     public function testReturnsInscribedEducationalPrograms()
     {
         // Simular la autenticación del usuario
@@ -106,7 +108,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         // Crear algunos programas formativos inscritos para el usuario
         $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create()->first();
 
-        $user->educationalPrograms()->attach($educationalProgram, ['uid' => generate_uuid(), 'status' => 'INSCRIBED', 'educational_program_uid' => $educationalProgram->uid]);
+        $user->educationalPrograms()->attach($educationalProgram, ['uid' => generate_uuid(), 'status' => 'INSCRIBED', 'acceptance_status' => 'ACCEPTED', 'educational_program_uid' => $educationalProgram->uid]);
 
         // Preparar los datos de la solicitud
         $data = [
@@ -147,19 +149,19 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         $this->actingAs($user);
 
         // Crear programas educativos con diferentes nombres y descripciones
-        $programs1 = EducationalProgramsModel::factory()->withEducationalProgramType()->create(['uid'=> generate_uuid(), 'name' => 'Curso de Matemáticas'])->first();
+        $programs1 = EducationalProgramsModel::factory()->withEducationalProgramType()->create(['uid' => generate_uuid(), 'name' => 'Curso de Matemáticas'])->first();
 
-        $programs2 = EducationalProgramsModel::factory()->withEducationalProgramType()->create(['uid'=> generate_uuid(), 'name' => 'Curso de Física'])->latest()->first();
+        $programs2 = EducationalProgramsModel::factory()->withEducationalProgramType()->create(['uid' => generate_uuid(), 'name' => 'Curso de Física'])->latest()->first();
 
 
         // Comprobar si el usuario ya está inscrito en el programa
-    if (!$user->educationalPrograms()->where('educational_program_uid', $programs1->uid)->exists()) {
-        $user->educationalPrograms()->attach($programs1->uid, ['uid' => generate_uuid(),'status' => 'INSCRIBED','educational_program_uid' => $programs1->uid]);
-    }
+        if (!$user->educationalPrograms()->where('educational_program_uid', $programs1->uid)->exists()) {
+            $user->educationalPrograms()->attach($programs1->uid, ['uid' => generate_uuid(), 'status' => 'INSCRIBED', 'acceptance_status' => 'ACCEPTED', 'educational_program_uid' => $programs1->uid]);
+        }
 
-    if (!$user->educationalPrograms()->where('educational_program_uid', $programs2->uid)->exists()) {
-        $user->educationalPrograms()->attach($programs2->uid, ['uid' => generate_uuid(),'status' => 'INSCRIBED','educational_program_uid' => $programs2->uid]);
-    }
+        if (!$user->educationalPrograms()->where('educational_program_uid', $programs2->uid)->exists()) {
+            $user->educationalPrograms()->attach($programs2->uid, ['uid' => generate_uuid(), 'status' => 'INSCRIBED', 'educational_program_uid' => $programs2->uid]);
+        }
 
 
         // Preparar los datos de la solicitud con un término de búsqueda
@@ -173,11 +175,9 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         // Verificar que la respuesta sea exitosa (código 200)
         $response->assertStatus(200);
-
-
     }
 
-/** @test Error 406 - Esta matrículado en el curso solicitado*/
+    /** @test Error 406 - Esta matrículado en el curso solicitado*/
 
     public function testAllows406UserEnrollProgram()
     {
@@ -187,12 +187,12 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         $status = EducationalProgramStatusesModel::where('code', 'ENROLLING')->first();
 
-         // Crear algunos programas formativos inscritos para el usuario
-         $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+        // Crear algunos programas formativos inscritos para el usuario
+        $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
             'educational_program_status_uid' => $status->uid
-         ])->first();
+        ])->first();
 
-         $user->educationalPrograms()->attach($educationalProgram, ['uid' => generate_uuid(), 'status' => 'ENROLLED', 'educational_program_uid' => $educationalProgram->uid]);
+        $user->educationalPrograms()->attach($educationalProgram, ['uid' => generate_uuid(), 'status' => 'ENROLLED', 'acceptance_status' => 'ACCEPTED', 'educational_program_uid' => $educationalProgram->uid]);
 
         // Preparar los datos de la solicitud
         $data = [
@@ -208,7 +208,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
     }
 
 
-/** @test Error 406 Por que el status del programa es diferente a ENROLLING*/
+    /** @test Error 406 Por que el status del programa es diferente a ENROLLING*/
     public function testUser406EnrollingIfCourseIsNotEnrolling()
     {
         // Simular la autenticación del usuario
@@ -217,10 +217,10 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         $status = EducationalProgramStatusesModel::where('code', 'INSCRIPTION')->first();
 
-         // Crear algunos programas formativos inscritos para el usuario
-         $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+        // Crear algunos programas formativos inscritos para el usuario
+        $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
             'educational_program_status_uid' => $status->uid
-         ])->first();
+        ])->first();
 
         // Preparar los datos de la solicitud
         $data = [
@@ -244,10 +244,10 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         $status = EducationalProgramStatusesModel::where('code', 'ENROLLING')->first();
 
-         // Crear algunos programas formativos inscritos para el usuario
-         $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+        // Crear algunos programas formativos inscritos para el usuario
+        $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
             'educational_program_status_uid' => $status->uid
-         ])->first();
+        ])->first();
 
 
         // Agregar al usuario como estudiante pero no aprobado
@@ -263,11 +263,9 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         $response = $this->post(route('enroll-educational-program-inscribed'), $data);
 
 
-         // Verificar que se lanza una excepción y se devuelve un código 406
-         $response->assertStatus(406);
-         $response->assertJson(['message' => 'No has sido aprobado en este curso']);
-
-
+        // Verificar que se lanza una excepción y se devuelve un código 406
+        $response->assertStatus(406);
+        $response->assertJson(['message' => 'No has sido aprobado en este curso']);
     }
 
     /** @test */
@@ -279,11 +277,11 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         $status = EducationalProgramStatusesModel::where('code', 'ENROLLING')->first();
 
-         // Crear algunos programas formativos inscritos para el usuario
-         $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+        // Crear algunos programas formativos inscritos para el usuario
+        $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
             'educational_program_status_uid' => $status->uid,
             'cost' => 0,
-         ])->first();
+        ])->first();
 
         // Agregar al usuario como estudiante pero no aprobado
         $educationalProgram->students()->attach($user->uid, ['acceptance_status' => 'ACCEPTED', 'uid' => generate_uuid()]);
@@ -291,6 +289,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         // Preparar los datos de la solicitud
         $data = [
             'educationalProgramUid' => $educationalProgram->uid,
+            // 'payment_gateway' => 'gateway_test',
         ];
 
         // Realizar una solicitud POST a la ruta definida
@@ -309,7 +308,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
     }
 
 
-/** @test download documento programa*/
+    /** @test download documento programa*/
     public function testDownloadsDocumentProgram()
     {
         // Simular la autenticación del usuario
@@ -318,12 +317,12 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         $status = EducationalProgramStatusesModel::where('code', 'ENROLLING')->first();
 
-         // Crear algunos programas formativos inscritos para el usuario
-         $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+        // Crear algunos programas formativos inscritos para el usuario
+        $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
             'educational_program_status_uid' => $status->uid
-         ])->first();
+        ])->first();
 
-         $document_program = EducationalProgramsDocumentsModel::create([
+        $document_program = EducationalProgramsDocumentsModel::create([
             'uid' => generate_uuid(),
             'document_name' => 'document_name',
             'educational_program_uid' => $educationalProgram->uid,
@@ -358,7 +357,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         ]);
     }
 
-/** @test CAncelar inscripción*/
+    /** @test CAncelar inscripción*/
     public function testError406CancelInscription()
     {
         // Crea un usuario simulado
@@ -369,7 +368,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         // Crear algunos programas formativos inscritos para el usuario
         $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
-           'educational_program_status_uid' => $status->uid
+            'educational_program_status_uid' => $status->uid
         ])->first();
 
         // Crea un programa educativo inscrito para el usuario
@@ -386,9 +385,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         // Verifica que la respuesta sea correcta
         $response->assertStatus(406)
-                ->assertJson(['message' => 'No estás inscrito en este programa formativo']);
-
-
+            ->assertJson(['message' => 'No estás inscrito en este programa formativo']);
     }
 
     public function testCancelInscription()
@@ -401,7 +398,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         // Crear algunos programas formativos inscritos para el usuario
         $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
-           'educational_program_status_uid' => $status->uid
+            'educational_program_status_uid' => $status->uid
         ])->first();
 
         // Crea un programa educativo inscrito para el usuario
@@ -418,10 +415,47 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         // Verifica que la respuesta sea correcta
         $response->assertStatus(200)
-                ->assertJson(['message' => 'Inscripción cancelada correctamente']);
-
-
+            ->assertJson(['message' => 'Inscripción cancelada correctamente']);
     }
 
+    /**
+     * @test
+     * Prueba que guarda correctamente los documentos del programa educativo.
+     */
+    // public function testSaveDocumentsEducationalProgram()
+    // {
+    //     // Simular autenticación de usuario
+    //     $user = UsersModel::factory()->create();
+    //     $this->actingAs($user);
 
+    //     // Crear un archivo simulado
+    //     Storage::fake('documents');
+    //     $file = UploadedFile::fake()->create('document.pdf', 100);
+
+    //     // Mockear la respuesta del backend
+    //     $filePath = 'documents/document.pdf';
+    //     // $this->mockFunction('sendFileToBackend', ['file_path' => $filePath]);
+
+    //     // Preparar los datos de la solicitud
+    //     $requestData = [
+    //         'documentUid' => $file,
+    //     ];
+
+    //     // Hacer la solicitud POST a la ruta
+    //     $response = $this->postJson('/profile/my_educational_programs/save_documents_educational_program', $requestData);
+
+    //     // Verificar que se guarde el archivo en la ruta correcta
+    //     // Storage::disk('documents')->assertExists($filePath);
+
+    //     // Verificar que el documento se haya guardado en la base de datos
+    //     // $this->assertDatabaseHas('educational_programs_students_documents', [
+    //     //     'educational_program_document_uid' => generate_uuid(),
+    //     //     'user_uid' => $user->uid,
+    //     //     'document_path' => $filePath,
+    //     // ]);
+
+    //     // Verificar que la respuesta sea exitosa
+    //     $response->assertStatus(200);
+    //     $response->assertJson(['message' => 'Documentos guardados correctamente']);
+    // }
 }

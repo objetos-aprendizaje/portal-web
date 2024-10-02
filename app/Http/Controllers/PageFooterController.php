@@ -17,7 +17,9 @@ class PageFooterController extends BaseController
         return view("page_footer", [
             'resources' => ["resources/js/home.js", "resources/js/carrousel.js"],
             'page' => $page,
-            'title' => $page->title
+            'title' => $page->title,
+            "page_title" => "Gestión de pago"
+
         ]);
 
     }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\OperationFailedException;
 use App\Models\CategoriesModel;
-use App\Models\CompetencesModel;
 use App\Models\CoursesAssessmentsModel;
 use App\Models\CoursesModel;
 use App\Models\EducationalProgramsModel;
@@ -12,6 +11,7 @@ use App\Models\EducationalResourcesAssessmentsModel;
 use App\Models\EducationalResourcesModel;
 use Illuminate\Http\Request;
 use App\Models\GeneralOptionsModel;
+use App\Models\LearningResultsModel;
 use Illuminate\Support\Facades\DB;
 
 
@@ -25,21 +25,18 @@ class SearcherController extends Controller
 
         $categories = CategoriesModel::whereNull('parent_category_uid')->with('subcategories')->get()->toArray();
 
-        $competences = CompetencesModel::whereNull('parent_competence_uid')->with('subcompetences')->orderBy('name', 'ASC')->get()->toArray();
-
         return view("searcher", [
             "general_options" => $general_options,
-            "page_title" => "Búsqueda de objetos de aprendizaje | POA",
+            "page_title" => "Búsqueda de objetos de aprendizaje",
             "categories" => $categories,
-            "competences" => $competences,
             "flatpickr" => true,
             "resources" => [
                 "resources/js/search.js"
             ],
+            "tomselect" => true,
             "treeselect" => true,
             "variables_js" => [
                 "categories" => $categories,
-                "competences" => $competences,
                 "learning_objects_appraisals" => app('general_options')['learning_objects_appraisals'] ? true : false
             ]
         ]);
@@ -61,13 +58,6 @@ class SearcherController extends Controller
         $filters =  $request->get('filters');
 
         $this->validateFilters($filters);
-
-        if (env('ENABLED_API_SEARCH')) {
-            if (isset($filters['search'])) {
-                $response = $this->searchApi($filters['search']);
-                $filters['add_uuids_to_search'] = $response->data;
-            }
-        }
 
         if (in_array("courses", $resource_types)) {
             $queries[] = $this->buildCoursesQuery($filters);
@@ -100,30 +90,17 @@ class SearcherController extends Controller
         return response()->json($learning_objects);
     }
 
+    public function searchLearningResults($query) {
+        $learningResults = LearningResultsModel::where('name', 'ilike', '%' . $query . '%')->select("uid", "name")->get();
+
+        return response()->json($learningResults);
+    }
+
     private function validateFilters($filters)
     {
         if (isset($filters['learningObjectStatus']) && !in_array($filters['learningObjectStatus'], ['INSCRIPTION', 'ENROLLING', 'DEVELOPMENT', 'FINISHED'])) {
             throw new OperationFailedException("El estado del objeto de aprendizaje no es válido");
         }
-    }
-
-    private function searchApi($searchText)
-    {
-        $endpoint = env('API_SEARCH_URL') . '/search_learning_objects';
-
-        $data = (object) [
-            "text" => $searchText,
-        ];
-
-        $header = [
-            "API-KEY" => env('API_SEARCH_KEY')
-        ];
-
-        $response = guzzle_call($endpoint, $data, $header, 'POST');
-
-        $response = json_decode($response);
-
-        return $response;
     }
 
     private function buildEducationalProgramsQuery($filters = [])
@@ -147,7 +124,7 @@ class SearcherController extends Controller
                     $query->select(DB::raw("SUM(ects_workload)"));
                 }
             ])
-            ->with('courses', 'courses.average_calification');
+            ->with('courses', 'courses.average_calification', 'courses.blocks.learningResults');
 
         if (isset($filters['learningObjectStatus'])) {
             $educational_programs_query->where('educational_program_statuses.code', $filters['learningObjectStatus']);
@@ -177,7 +154,14 @@ class SearcherController extends Controller
 
 
         if (isset($filters['search'])) {
-            $educational_programs_query->where('educational_programs.name', 'like', '%' . $filters['search'] . '%')->orWhere('description', 'like', '%' . $filters['search'] . '%');
+            $educational_programs_query->where('educational_programs.name', 'ilike', '%' . $filters['search'] . '%')->orWhere('description', 'ilike', '%' . $filters['search'] . '%');
+        }
+
+        if(isset($filters["learningResults"])) {
+            $learningResults = $filters["learningResults"];
+            $educational_programs_query->whereHas('courses.blocks.learningResults', function ($query) use ($learningResults) {
+                $query->whereIn('learning_results.uid', $learningResults);
+            });
         }
 
         return $educational_programs_query;
@@ -225,7 +209,7 @@ class SearcherController extends Controller
         }
 
         if (isset($filters['search'])) {
-            $educational_resources_query->where('title', 'like', '%' . $filters['search'] . '%')->orWhere('description', 'like', '%' . $filters['search'] . '%');
+            $educational_resources_query->where('title', 'ilike', '%' . $filters['search'] . '%')->orWhere('description', 'ilike', '%' . $filters['search'] . '%');
             if (isset($filters['add_uuids_to_search'])) {
                 $educational_resources_query->orWhereIn('educational_resources.uid', $filters['add_uuids_to_search']);
             }
@@ -259,6 +243,7 @@ class SearcherController extends Controller
                 '=',
                 'courses.uid'
             )
+            ->with("blocks.learningResults")
             ->whereNull('educational_program_uid');
 
         if (isset($filters['learningObjectStatus'])) {
@@ -304,12 +289,19 @@ class SearcherController extends Controller
 
         if (isset($filters['search'])) {
             $courses_query->where(function ($query) use ($filters) {
-                $query->where('title', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('description', 'like', '%' . $filters['search'] . '%');
+                $query->where('title', 'ILIKE', '%' . $filters['search'] . '%')
+                    ->orWhere('description', 'ILIKE', '%' . $filters['search'] . '%');
 
                 if (isset($filters['add_uuids_to_search'])) {
                     $query->orWhereIn('courses.uid', $filters['add_uuids_to_search']);
                 }
+            });
+        }
+
+        if(isset($filters["learningResults"])) {
+            $learningResults = $filters["learningResults"];
+            $courses_query->whereHas('blocks.learningResults', function ($query) use ($learningResults) {
+                $query->whereIn('learning_results.uid', $learningResults);
             });
         }
 

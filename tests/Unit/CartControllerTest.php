@@ -224,7 +224,27 @@ class CartControllerTest extends TestCase
        // Definimos los datos para la solicitud con un UID no válido
        $data = [
            'learning_object_type' => "course",
-           'learning_object_uid' => "invalid-uid",
+           'learning_object_uid' => generate_uuid(),
+       ];
+
+       // Realizamos la solicitud POST
+       $response = $this->postJson('/cart/make_payment', $data);
+
+       // Verificamos que se devuelva un error 405
+       $response->assertStatus(405);
+   }
+
+   /** @test*/
+   public function testMakePaymentInvalidRerquest()
+   {
+       // Simulamos la autenticación del usuario
+       $user = UsersModel::factory()->create();
+       Auth::login($user);
+
+       // Definimos los datos para la solicitud con un UID no válido
+       $data = [
+           'learning_object_type' => "no-course",
+           'learning_object_uid' => generate_uuid(),
        ];
 
        // Realizamos la solicitud POST
@@ -320,6 +340,37 @@ class CartControllerTest extends TestCase
 
         $response->assertJson(['message' => "Ya estás inscrito"]);
     }
+
+    /** @test*/
+    public function testInscriptionWithoutValidateStudentRegistrations()
+    {
+        $user = UsersModel::factory()->create()->first();
+        $this->actingAs($user);
+
+        $status = CourseStatusesModel::where('code', 'INSCRIPTION')->first();
+        // Crea un curso disponible para inscripción
+        $course = CoursesModel::factory()->withCourseType()->create([
+            'course_status_uid'  => $status->uid,
+            'validate_student_registrations' => false,      
+            'cost'=>null      
+        ])->first();
+
+        CoursesStudentsModel::factory()->create([
+            'user_uid' => $user->uid,
+            'course_uid' => $course->uid,
+        ]);
+
+        $data = [
+            'learningObjectType' => 'course',
+            'learningObjectUid' => $course->uid,
+        ];
+       
+        $response = $this->postJson('/cart/inscribe', $data);
+
+        $response->assertJson(['message' => "Ya estás inscrito"]);
+    }
+
+
 
 
 

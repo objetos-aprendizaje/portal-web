@@ -49,7 +49,7 @@ class ResourceInfoControllerTest extends TestCase
     public function testResourceInfoReturns404WhenResourceNotFound()
     {
         // Simular un UID inexistente
-        $response = $this->get('/resource/nonexistent-uid');
+        $response = $this->get('/resource/' . generate_uuid());
 
         // Asegurarse de que la respuesta sea un 404
         $response->assertStatus(404);
@@ -58,11 +58,9 @@ class ResourceInfoControllerTest extends TestCase
     public function testResourceInfoLoadsCorrectlyWhenResourceExists()
     {
 
-         // Crear el estado del recurso educativo (asegurándonos que sea PUBLISHED)
-         $status = EducationalResourceStatusesModel::factory()->create([
-            'uid'  => generate_uuid(),
-            'code' => 'PUBLISHED',
-        ])->latest()->first();
+        // Reviso  el estado del recurso educativo (asegurándonos que sea PUBLISHED)       
+
+        $status = EducationalResourceStatusesModel::where('code','PUBLISHED')->first();
 
         // Crear el tipo de recurso educativo
         $educationalResourceType = EducationalResourceTypesModel::factory()->create()->latest()->first();
@@ -130,8 +128,10 @@ class ResourceInfoControllerTest extends TestCase
         // Comparte la variable $header_pages para esta prueba
         View::share('header_pages', $headerPages);
 
+        // dd($this->get('/resource/'.$educationalResource->uid));
+
         // Realizar la petición HTTP a la ruta del recurso
-        $response = $this->get('/resource/' . $educationalResource->uid);
+        $response = $this->get('/resource/'.$educationalResource->uid);   
 
         // Verificar que el estado de respuesta sea 200
         $response->assertStatus(200);
@@ -153,11 +153,9 @@ class ResourceInfoControllerTest extends TestCase
      */
     public function testGetResourceSuccess()
     {
-        // Crear el estado del recurso educativo (asegurándonos que sea PUBLISHED)
-        $status = EducationalResourceStatusesModel::factory()->create([
-            'uid'  => generate_uuid(),
-            'code' => 'PUBLISHED',
-        ])->latest()->first();
+        // Reviso  el estado del recurso educativo (asegurándonos que sea PUBLISHED)       
+
+        $status = EducationalResourceStatusesModel::where('code','PUBLISHED')->first();
 
         // Crear el tipo de recurso educativo
         $educationalResourceType = EducationalResourceTypesModel::factory()->create()->latest()->first();
@@ -169,9 +167,10 @@ class ResourceInfoControllerTest extends TestCase
         $user = UsersModel::factory()->create();
         $this->actingAs($user);
 
+        $uid = generate_uuid();
         // Crear un recurso educativo utilizando las relaciones
         $educationalResource = EducationalResourcesModel::factory()->create([
-            'uid' => generate_uuid(),
+            'uid' => $uid,
             'title' => 'Sample Resource',
             'status_uid' => $status->uid,
             'educational_resource_type_uid' => $educationalResourceType->uid,
@@ -181,7 +180,7 @@ class ResourceInfoControllerTest extends TestCase
 
 
         // Realizar la petición GET a la ruta con el uid del recurso
-        $response = $this->get('/resource/get_resource/'.$educationalResource->uid);
+        $response = $this->get('/resource/get_resource/'.$uid);
 
         // Verificar que el estado de la respuesta es 200 (OK)
         $response->assertStatus(200);
@@ -196,54 +195,11 @@ class ResourceInfoControllerTest extends TestCase
     public function testGetResourceNotFound()
     {
         // Intentar acceder a un recurso inexistente
-        $response = $this->get('/resource/get_resource/nonexistent_uid');
+        $response = $this->get('/resource/get_resource/' . generate_uuid());
 
         // Verificar que el estado de la respuesta es 404 (Not Found)
         $response->assertStatus(404);
     }
-
-    /**
-     * @test guarda recurso educativo
-     */
-    public function testSaveAccessResourceSuccess()
-    {
-        // Estado del recurso educativo (asegurándonos que sea PUBLISHED)
-        $status = EducationalResourceStatusesModel::where("code", "PUBLISHED")->first();
-
-        // Crear el tipo de recurso educativo
-        $educationalResourceType = EducationalResourceTypesModel::factory()->create()->latest()->first();
-
-        // Crear el tipo de licencia
-        $licenseType = LicenseTypesModel::factory()->create()->latest()->first();
-
-        // Crear un usuario y autenticarlo
-        $user = UsersModel::factory()->create();
-        $this->actingAs($user);
-
-        // Crear un recurso educativo utilizando las relaciones
-        $educationalResource = EducationalResourcesModel::factory()->create([
-            'uid' => generate_uuid(),
-            'title' => 'Sample Resource',
-            'status_uid' => $status->uid,
-            'educational_resource_type_uid' => $educationalResourceType->uid,
-            'creator_user_uid' => $user->uid,
-            'license_type_uid' => $licenseType->uid, // Relacionar con el tipo de licencia
-        ])->latest()->first();
-
-
-      // Realizar la petición POST a la ruta, enviando el UID en el cuerpo
-         $response = $this->post('/resource/access_resource', ['educational_resource_uid' => $educationalResource->uid]);
-
-        // Verificar que la respuesta es 200 (OK)
-        $response->assertStatus(200);
-
-
-        // Verificar que el mensaje de éxito está presente en la respuesta JSON
-        $response->assertJson([
-            'message' => 'Se ha registrado correctamente el acceso al recurso',
-        ]);
-    }
-
 
     public function testCalificateResourceSuccess()
     {

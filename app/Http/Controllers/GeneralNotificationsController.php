@@ -30,7 +30,7 @@ class GeneralNotificationsController extends BaseController
         $user_uid = Auth::user()['uid'];
 
         $general_notification = GeneralNotificationsModel::where('uid', $notification_general_uid)->addSelect([
-            'is_read' => UserGeneralNotificationsModel::select(DB::raw('IF(COUNT(*), 1, 0)'))
+            'is_read' => UserGeneralNotificationsModel::select(DB::raw('CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS INTEGER)'))
                 ->whereColumn('user_general_notifications.general_notification_uid', 'general_notifications.uid')
                 ->where('user_general_notifications.user_uid', $user_uid)
                 ->limit(1)

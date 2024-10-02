@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\OperationFailedException;
 use App\Models\CategoriesModel;
 use App\Models\CoursesAssessmentsModel;
 use App\Models\CoursesModel;
@@ -12,13 +13,21 @@ use App\Models\EducationalResourcesModel;
 use App\Models\GeneralOptionsModel;
 use App\Models\SlidersPrevisualizationsModel;
 use App\Models\UserLanesModel;
+use App\Services\EmbeddingsService;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 
 class HomeController extends BaseController
 {
+    protected $embeddingsService;
+
+    public function __construct(EmbeddingsService $embeddingsService)
+    {
+        $this->embeddingsService = $embeddingsService;
+    }
     public function index()
     {
         $general_options = GeneralOptionsModel::all()->pluck('option_value', 'option_name')->toArray();
@@ -75,6 +84,7 @@ class HomeController extends BaseController
             "lanes_preferences" => $lanes_preferences,
             "sliderPrevisualization" => $sliderPrevisualization,
             "featuredLearningObjectsCarrousel" => $featuredLearningObjectsCarrousel,
+            "page_title" => "Inicio"
         ]);
     }
 
@@ -117,6 +127,188 @@ class HomeController extends BaseController
         return $sliderPrevisualization;
     }
 
+    public function getActiveCourses(Request $request)
+    {
+        $items_per_page = $request->items_per_page;
+
+        $user = Auth::user();
+
+        $courses_students = $user->courses_students()->with('status')
+            ->whereHas('status', function ($query) {
+                $query->where('code', 'DEVELOPMENT');
+            })
+            ->wherePivot('acceptance_status', 'ACCEPTED')
+            ->wherePivot('status', 'ENROLLED')
+            ->paginate($items_per_page);
+
+        return response()->json($courses_students);
+    }
+
+    public function getRecommendedCourses(Request $request)
+    {
+        $items_per_page = $request->items_per_page;
+        $page = $request->page;
+
+        // Cursos en los que el usuario está inscrito
+        $coursesUser = auth()->user()->courses_students;
+
+        if (!$coursesUser->count()) {
+            throw new OperationFailedException("No courses found for the user");
+        }
+        $categoriesUser = auth()->user()->categories->pluck('uid')->toArray();
+
+        $learningResultsUser = auth()->user()->learningResultsPreferences->pluck('uid')->toArray();
+
+        $similarCourses = $this->embeddingsService->getSimilarCoursesList($coursesUser, $categoriesUser, $learningResultsUser, $items_per_page, $page);
+
+        return response()->json($similarCourses);
+    }
+
+    public function getRecommendedEducationalResources(Request $request)
+    {
+        $items_per_page = $request->items_per_page;
+        $page = $request->page;
+
+        // Recursos educativos con los que el usuario ha interactuado
+        $educationalResourcesUser = auth()->user()->educationalResources;
+
+        if (!$educationalResourcesUser->count()) {
+            throw new OperationFailedException("No educational resources found for the user");
+        }
+        $categoriesUser = auth()->user()->categories->pluck('uid')->toArray();
+        $learningResultsUser = auth()->user()->learningResultsPreferences->pluck('uid')->toArray();
+
+        $similarEducationalResources = $this->embeddingsService->getSimilarEducationalResourcesList($educationalResourcesUser, $categoriesUser, $learningResultsUser, $items_per_page, $page);
+
+        return response()->json($similarEducationalResources);
+    }
+
+    public function getMyEducationalResources(Request $request)
+    {
+        $items_per_page = $request->items_per_page;
+
+        $educationalResources = EducationalResourcesModel::select("educational_resources.*")
+            ->distinct()
+            ->whereIn('uid', function ($query) {
+                $query->select('educational_resource_uid')
+                    ->from('educational_resource_access')
+                    ->where('user_uid', Auth::user()->uid);
+            })
+            ->paginate($items_per_page);
+
+        return response()->json($educationalResources);
+    }
+
+    public function getRecommendedItinerary(Request $request)
+    {
+        $itemsPerPage = $request->items_per_page;
+
+        // Resultados de aprendizaje del alumno
+        $userLearningResults = $this->getLearningResultsStudent();
+
+        // Recursos de aprendizaje del alumno cubiertos
+        $userLearningResultsCovered = $this->getCoveredLearningResults($userLearningResults);
+
+        $userLearningResultsNotCovered = array_diff($userLearningResults, $userLearningResultsCovered);
+
+        // Cursos con resultados de aprendizaje del alumno
+        $paginatedCourses = $this->getCoursesLearningResultsStudent($userLearningResultsNotCovered, $itemsPerPage);
+
+        // Filtrar cursos con resultados de aprendizaje del alumno
+        $paginatedFilteredCourses = $this->filterCoursesLearningResults($paginatedCourses, $userLearningResultsNotCovered, $itemsPerPage);
+
+        return response()->json($paginatedFilteredCourses);
+    }
+
+    private function getLearningResultsStudent()
+    {
+        $userLearningResults = Auth::user()->learningResultsPreferences()
+            ->get()
+            ->pluck("uid")->toArray();
+
+        return $userLearningResults;
+    }
+
+    private function getCoveredLearningResults($userLearningResults)
+    {
+        $userLearningResultsCovered = CoursesModel::whereHas('students', function ($query) {
+            $query->where('user_uid', Auth::user()->uid);
+        })
+            ->whereHas('blocks.learningResults', function ($query) use ($userLearningResults) {
+                $query->whereIn('learning_results.uid', $userLearningResults);
+            })
+            ->with('blocks.learningResults', function ($query) use ($userLearningResults) {
+                $query->whereIn('learning_results.uid', $userLearningResults);
+            })
+            ->get()->pluck('blocks')->flatten()->pluck('learningResults')->flatten()->pluck('uid')->unique()->toArray();
+
+        return $userLearningResultsCovered;
+    }
+
+    private function getCoursesLearningResultsStudent($userLearningResultsNotCovered, $itemsPerPage)
+    {
+        $paginatedCourses = CoursesModel::with(['status', 'blocks.learningResults' => function ($query) use ($userLearningResultsNotCovered) {
+            $query->whereIn('learning_results.uid', $userLearningResultsNotCovered);
+        }])
+            ->whereHas('blocks.learningResults', function ($query) use ($userLearningResultsNotCovered) {
+                $query->whereIn('learning_results.uid', $userLearningResultsNotCovered);
+            })
+            ->whereHas('status', function ($query) {
+                $query->where('code', 'INSCRIPTION');
+            })
+            ->where("belongs_to_educational_program", false)
+            ->selectSub(function ($query) use ($userLearningResultsNotCovered) {
+                $query->from('learning_results as l_r')
+                    ->join("learning_results_blocks as l_r_b", "l_r.uid", "=", "l_r_b.learning_result_uid")
+                    ->join("course_blocks as c_b", "l_r_b.course_block_uid", "=", "c_b.uid")
+                    ->join("courses as c", "c_b.course_uid", "=", "c.uid")
+                    ->where("c.belongs_to_educational_program", false)
+                    ->whereIn('l_r.uid', $userLearningResultsNotCovered)
+                    ->whereColumn('c.uid', 'courses.uid')
+                    ->selectRaw('count(l_r.uid) as learning_results_count');
+            }, 'learning_results_count')
+            ->addSelect('courses.*')
+            ->orderBy('learning_results_count', 'desc')->paginate($itemsPerPage);
+
+        return $paginatedCourses;
+    }
+
+    private function filterCoursesLearningResults($paginatedCourses, $userLearningResultsNotCovered, $itemsPerPage)
+    {
+        $filteredCourses = [];
+        $coveredLearningResults = collect();
+        foreach ($paginatedCourses as $course) {
+            $courseLearningResults = $course->blocks->pluck('learningResults')->flatten()->pluck('uid')->unique();
+
+            // Verificar si el curso cubre algún resultado de aprendizaje no cubierto
+            $uncoveredResults = $courseLearningResults->diff($coveredLearningResults);
+
+            if ($uncoveredResults->isNotEmpty()) {
+                $filteredCourses[] = $course;
+                $coveredLearningResults = $coveredLearningResults->merge($uncoveredResults);
+
+                // Detener la iteración si todos los resultados de aprendizaje no cubiertos están cubiertos
+                if ($coveredLearningResults->intersect($userLearningResultsNotCovered)->count() == count($userLearningResultsNotCovered)) {
+                    break;
+                }
+            }
+        }
+
+        // Convertir los cursos filtrados a una colección
+        $filteredCoursesCollection = collect($filteredCourses);
+
+        // Crear una nueva instancia de LengthAwarePaginator para los cursos filtrados
+        $paginatedFilteredCourses = new LengthAwarePaginator(
+            $filteredCoursesCollection->forPage($paginatedCourses->currentPage(), $itemsPerPage),
+            $filteredCoursesCollection->count(),
+            $itemsPerPage,
+            $paginatedCourses->currentPage(),
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return $paginatedFilteredCourses;
+    }
+
     private function getFeaturedEducationalPrograms()
     {
         $featuredEducationalPrograms = EducationalProgramsModel::select('educational_programs.*', 'califications_avg.average_calification')
@@ -128,38 +320,32 @@ class HomeController extends BaseController
                 '=',
                 'educational_programs.uid'
             )
-            ->addSelect([
-                'total_ects_workload' => CoursesModel::select(DB::raw('SUM(ects_workload)'))
-                    ->whereColumn('educational_program_uid', 'educational_programs.uid')
-            ])
+
             ->with("status")
             ->whereHas('status', function ($query) {
                 $query->whereIn('code', ['ACCEPTED_PUBLICATION', 'INSCRIPTION']);
             })
             ->select(
-                "uid",
-                "educational_program_status_uid",
-                "name as title",
-                "image_path",
-                "description",
-                "inscription_start_date",
-                "inscription_finish_date",
-                "realization_start_date",
-                "realization_finish_date",
-                "average_calification",
-                "featured_main_carrousel",
-                "featured_main_carrousel_approved",
-                "featured_slider",
-                "featured_slider_approved",
-                "featured_slider_image_path",
-                "featured_slider_title",
-                "featured_slider_description",
-                "featured_slider_color_font"
+                "educational_programs.uid",
+                "educational_programs.educational_program_status_uid",
+                "educational_programs.name as title",
+                "educational_programs.image_path",
+                "educational_programs.description",
+                "educational_programs.inscription_start_date",
+                "educational_programs.inscription_finish_date",
+                "educational_programs.realization_start_date",
+                "educational_programs.realization_finish_date",
+                "califications_avg.average_calification",
+                "educational_programs.featured_main_carrousel",
+                "educational_programs.featured_main_carrousel_approved",
+                "educational_programs.featured_slider",
+                "educational_programs.featured_slider_approved",
+                "educational_programs.featured_slider_image_path",
+                "educational_programs.featured_slider_title",
+                "educational_programs.featured_slider_description",
+                "educational_programs.featured_slider_color_font",
+                DB::raw('(SELECT SUM(CAST(ects_workload AS numeric)) FROM courses WHERE courses.educational_program_uid = educational_programs.uid) as ects_workload')
             )
-            ->addSelect([
-                'ects_workload' => CoursesModel::select(DB::raw('SUM(ects_workload)'))
-                    ->whereColumn('educational_program_uid', 'educational_programs.uid')
-            ])
             ->get()
             ->map(function ($program) {
                 $program->type = 'educationalProgram';
@@ -208,23 +394,6 @@ class HomeController extends BaseController
         }])->get();
 
         return $categories;
-    }
-
-    public function getActiveCourses(Request $request)
-    {
-        $items_per_page = $request->items_per_page;
-
-        $user = Auth::user();
-
-        $courses_students = $user->courses_students()->with('status')
-            ->whereHas('status', function ($query) {
-                $query->where('code', 'DEVELOPMENT');
-            })
-            ->wherePivot('acceptance_status', 'ACCEPTED')
-            ->wherePivot('status', 'ENROLLED')
-            ->paginate($items_per_page);
-
-        return response()->json($courses_students);
     }
 
     public function getInscribedCourses(Request $request)

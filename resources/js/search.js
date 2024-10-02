@@ -10,9 +10,9 @@ import {
 import { heroicon } from "./heroicons";
 
 import Treeselect from "treeselectjs";
+import TomSelect from "tom-select";
 
 let treeSelectCategories;
-let treeSelectCompetences;
 
 let selectedCategories = [];
 let selectedCompetences = [];
@@ -21,11 +21,13 @@ let resourceTypes = [];
 
 let inscriptionDateFlatpickr;
 let realizationDateFlatpickr;
+let tomSelectLearningResultsFilter;
 
 document.addEventListener("DOMContentLoaded", function () {
     initHandlers();
     initializeFlatpickr();
     initializeTreeSelect();
+    initializeTomSelectCompetences();
     handleChecksResourceTypes();
     getResourcesChecked();
     getCategoryChecked();
@@ -153,7 +155,7 @@ function wipeFilters() {
     treeSelectCategories.updateValue([]);
 
     selectedCompetences = [];
-    treeSelectCompetences.updateValue([]);
+    tomSelectLearningResultsFilter.clear();
 
     deleteParamFromUrl("category_uid");
     deleteParamFromUrl("text");
@@ -164,9 +166,6 @@ function deleteFilter(filterKey) {
     if (filterKey === "categories") {
         selectedCategories = [];
         treeSelectCategories.updateValue([]);
-    } else if (filterKey === "competences") {
-        selectedCompetences = [];
-        treeSelectCompetences.updateValue([]);
     } else if (filterKey === "learningObjectStatus") {
         document.getElementById("learning-object-status").value = "";
     } else if (filterKey === "inscriptionDate") {
@@ -180,6 +179,8 @@ function deleteFilter(filterKey) {
     } else if (filterKey === "search") {
         document.getElementById("search").value = "";
         deleteParamFromUrl("text");
+    } else if (filterKey === "learningResults") {
+        tomSelectLearningResultsFilter.clear();
     }
 
     searchLearningObjects();
@@ -271,6 +272,52 @@ function initializeFlatpickr() {
     );
 }
 
+function initializeTomSelectCompetences() {
+    tomSelectLearningResultsFilter = new TomSelect("#learning-results-filter", {
+        plugins: {
+            remove_button: {
+                title: "Eliminar",
+            },
+        },
+        render: {
+            no_results: function (data, escape) {
+                return '<div class="no-results">No se encontraron resultados</div>';
+            },
+        },
+        search: true,
+        create: false,
+        load: function (query, callback) {
+            const url =
+                "/searcher/get_learning_results/" + encodeURIComponent(query);
+            fetch(url)
+                .then((response) => response.json())
+                .then((json) => {
+                    if (json.length) {
+                        const response = json.map((item) => {
+                            return {
+                                value: item.uid,
+                                text: item.name,
+                            };
+                        });
+                        callback(response);
+                    } else {
+                        callback();
+                    }
+                })
+                .catch(() => {
+                    callback();
+                });
+        },
+        onItemAdd: function () {
+            this.control_input.value = "";
+        },
+    });
+
+    tomSelectLearningResultsFilter.on("change", function (value) {
+        searchLearningObjects();
+    });
+}
+
 function initializeTreeSelect() {
     const optionsCategoriesTreeSelect = convertCategoriesToOptions(
         window.categories
@@ -292,33 +339,6 @@ function initializeTreeSelect() {
             searchLearningObjects();
         },
     });
-
-    const optionsCompetencesTreeSelect = convertCompetencesToOptions(
-        window.competences
-    );
-    treeSelectCompetences = new Treeselect({
-        parentHtmlContainer: document.getElementById("treeselect-competences"),
-        options: optionsCompetencesTreeSelect,
-        showTags: false,
-        tagsCountText: "competencias seleccionadas",
-        searchable: false,
-        iconElements: {},
-        placeholder: "Competencias",
-        value: [],
-        ariaLabel: "competencias",
-        inputCallback: function (competences) {
-            selectedCompetences = competences;
-            searchLearningObjects();
-        },
-    });
-}
-
-function convertCompetencesToOptions(competences) {
-    return competences.map((competence) => ({
-        name: competence.name,
-        value: competence.uid,
-        children: convertCompetencesToOptions(competence.subcompetences),
-    }));
 }
 
 function convertCategoriesToOptions(categories) {
@@ -353,6 +373,10 @@ function collectFilters() {
     if (selectedCategories.length) filters.categories = selectedCategories;
     if (selectedCompetences.length) filters.competences = selectedCompetences;
     if (search) filters.search = search;
+    const learningResultsSelected = tomSelectLearningResultsFilter.items;
+    if (learningResultsSelected.length) {
+        filters.learningResults = learningResultsSelected;
+    }
 
     return filters;
 }
@@ -491,6 +515,14 @@ function updateFiltersSelectors(filters) {
 
     if (filters.search) {
         addFilter("Búsqueda: " + filters.search, "search");
+    }
+
+    if (filters.learningResults && filters.learningResults.length) {
+        addFilter(
+            filters.learningResults.length +
+                " resultados de aprendizaje seleccionados",
+            "learningResults"
+        );
     }
 }
 

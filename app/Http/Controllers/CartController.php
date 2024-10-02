@@ -39,19 +39,28 @@ class CartController extends BaseController
             "learning_object_type" => $learning_object_type,
             "learning_object_uid" => $uid,
             "learningObjectData" => $learningObjectData,
-            "page_title" => "Gestión de pago | POA"
+            "page_title" => "Gestión de pago"
         ]);
     }
 
     protected function getCourseData($uid)
     {
-        $course = CoursesModel::where('uid', $uid)->with('course_documents')->first();
+        $course = CoursesModel::where('uid', $uid)->with(['course_documents', 'paymentTerms'])->first();
+
+        $totalCost = 0;
+        if($course->payment_mode == "INSTALLMENT_PAYMENT") {
+            foreach ($course->paymentTerms as $paymentTerm) {
+                $totalCost += $paymentTerm->cost;
+            }
+        } else {
+            $totalCost = $course->cost;
+        }
 
         return [
             "uid" => $course->uid,
             "title" => $course->title,
             "description" => $course->description,
-            "cost" => $course->cost,
+            "cost" => $totalCost,
             "ects_workload" => $course->ects_workload,
             "image_path" => $course->image_path,
         ];
@@ -59,20 +68,30 @@ class CartController extends BaseController
 
     protected function getEducationalProgramData($uid)
     {
-        $educational_program = EducationalProgramsModel::where('uid', $uid)->with('courses')->first();
+        $educational_program = EducationalProgramsModel::where('uid', $uid)->with(['courses', 'paymentTerms'])->first();
+
+        $totalCost = 0;
+        if($educational_program->payment_mode == "INSTALLMENT_PAYMENT") {
+            foreach ($educational_program->paymentTerms as $paymentTerm) {
+                $totalCost += $paymentTerm->cost;
+            }
+        } else {
+            $totalCost = $educational_program->cost;
+        }
+
+        $ectsWorkload = 0;
+        foreach ($educational_program->courses as $course) {
+            $ectsWorkload += $course->ects_workload;
+        }
 
         $data = [
             "uid" => $educational_program->uid,
             "title" => $educational_program->name,
             "description" => $educational_program->description,
-            "cost" => $educational_program->cost,
-            "ects_workload" => 0, // Se calculará en el bucle siguiente
+            "cost" => $totalCost,
+            "ects_workload" => $ectsWorkload,
             "image_path" => $educational_program->image_path,
         ];
-
-        foreach ($educational_program->courses as $course) {
-            $data['ects_workload'] += $course->ects_workload;
-        }
 
         return $data;
     }

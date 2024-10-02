@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
         handleScrollCustomLanes();
         toggleScrollButtons();
         initHandlersCustomLanes();
-
     }
 
     controlSlides("main-slider");
@@ -77,7 +76,7 @@ function handleScrollCustomLanes() {
         }
 
         if (scrollRight === 0) {
-+            scrollRightBtn.classList.remove("lane-arrow-enabled");
+            scrollRightBtn.classList.remove("lane-arrow-enabled");
         } else {
             scrollRightBtn.classList.add("lane-arrow-enabled");
         }
@@ -91,29 +90,18 @@ function handlePaginationLanes() {
     const container = document.getElementById("pagination-lane-courses");
 
     handlePagination(container, (pageNumber) => {
-        console.log("pageNumber", pageNumber);
-        if (currentLane == "courses-actived") {
-            getActiveCourses(pageNumber);
-        } else if (currentLane == "courses-inscribed") {
-            getInscribedCourses(pageNumber);
-        } else if (currentLane == "courses-teacher") {
-            getTeacherCourses(pageNumber);
-        }
+        const numPages = document.querySelector(
+            "#selector-num-pages-courses-lanes .selector-num-pages"
+        ).value;
+
+        loadLane(currentLane, pageNumber, numPages);
     });
 
     const selectorNumPagesCoursesLanes = document.getElementById(
         "selector-num-pages-courses-lanes"
     );
     handleNumPages(selectorNumPagesCoursesLanes, (numPages) => {
-        console.log("numPages", numPages);
-
-        if (currentLane == "courses-actived") {
-            getActiveCourses(1, numPages);
-        } else if (currentLane == "courses-inscribed") {
-            getInscribedCourses(1, numPages);
-        } else if (currentLane == "courses-teacher") {
-            getTeacherCourses(1, numPages);
-        }
+        loadLane(currentLane, 1, numPages);
     });
 }
 
@@ -161,6 +149,7 @@ function handleLanes() {
     });
 }
 
+// Cuando se cambia el carril desde la pestaña
 function handleLaneChange() {
     const laneTabs = document.querySelectorAll(".lane-tab");
 
@@ -171,18 +160,12 @@ function handleLaneChange() {
 
             event.target.classList.add("selected");
 
-            if (lane == "courses-actived") {
-                currentLane = "courses-actived";
-                getActiveCourses();
-            } else if (lane == "courses-inscribed") {
-                currentLane = "courses-inscribed";
-                getInscribedCourses();
-            } else if (lane == "courses-teacher") {
-                currentLane = "courses-teacher";
-                getTeacherCourses();
-            } else if (lane == "courses-recommended") {
-                // To do
-            }
+            const numPages = document.querySelector(
+                "#selector-num-pages-courses-lanes .selector-num-pages"
+            ).value;
+
+            currentLane = lane;
+            loadLane(currentLane, 1, numPages);
         });
     });
 }
@@ -199,9 +182,55 @@ function getActiveCourses(page = 1, items_per_page = 3) {
         loader: true,
     };
 
-    apiFetch(params).then((response) => {
-        showCourses(response);
-    });
+    apiFetch(params)
+        .then((response) => {
+            showLearningObjects(response, "courses");
+        })
+        .catch((error) => {
+            showNoLearningObjectsLanesUser("courses");
+        });
+}
+
+function getRecommendedCourses(page = 1, items_per_page = 3) {
+    const params = {
+        method: "POST",
+        url: "/home/get_recommended_courses",
+        stringify: true,
+        body: {
+            page,
+            items_per_page,
+        },
+        loader: true,
+    };
+
+    apiFetch(params)
+        .then((response) => {
+            showLearningObjects(response, "courses");
+        })
+        .catch(() => {
+            showNoLearningObjectsLanesUser("courses");
+        });
+}
+
+function getRecommendedEducationalResources(page = 1, items_per_page = 3) {
+    const params = {
+        method: "POST",
+        url: "/home/get_recommended_educational_resources",
+        stringify: true,
+        body: {
+            page,
+            items_per_page,
+        },
+        loader: true,
+    };
+
+    apiFetch(params)
+        .then((response) => {
+            showLearningObjects(response, "educationalResources");
+        })
+        .catch((error) => {
+            showNoLearningObjectsLanesUser("educationalResources");
+        });
 }
 
 function getInscribedCourses(page = 1, items_per_page = 3) {
@@ -216,9 +245,55 @@ function getInscribedCourses(page = 1, items_per_page = 3) {
         loader: true,
     };
 
-    apiFetch(params).then((response) => {
-        showCourses(response);
-    });
+    apiFetch(params)
+        .then((response) => {
+            showLearningObjects(response, "courses");
+        })
+        .catch(() => {
+            showNoLearningObjectsLanesUser("courses");
+        });
+}
+
+function getMyEducationalResources(page = 1, items_per_page = 3) {
+    const params = {
+        method: "POST",
+        url: "/home/get_my_educational_resources",
+        stringify: true,
+        body: {
+            page,
+            items_per_page,
+        },
+        loader: true,
+    };
+
+    apiFetch(params)
+        .then((response) => {
+            showLearningObjects(response, "educationalResources");
+        })
+        .catch((error) => {
+            showNoLearningObjectsLanesUser("educationalResources");
+        });
+}
+
+function getRecommendedItinerary(page = 1, items_per_page = 3) {
+    const params = {
+        method: "POST",
+        url: "/home/get_recommended_itinerary",
+        stringify: true,
+        body: {
+            page,
+            items_per_page,
+        },
+        loader: true,
+    };
+
+    apiFetch(params)
+        .then((response) => {
+            showLearningObjects(response, "courses");
+        })
+        .catch(() => {
+            showNoLearningObjectsLanesUser("courses");
+        });
 }
 
 function getTeacherCourses(page = 1, items_per_page = 3) {
@@ -234,45 +309,52 @@ function getTeacherCourses(page = 1, items_per_page = 3) {
     };
 
     apiFetch(params).then((response) => {
-        console.log(response);
-        showCourses(response);
+        showLearningObjects(response, "courses");
     });
 }
 
-function showCourses(response) {
+function showLearningObjects(response, type) {
     let coursesLanesContainer = document.getElementById(
         "courses-lane-container"
     );
 
-    if (response.data.length) {
-        coursesLanesContainer.innerHTML = "";
-
-        document
-            .getElementById("control-pagination-courses-lanes")
-            .classList.remove("hidden");
-
-        loadResources(coursesLanesContainer, response.data);
-
-        const containerPagination = document.getElementById(
-            "pagination-lane-courses"
-        );
-
-        updatePagination(
-            containerPagination,
-            response.current_page,
-            response.last_page
-        );
-    } else {
-        coursesLanesContainer.innerHTML =
-            "<h2 class='text-center'>No hay cursos</h2>";
-
-        document
-            .getElementById("control-pagination-courses-lanes")
-            .classList.add("hidden");
+    if (!response.data.length) {
+        showNoLearningObjectsLanesUser(type);
+        return;
     }
+
+    coursesLanesContainer.innerHTML = "";
+
+    document
+        .getElementById("control-pagination-courses-lanes")
+        .classList.remove("hidden");
+
+    loadResources(coursesLanesContainer, response.data, type);
+
+    const containerPagination = document.getElementById(
+        "pagination-lane-courses"
+    );
+
+    updatePagination(
+        containerPagination,
+        response.current_page,
+        response.last_page
+    );
 }
 
-function loadResources(learningObjectsContainer, learning_objects) {
+function showNoLearningObjectsLanesUser(type) {
+    document.getElementById(
+        "courses-lane-container"
+    ).innerHTML = `<h2 class='text-center'>No hay ${
+        type == "courses" ? "cursos" : "recursos educativos"
+    }</h2>`;
+
+    document
+        .getElementById("control-pagination-courses-lanes")
+        .classList.add("hidden");
+}
+
+function loadResources(learningObjectsContainer, learning_objects, type) {
     let templateLearningObject = document.getElementById(
         "learning-object-template"
     );
@@ -287,12 +369,42 @@ function loadResources(learningObjectsContainer, learning_objects) {
         templateCloned.querySelector(".block-description").innerHTML =
             learning_object.description;
 
+        let url = "#";
         if (
+            type == "courses" &&
             learning_object.status.code == "DEVELOPMENT" &&
             learning_object.lms_url
         ) {
-            templateCloned.querySelectorAll(".block-url").forEach((element) => {
-                element.href = learning_object.lms_url;
+            url = learning_object.lms_url;
+        } else if (
+            type == "courses" &&
+            learning_object.status.code == "INSCRIPTION"
+        ) {
+            url = `/course/${learning_object.uid}`;
+        } else if (type == "educationalResources") {
+            url = `/resource/${learning_object.uid}`;
+        }
+
+        templateCloned.querySelectorAll(".block-url").forEach((element) => {
+            element.href = url;
+        });
+
+        if (type == "courses") {
+            templateCloned.querySelector(
+                ".learning-object-start-date"
+            ).innerHTML = formatDate(learning_object.realization_start_date);
+
+            templateCloned.querySelector(
+                ".learning-object-finish-date"
+            ).innerHTML = formatDate(learning_object.realization_finish_date);
+        } else {
+            const idsHidde = [
+                ".learning-objects-dates-container",
+                ".separator-dates",
+            ];
+
+            idsHidde.forEach((id) => {
+                templateCloned.querySelector(id).classList.add("hidden");
             });
         }
 
@@ -300,16 +412,26 @@ function loadResources(learningObjectsContainer, learning_objects) {
             ".learning-object-image"
         ).src = `${window.backendUrl}/${learning_object.image_path}`;
 
-        templateCloned.querySelector(
-            ".learning-object-start-date"
-        ).innerHTML = formatDate(learning_object.realization_start_date);
-
-        templateCloned.querySelector(
-            ".learning-object-finish-date"
-        ).innerHTML = formatDate(learning_object.realization_finish_date);
-
         learningObjectsContainer.appendChild(
             document.importNode(templateCloned, true)
         );
     });
+}
+
+function loadLane(lane, page = 1, items_per_page = 3) {
+    if (lane == "courses-actived") {
+        getActiveCourses(page, items_per_page);
+    } else if (lane == "courses-inscribed") {
+        getInscribedCourses(page, items_per_page);
+    } else if (lane == "courses-teacher") {
+        getTeacherCourses(page, items_per_page);
+    } else if (lane == "courses-recommended") {
+        getRecommendedCourses(page, items_per_page);
+    } else if (lane == "educational-resources-recommended") {
+        getRecommendedEducationalResources(page, items_per_page);
+    } else if (lane == "my-educational-resources") {
+        getMyEducationalResources(page, items_per_page);
+    } else if (lane == "recommended-itinerary") {
+        getRecommendedItinerary(page, items_per_page);
+    }
 }
