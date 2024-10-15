@@ -89,7 +89,7 @@ class CourseInfoControllerTest extends TestCase
         $response->assertViewHas('resources', [
             'resources/js/course_info.js'
         ]);
-        $response->assertViewHas('page_title', $course->title . ' | POA');
+        $response->assertViewHas('page_title', $course->title);
     }
 
     /**

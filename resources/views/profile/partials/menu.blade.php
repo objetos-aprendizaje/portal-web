@@ -4,7 +4,7 @@
     <h2 class="py-[25px] text-center">Configuración</h2>
 
     <ul id="main-menu" class="main-menu space-y-2 ">
-        <a class="no-effect-hover" href="{{ route('my-profile') }}">
+        <a aria-label="enlace" class="no-effect-hover" href="{{ route('my-profile') }}">
             <li class="menu-element {{ $currentPage === 'myProfile' ? 'menu-element-selected' : '' }}">
                 <div class="menu-content">
                     <div class="icon">{{ e_heroicon('user', 'outline', '#C7C7C7', 24, 24) }}</div>
@@ -22,7 +22,7 @@
             </div>
 
             <ul class="sub-menu">
-                <a class="no-effect-hover" href="{{ route('my-courses-inscribed') }}">
+                <a aria-label="enlace" class="no-effect-hover" href="{{ route('my-courses-inscribed') }}">
                     <li>
                         <div
                             class="menu-content sub-menu-content {{ $currentPage === 'inscribedCourses' ? 'menu-element-selected' : '' }}">
@@ -32,7 +32,7 @@
                     </li>
                 </a>
 
-                <a class="no-effect-hover" href="{{ route('my-courses-enrolled') }}">
+                <a aria-label="enlace" class="no-effect-hover" href="{{ route('my-courses-enrolled') }}">
                     <li>
                         <div
                             class="menu-content sub-menu-content {{ $currentPage === 'enrolledCourses' ? 'menu-element-selected' : '' }}">
@@ -42,7 +42,7 @@
                     </li>
                 </a>
 
-                <a class="no-effect-hover" href="{{ route('my-courses-historic') }}">
+                <a aria-label="enlace" class="no-effect-hover" href="{{ route('my-courses-historic') }}">
                     <li>
                         <div
                             class="menu-content sub-menu-content {{ $currentPage === 'historicCourses' ? 'menu-element-selected' : '' }}">
@@ -65,7 +65,7 @@
             </div>
 
             <ul class="sub-menu">
-                <a class="no-effect-hover" href="{{ route('my-educational-programs-inscribed') }}">
+                <a aria-label="enlace" class="no-effect-hover" href="{{ route('my-educational-programs-inscribed') }}">
                     <li>
                         <div
                             class="menu-content sub-menu-content {{ $currentPage === 'inscribedEducationalPrograms' ? 'menu-element-selected' : '' }}">
@@ -75,7 +75,7 @@
                     </li>
                 </a>
 
-                <a class="no-effect-hover" href="{{ route('my-educational-programs-enrolled') }}">
+                <a aria-label="enlace" class="no-effect-hover" href="{{ route('my-educational-programs-enrolled') }}">
                     <li>
                         <div
                             class="menu-content sub-menu-content {{ $currentPage === 'enrolledEducationalPrograms' ? 'menu-element-selected' : '' }}">
@@ -85,7 +85,7 @@
                     </li>
                 </a>
 
-                <a class="no-effect-hover" href="{{ route('my-educational-programs-historic') }}">
+                <a aria-label="enlace" class="no-effect-hover" href="{{ route('my-educational-programs-historic') }}">
                     <li>
                         <div
                             class="menu-content sub-menu-content {{ $currentPage === 'historicEducationalPrograms' ? 'menu-element-selected' : '' }}">
@@ -98,7 +98,7 @@
             </ul>
         </li>
 
-        <a class="no-effect-hover" href="{{ route('competences-learning-results') }}">
+        <a aria-label="enlace" class="no-effect-hover" href="{{ route('competences-learning-results') }}">
             <li class="menu-element {{ $currentPage === 'competences_learning_results' ? 'menu-element-selected' : '' }}">
                 <div class="menu-content">
                     <div class="icon">{{ e_heroicon('book-open', 'outline', '#C7C7C7', 24, 24) }}</div>
@@ -107,7 +107,7 @@
             </li>
         </a>
 
-        <a class="no-effect-hover" href="{{ route('notifications') }}">
+        <a aria-label="enlace" class="no-effect-hover" href="{{ route('notifications') }}">
             <li class="menu-element {{ $currentPage === 'notifications' ? 'menu-element-selected' : '' }}">
                 <div class="menu-content">
                     <div class="icon">{{ e_heroicon('bell-alert', 'outline', '#C7C7C7', 24, 24) }}</div>
@@ -116,7 +116,7 @@
             </li>
         </a>
 
-        <a class="no-effect-hover" href="{{ route('categories') }}">
+        <a aria-label="enlace" class="no-effect-hover" href="{{ route('categories') }}">
             <li class="menu-element {{ $currentPage === 'categories' ? 'menu-element-selected' : '' }}">
                 <div class="menu-content">
                     <div class="icon">{{ e_heroicon('rectangle-stack', 'outline', '#C7C7C7', 24, 24) }}</div>

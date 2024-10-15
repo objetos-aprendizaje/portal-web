@@ -3,24 +3,24 @@
     class="px-[30px] h-[110px] bg-white items-center justify-between hidden lg:flex border-b top-0 fixed w-full z-50">
     <div class="flex items-center gap-[25px]">
         @if (!$general_options['poa_logo_1'] && !$general_options['poa_logo_2'] && !$general_options['poa_logo_3'])
-            <a class="no-effect-hover" href="/" class="no-effect-hover">
+            <a aria-label="enlace" class="no-effect-hover" href="/" class="no-effect-hover">
                 <img src="/data/images/default_images/logo-default.png" class="mr-3 h-[75px]" alt="Logo header">
             </a>
         @else
             @if ($general_options['poa_logo_1'])
-                <a class="no-effect-hover" href="/" class="no-effect-hover">
+                <a aria-label="enlace" class="no-effect-hover" href="/" class="no-effect-hover">
                     <img src="{{ env('BACKEND_URL') . '/' . $general_options['poa_logo_1'] }}"
                         class="mr-3 w-[215px] h-[75px]" alt="Logo header">
                 </a>
             @endif
             @if ($general_options['poa_logo_2'])
-                <a class="no-effect-hover" href="/" class="no-effect-hover">
+                <a aria-label="enlace" class="no-effect-hover" href="/" class="no-effect-hover">
                     <img src="{{ env('BACKEND_URL') . '/' . $general_options['poa_logo_2'] }}"
                         class="mr-3 w-[215px] h-[75px]" alt="Logo header">
                 </a>
             @endif
             @if ($general_options['poa_logo_3'])
-                <a class="no-effect-hover" href="/" class="no-effect-hover">
+                <a aria-label="enlace" class="no-effect-hover" href="/" class="no-effect-hover">
                     <img src="{{ env('BACKEND_URL') . '/' . $general_options['poa_logo_3'] }}"
                         class="mr-3 w-[215px] h-[75px]" alt="Logo header">
                 </a>
@@ -39,11 +39,11 @@
     </div>
     <div class="flex gap-[30px] items-center h-full">
         <div class="flex items-center gap-[10px] h-full">
-            <a href="{{ route('index') }}" class="block p-[10px]">Inicio</a>
-            <a href="{{ route('searcher') }}" class="p-[10px]">Buscador</a>
+            <a aria-label="enlace" href="{{ route('index') }}" class="block p-[10px]">Inicio</a>
+            <a aria-label="enlace" href="{{ route('searcher') }}" class="p-[10px]">Buscador</a>
             @foreach ($header_pages as $page)
                 <div class="flex items-center h-full">
-                    <a href="/page/{{ $page->slug }}"
+                    <a aria-label="enlace" href="/page/{{ $page->slug }}"
                         class="flex items-center gap-[4px] px-[10px] rounded-[8px] h-full {{ $page->headerPagesChildren->count() ? 'has-submenu-header' : '' }}">{{ $page['name'] }}
                         @if ($page->headerPagesChildren->count())
                             {{ e_heroicon('chevron-down', 'outline', 'black', 20, 20) }}
@@ -53,7 +53,7 @@
                         <div
                             class="submenu-header hidden absolute shadow top-full bg-white p-[12px] rounded-[8px] w-[260px]">
                             @foreach ($page->headerPagesChildren as $pageChildren)
-                                <a href="/page/{{ $pageChildren->slug }}"
+                                <a aria-label="enlace" href="/page/{{ $pageChildren->slug }}"
                                     class="flex gap-2 p-[10px] hover:bg-color_hover_2 rounded-[8px] mb-[12px]">{{ $pageChildren['name'] }}</a>
                             @endforeach
                         </div>
@@ -103,11 +103,11 @@
             </div>
         @else
             <div class="flex gap-[10px]">
-                <a href="/login"
+                <a aria-label="enlace" href="/login"
                     class="w-[128px] m-auto border border-color_1 justify-center rounded-[6px] bg-white text-color_1 px-[10px] py-[10px] text-center hover:bg-color_1 hover:text-white transition duration-300">Iniciar
                     sesión</a>
 
-                <a href="/register"
+                <a aria-label="enlace" href="/register"
                     class=" w-[128px] m-auto border rounded-[6px] bg-color_1 text-center justify-center text-white px-[10px] py-[10px] button-register hover:bg-color_2">Registrarme</a>
             </div>
         @endif
@@ -118,18 +118,18 @@
     <div class="w-[282px] p-[24px] z-50 fixed right-[6px] origin-top-left divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
         role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
         <div class="py-1 flex flex-col gap-[24px]" role="none">
-            <a href="/profile/update_account" class="hover:bg-color_hover_2 block p-[10px] text-sm no-effect-hover"
+            <a aria-label="enlace" href="/profile/update_account" class="hover:bg-color_hover_2 block p-[10px] text-sm no-effect-hover"
                 role="menuitem" tabindex="-1" id="menu-item-0">Perfil</a>
 
             @if (Auth::check() && Auth::user()->hasAnyRole(['ADMINISTRATOR', 'MANAGEMENT', 'TEACHER']))
-                <a href="{{ env('BACKEND_URL') }}"
-                    class=" hover:bg-color_hover_2 uth::user()->hasAnyRole(['ADMINISTRblock p-[10px] text-sm no-effect-hover" role="menuitem"
-                    tabindex="-1" id="menu-item-1">Administrar
+                <a aria-label="enlace" href="{{ env('BACKEND_URL') }}"
+                    class=" hover:bg-color_hover_2 uth::user()->hasAnyRole(['ADMINISTRblock p-[10px] text-sm no-effect-hover"
+                    role="menuitem" tabindex="-1" id="menu-item-1">Administrar
                     Portal</a>
             @endif
             <hr>
 
-            <a href="{{ env('APP_URL') }}/logout"
+            <a aria-label="enlace" href="{{ env('APP_URL') }}/logout"
                 class="hover:bg-color_hover_2 text-sm flex gap-[8px] items-center no-effect-hover" role="menuitem"
                 tabindex="-1" id="menu-item-3">
                 <span
@@ -139,8 +139,7 @@
     </div>
 </div>
 <!-- Menú móvil-->
-<header
-    class="h-[60px] lg:hidden bg-white justify-between mobile-navbar border-b fixed w-full z-50 top-0 flex justify-between items-center">
+<header class="mobile-navbar">
     <div>
         <button data-collapse-toggle="mobile-menu" type="button" id="mobile-menu-btn"
             class="inline-flex items-center p-1 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg lg:hidden focus:outline-none">
@@ -152,7 +151,7 @@
     </div>
 
     <div class="flex justify-around items-center">
-        <a href="/" class="flex items-center no-effect-hover">
+        <a aria-label="enlace" href="/" class="flex items-center no-effect-hover">
             <img src="{{ $general_options['poa_logo_1'] ? env('BACKEND_URL') . '/' . $general_options['poa_logo_1'] : '/data/images/default_images/logo-default.png' }}"
                 class="h-[50px]" alt="Logo header">
         </a>
@@ -172,7 +171,7 @@
     </div>
 
     <div class="p-2 cursor-pointer mx-1 transition input-search-mobile ">
-        <a href="/searcher">{{ e_heroicon('magnifying-glass', 'outline', 'grey') }}</a>
+        <a aria-label="enlace"  href="/searcher">{{ e_heroicon('magnifying-glass', 'outline', 'grey') }}</a>
     </div>
 </header>
 
@@ -195,22 +194,67 @@
             </li>
         @endif
 
-        <a href="/">
+        <a aria-label="enlace" href="/">
             <li class="option">
                 <div class="option-label">Inicio</div>
             </li>
         </a>
 
-        <a href="{{ route('searcher') }}">
+        <a aria-label="enlace" href="{{ route('searcher') }}">
             <li class="option-label option">
                 <div>Buscador</div>
             </li>
         </a>
 
+        @foreach ($header_pages as $page)
+            @if (!$page->headerPagesChildren->count())
+                <a aria-label="enlace" href="{{ '/page/' . $page->slug }}">
+                    <li class="option">
+                        <div class="option-label">{{ $page->name }}</div>
+                    </li>
+                </a>
+            @else
+                <li class="option-submenu ">
+                    <div class="option-label flex justify-between items-center hover:opacity-75">
+                        <div>{{ $page->name }}</div>
+                        <div class="icon-closed">
+                            {{ e_heroicon('chevron-right', 'outline', null, 16, 16) }}
+                        </div>
+                        <div class="icon-openned hidden">
+                            {{ e_heroicon('chevron-down', 'outline', null, 16, 16) }}
+                        </div>
+                    </div>
+
+                    <ul class="submenu hidden overflow-y-scroll max-h-[200px]">
+                        @foreach ($page->headerPagesChildren as $page)
+                            <a aria-label="enlace" href="{{ '/page/' . $page->slug }}">
+                                <li class="option">
+                                    <div class="option-label">{{ $page->name }}</div>
+                                </li>
+                            </a>
+                        @endforeach
+
+                    </ul>
+                </li>
+            @endif
+        @endforeach
+
         @if (Auth::check())
+            <a aria-label="enlace" href="{{ env('BACKEND_URL') }}">
+                <li class="option-label option">
+                    <div>Administrar Portal</div>
+                </li>
+            </a>
+
+            <a aria-label="enlace" href="{{ route('my-profile') }}">
+                <li class="option-label option">
+                    <div>Mi perfil</div>
+                </li>
+            </a>
+
             <li class="option-submenu">
                 <div class="option-label flex justify-between items-center hover:opacity-75">
-                    <div>Tu cuenta</div>
+                    <div>Mis cursos</div>
                     <div class="icon-closed">
                         {{ e_heroicon('chevron-right', 'outline', null, 16, 16) }}
                     </div>
@@ -220,53 +264,75 @@
                 </div>
 
                 <ul class="submenu hidden">
-                    <a href="/profile/update_account">
+                    <a aria-label="enlace" href="/profile/my_courses/inscribed">
                         <li>
-                            <div class="option-label">Perfil</div>
+                            <div class="option-label">Inscritos</div>
                         </li>
                     </a>
-                    @if (Auth::check() && Auth::user()->hasAnyRole(['ADMINISTRATOR', 'MANAGEMENT', 'TEACHER']))
-                        <a href="{{ env('BACKEND_URL') }}">
-                            <li>
-                                <div class="option-label">Administrar Portal</div>
-                            </li>
-                        </a>
-                    @endif
+
+                    <a aria-label="enlace" href="/profile/my_courses/enrolled">
+                        <li>
+                            <div class="option-label">Matriculados</div>
+                        </li>
+                    </a>
+
+                    <a aria-label="enlace" ref="/profile/my_courses/historic">
+                        <li>
+                            <div class="option-label">Histórico</div>
+                        </li>
+                    </a>
                 </ul>
             </li>
 
-            @foreach ($header_pages as $page)
-                @if (!$page->headerPagesChildren->count())
-                    <a href="{{ '/page/' . $page->slug }}">
-                        <li class="option">
-                            <div class="option-label">{{ $page->name }}</div>
+            <li class="option-submenu">
+                <div class="option-label flex justify-between items-center hover:opacity-75">
+                    <div>Mis programas formativos</div>
+                    <div class="icon-closed">
+                        {{ e_heroicon('chevron-right', 'outline', null, 16, 16) }}
+                    </div>
+                    <div class="icon-openned hidden">
+                        {{ e_heroicon('chevron-down', 'outline', null, 16, 16) }}
+                    </div>
+                </div>
+
+                <ul class="submenu hidden">
+                    <a aria-label="enlace" href="/profile/my_educational_programs/inscribed">
+                        <li>
+                            <div class="option-label">Inscritos</div>
                         </li>
                     </a>
-                @else
-                    <li class="option-submenu ">
-                        <div class="option-label flex justify-between items-center hover:opacity-75">
-                            <div>{{ $page->name }}</div>
-                            <div class="icon-closed">
-                                {{ e_heroicon('chevron-right', 'outline', null, 16, 16) }}
-                            </div>
-                            <div class="icon-openned hidden">
-                                {{ e_heroicon('chevron-down', 'outline', null, 16, 16) }}
-                            </div>
-                        </div>
 
-                        <ul class="submenu hidden overflow-y-scroll max-h-[200px]">
-                            @foreach ($page->headerPagesChildren as $page)
-                                <a href="{{ '/page/' . $page->slug }}">
-                                    <li class="option">
-                                        <div class="option-label">{{ $page->name }}</div>
-                                    </li>
-                                </a>
-                            @endforeach
+                    <a aria-label="enlace" href="/profile/my_educational_programs/enrolled">
+                        <li>
+                            <div class="option-label">Matriculados</div>
+                        </li>
+                    </a>
 
-                        </ul>
-                    </li>
-                @endif
-            @endforeach
+                    <a aria-label="enlace" href="/profile/my_educational_programs/historic">
+                        <li>
+                            <div class="option-label">Histórico</div>
+                        </li>
+                    </a>
+                </ul>
+            </li>
+
+            <a aria-label="enlace" href="{{ route('competences-learning-results') }}">
+                <li class="option-label option">
+                    Competencias y resultados de aprendizaje
+                </li>
+            </a>
+
+            <a aria-label="enlace" href="{{ route('notifications') }}">
+                <li class="option-label option">
+                    Notificaciones
+                </li>
+            </a>
+
+            <a aria-label="enlace" href="{{ route('categories') }}">
+                <li class="option-label option">
+                    Categorías
+                </li>
+            </a>
 
             @if (Auth::user()->general_notifications_allowed)
                 <li class="option-submenu ">

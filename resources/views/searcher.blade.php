@@ -122,7 +122,7 @@
 
             <div class="col-span-full learning-results-filter">
                 <select id="learning-results-filter" name="learning_results[]" multiple
-                    placeholder="Selecciona resultados de aprendizaje">
+                    placeholder="Selecciona resultados de aprendizaje" aria-label="Selecciona resultados de aprendizaje">
                 </select>
             </div>
         </section>
@@ -133,7 +133,7 @@
                     <div>Mostrando <span id="filter-results-showing"></span> de <span id="filter-results-total"></span>
                         resultados</div>
                     <div class="border-l border h-[16px] flex-none hidden lg:block"></div>
-                    <div class="text-[#FF2954]" id="delete-all-filters-btn"><a title="limpiar"
+                    <div class="text-[#FF2954]" id="delete-all-filters-btn"><a aria-label="enlace" title="limpiar"
                             href="javascript:void(0)">Limpiar</a></div>
                 </div>
             </div>
@@ -165,7 +165,7 @@
         <template id="learning-object-template">
             <div class="learning-object-block shadow-lg">
                 <div class="learning-object-img-container">
-                    <a title="objeto de aprendizaje" class="no-effect-hover" class="learning-object-url"
+                    <a aria-label="enlace" title="objeto de aprendizaje" class="no-effect-hover" class="learning-object-url"
                         href="javascript:void(0)">
                         <img alt="objeto de aprendizaje" src="" class="learning-object-image">
                     </a>
@@ -176,7 +176,7 @@
 
                     <div class="block-container-title">
                         <div>
-                            <a title="objeto de aprendizaje" class="learning-object-url" href="javascript:void(0)">
+                            <a aria-label="enlace" title="objeto de aprendizaje" class="learning-object-url" href="javascript:void(0)">
                                 <h2 class="block-title"></h2>
                             </a>
                         </div>
@@ -187,7 +187,7 @@
 
                     </div>
 
-                    <a title="objeto de aprendizaje" class="learning-object-url" href="javascript:void(0)">
+                    <a aria-label="enlace" title="objeto de aprendizaje" class="learning-object-url" href="javascript:void(0)">
                         <div class="block-description"></div>
                     </a>
 

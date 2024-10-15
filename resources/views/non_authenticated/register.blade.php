@@ -3,20 +3,20 @@
     <section class="md:flex hidden">
 
         <div class="w-1/2">
-            <img id="image-background" src="{{ asset('data/images/background_login.png') }}" class="object-cover w-full">
+            <img alt="registro" id="image-background" src="{{ asset('data/images/background_login.png') }}" class="object-cover w-full">
         </div>
 
         <div class="w-1/2 justify-center flex items-center">
             <div class="w-[530px] mb-[25px]">
                 <div class="rounded-[20px] border py-[20px] px-[40px]">
                     @if (app('general_options')['poa_logo_1'])
-                        <img class="mx-auto block max-w-[211px] max-h-[80px] mb-[15px]"
+                        <img alt="registro" class="mx-auto block max-w-[211px] max-h-[80px] mb-[15px]"
                             src="{{ env('BACKEND_URL') . '/' . app('general_options')['poa_logo_1'] }}" />
                     @endif
 
                     <h1 class="text-[32px] text-center mb-[15px]">Registrarme</h1>
 
-                    <p class="text-center mb-[20px]">¿Ya tienes una cuenta? <a class="text-color_1" href="/login">Inicia
+                    <p class="text-center mb-[20px]">¿Ya tienes una cuenta? <a aria-label="enlace" class="text-color_1" href="/login">Inicia
                             Sesión</a></p>
 
                     <form id="registerFormDesktop" action="/register/submit" method="POST">
@@ -92,12 +92,12 @@
                         @endif
 
                         @if ($urlCas)
-                            <a class="no-effect-hover" href="{{ $urlCas }}">
+                            <a aria-label="enlace" class="no-effect-hover" href="{{ $urlCas }}">
                                 <div class="flex justify-center mb-[25px]">
                                     <div
                                         class="inline-flex border rounded-full items-center justify-center pl-[6px] pr-[14px] py-[6px] gap-2 cursor-pointer hover:border-color_1">
                                         <div>
-                                            <img src="{{ asset('/data/images/logo_min_boton_login.png') }}"
+                                            <img alt="registro" src="{{ asset('/data/images/logo_min_boton_login.png') }}"
                                                 class="w-[40px] h-[40px] mx-auto rounded-full  block" />
                                         </div>
 
@@ -113,46 +113,46 @@
 
                         <div class="flex justify-center gap-[32px]">
                             @if ($parameters_login_systems['facebook_login_active'])
-                                <a class="no-effect-hover" href="/auth/facebook">
+                                <a aria-label="enlace" class="no-effect-hover" href="/auth/facebook">
                                     <button title="facebook login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
+                                        <img alt="registro" class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
                                     </button>
                                 </a>
                             @endif
 
                             @if ($parameters_login_systems['twitter_login_active'])
-                                <a class="no-effect-hover" href="/auth/twitter">
+                                <a aria-label="enlace" class="no-effect-hover" href="/auth/twitter">
                                     <button title="twitter login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
+                                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
                                     </button>
                                 </a>
                             @endif
 
                             @if ($parameters_login_systems['linkedin_login_active'])
-                                <a class="no-effect-hover" href="/auth/linkedin">
+                                <a aria-label="enlace" class="no-effect-hover" href="/auth/linkedin">
                                     <button title="linkedin login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
+                                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
                                     </button>
                                 </a>
                             @endif
 
                             @if ($parameters_login_systems['google_login_active'])
-                                <a class="no-effect-hover" href="/auth/google">
+                                <a aria-label="enlace" class="no-effect-hover" href="/auth/google">
                                     <button title="google login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
+                                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
                                     </button>
                                 </a>
                             @endif
 
                             @if ($urlRediris)
-                                <a class="no-effect-hover" href="{{ $urlRediris }}">
+                                <a aria-label="enlace" class="no-effect-hover" href="{{ $urlRediris }}">
                                     <button title="rediris login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
+                                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
                                     </button>
                                 </a>
                             @endif
@@ -162,7 +162,7 @@
                     </form>
 
                     @if ($cert_login != '')
-                        <div class="text-center p-4"><a
+                        <div class="text-center p-4"><a aria-label="enlace"
                                 href="https://{{ env('DOMINIO_CERTIFICADO') }}/certificate-access">Acceso mediante
                                 Certificado Digital</a></div>
                     @endif
@@ -176,7 +176,7 @@
 
     <section class="md:hidden p-[20px]">
         @if (app('general_options')['poa_logo_1'])
-            <img class="mx-auto block max-w-[146px] h-[51px] mb-[15px]"
+            <img alt="registro" class="mx-auto block max-w-[146px] h-[51px] mb-[15px]"
                 src="{{ env('BACKEND_URL') . '/' . app('general_options')['poa_logo_1'] }}" />
         @endif
 
@@ -251,12 +251,12 @@
         @endif
 
         @if ($urlCas)
-            <a class="no-effect-hover" href="{{ $urlCas }}">
+            <a aria-label="enlace" class="no-effect-hover" href="{{ $urlCas }}">
                 <div class="flex justify-center mb-[25px] cursor-pointer ">
                     <div
                         class="hover:border-color_1 inline-flex border rounded-full items-center justify-center pl-[6px] pr-[14px] py-[6px] gap-2">
                         <div>
-                            <img src="{{ asset('data/images/logo_min_boton_login.png') }}"
+                            <img alt="registro" src="{{ asset('data/images/logo_min_boton_login.png') }}"
                                 class="w-[40px] h-[40px] mx-auto rounded-full  block" />
                         </div>
 
@@ -272,46 +272,46 @@
 
         <div class="flex justify-center gap-[32px] flex-wrap">
             @if ($parameters_login_systems['facebook_login_active'])
-                <a class="no-effect-hover" href="/auth/facebook">
+                <a aria-label="enlace" class="no-effect-hover" href="/auth/facebook">
                     <button title="facebook login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                        <img class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
+                        <img alt="registro" class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
                     </button>
                 </a>
             @endif
 
             @if ($parameters_login_systems['twitter_login_active'])
-                <a class="no-effect-hover" href="/auth/twitter">
+                <a aria-label="enlace" class="no-effect-hover" href="/auth/twitter">
                     <button title="twitter login"type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
+                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
                     </button>
                 </a>
             @endif
 
             @if ($parameters_login_systems['linkedin_login_active'])
-                <a class="no-effect-hover" href="/auth/linkedin">
+                <a aria-label="enlace" class="no-effect-hover" href="/auth/linkedin">
                     <button title="linkedin login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
+                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
                     </button>
                 </a>
             @endif
 
             @if ($parameters_login_systems['google_login_active'])
-                <a class="no-effect-hover" href="/auth/google">
+                <a aria-label="enlace" class="no-effect-hover" href="/auth/google">
                     <button title="google login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
+                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
                     </button>
                 </a>
             @endif
 
             @if ($urlRediris)
-                <a class="no-effect-hover" href="{{ $urlRediris }}">
+                <a aria-label="enlace" class="no-effect-hover" href="{{ $urlRediris }}">
                     <button title="rediris login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
+                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
                     </button>
                 </a>
             @endif

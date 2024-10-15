@@ -2,13 +2,13 @@
     <div class="hidden lg:flex justify-between py-20 border-gray-100 container mx-auto items-center">
 
         <div>
-            <a class="no-effect-hover" href="/" class="">
+            <a aria-label="enlace" class="no-effect-hover" href="/" class="">
 
                 @if ($general_options['poa_logo_1'])
-                    <img src="{{ env('BACKEND_URL') . '/' . $general_options['poa_logo_1'] }}"
+                    <img alt="logotipo" src="{{ env('BACKEND_URL') . '/' . $general_options['poa_logo_1'] }}"
                         class="mr-3 w-[212px] h-[75px]" alt="Logo header">
                 @else
-                    <img src="/data/images/default_images/logo-default.png" class="mr-3 w-[100px] h-[100px]"
+                    <img alt="logotipo" src="/data/images/default_images/logo-default.png" class="mr-3 w-[100px] h-[100px]"
                         alt="Logo header">
                 @endif
             </a>
@@ -30,7 +30,7 @@
 
                 @foreach ($footer_pages as $footer_page)
                     <li>
-                        <a href="/page/{{ $footer_page['slug'] }}" class="text-color_3">
+                        <a aria-label="enlace" href="/page/{{ $footer_page['slug'] }}" class="text-color_3">
                             {{ $footer_page['name'] }}
                         </a>
                     </li>
@@ -62,6 +62,10 @@
         </div>
     </div>
 
+    <div class="container mx-auto mt-[51px] mb-[30px] flex justify-center">
+        <img alt="logotipo" class="max-w-[600px] w-full" src="images/logo-financed-ue.png"/>
+    </div>
+
     <hr>
 
     <div class="container mx-auto flex justify-between py-[38px] lg:flex-row gap-[20px] flex-col-reverse items-center">
@@ -80,7 +84,7 @@
 
                 @if ($general_options['facebook_url'])
                     <div>
-                        <a href="{{ $general_options['facebook_url'] }}" rel="noreferrer" target="_blank"
+                        <a aria-label="enlace" href="{{ $general_options['facebook_url'] }}" rel="noreferrer" target="_blank"
                             class="text-gray-700 transition hover:opacity-75">
                             <span class="sr-only">Facebook</span>
 
@@ -96,7 +100,7 @@
 
                 @if ($general_options['instagram_url'])
                     <div>
-                        <a href="{{ $general_options['instagram_url'] }}" rel="noreferrer" target="_blank"
+                        <a aria-label="enlace" href="{{ $general_options['instagram_url'] }}" rel="noreferrer" target="_blank"
                             class="text-gray-700 transition hover:opacity-75">
                             <span class="sr-only">Instagram</span>
 
@@ -113,7 +117,7 @@
 
                 @if ($general_options['x_url'])
                     <div>
-                        <a href="{{ $general_options['x_url'] }}" rel="noreferrer" target="_blank"
+                        <a aria-label="enlace" href="{{ $general_options['x_url'] }}" rel="noreferrer" target="_blank"
                             class="text-gray-700 transition hover:opacity-75">
                             <span class="sr-only">X</span>
 
@@ -138,7 +142,7 @@
 
                 @if ($general_options['youtube_url'])
                     <div>
-                        <a href="{{ $general_options['youtube_url'] }}" rel="noreferrer" target="_blank"
+                        <a aria-label="enlace" href="{{ $general_options['youtube_url'] }}" rel="noreferrer" target="_blank"
                             class="text-gray-700 transition hover:opacity-75">
                             <span class="sr-only">YouTube</span>
 
@@ -154,7 +158,7 @@
 
                 @if ($general_options['linkedin_url'])
                     <div>
-                        <a href="{{ $general_options['linkedin_url'] }}" rel="noreferrer" target="_blank"
+                        <a aria-label="enlace" href="{{ $general_options['linkedin_url'] }}" rel="noreferrer" target="_blank"
                             class="text-gray-700 transition hover:opacity-75">
                             <span class="sr-only">Linkedin</span>
 

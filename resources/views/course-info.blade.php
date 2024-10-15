@@ -68,7 +68,7 @@
             <div class="lg:min-w-[475px] lg:max-w-[475px] mb-[31px] lg:mb-0">
 
                 <div class="shadow-xl pb-[20px] mb-[50px]">
-                    <img alt="{{ $course->title }}" class="mb-[30px] w-full h-[425px]"
+                    <img aria-label="enlace" alt="{{ $course->title }}" class="mb-[30px] w-full h-[425px]"
                         src="{{ $course->image_path ? env('BACKEND_URL') . '/' . $course->image_path : '/images/articulo0.png' }}">
 
                     @if ($course->status->code == 'INSCRIPTION')
@@ -230,7 +230,7 @@
                 </div>
 
                 <div class="flex justify-center items-center">
-                    <a class="no-effect-hover" href="/doubts/course/{{ $course->uid }}"><button type="button"
+                    <a aria-label="enlace" class="no-effect-hover" href="/doubts/course/{{ $course->uid }}"><button type="button"
                             class="btn btn-primary min-w-[304px]">¿Dudas?
                             {{ e_heroicon('chat-bubble-bottom-center-text', 'outline') }}</button></a>
                 </div>

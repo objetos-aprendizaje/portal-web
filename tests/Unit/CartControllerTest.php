@@ -97,7 +97,8 @@ class CartControllerTest extends TestCase
             'cost' => 100,
             'ects_workload' => 5,
             'image_path' => 'images/test-images/articulo0.png',
-        ])->latest()->first();
+        ])->first();
+        // dd($course);
 
         app()->instance('general_options', ['redsys_enabled' => false]);
 

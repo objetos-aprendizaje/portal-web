@@ -185,6 +185,8 @@ function generateRedsysObject($amount, $orderNumber, $merchantData, $description
 
 function formatDateTimeNotifications($date)
 {
+    Carbon::setLocale('es');
+
     $pastDate = new Carbon($date);
     $currentDate = Carbon::now();
     $interval = $currentDate->diff($pastDate);

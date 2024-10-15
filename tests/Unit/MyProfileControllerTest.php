@@ -73,7 +73,6 @@ class MyProfileControllerTest extends TestCase
             ]
         );  
 
-
         $this->actingAs($user);
 
         // Simular la subida de un archivo
@@ -81,10 +80,10 @@ class MyProfileControllerTest extends TestCase
         $image = UploadedFile::fake()->image('profile.jpg');
 
         // Mockear la función updateImageBackend para que devuelva una ruta simulada
-        $this->partialMock(MyProfileController::class, function ($mock) {
-            $mock->shouldReceive('updateImageBackend')
-                ->andReturn('images/profile.jpg');
-        });
+        // $this->partialMock(MyProfileController::class, function ($mock) {
+        //     $mock->shouldReceive('updateImageBackend')
+        //         ->andReturn('images/profile.jpg');
+        // });
 
         // Simular la solicitud con datos y una imagen
         $response = $this->post('/profile/update_account/update', [

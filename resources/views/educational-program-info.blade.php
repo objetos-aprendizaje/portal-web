@@ -19,7 +19,7 @@
                             <div class="w-[130px] flex-none flex justify-center">
                                 <img class="w-[130px] h-[130px]"
                                     src="{{ $course->image_path ? env('BACKEND_URL') . '/' . $course->image_path : env('DEFAULT_IMAGE_ROUTE') }}"
-                                    alt="">
+                                    alt="{{ $course->title }}">
                             </div>
 
                             <div class="flex flex-col justify-between py-[20px] flex-grow">
@@ -39,12 +39,12 @@
             <div class="lg:w-[475px] lg:flex-shrink-0 mb-[31px] lg:mb-0">
 
                 <div class="shadow-xl pb-[20px] mb-[50px]">
-                    <img class="mb-[30px]  h-[425px]"
+                    <img alt="{{ $educational_program->name }}" class="mb-[30px]  h-[425px]"
                         src="{{ env('BACKEND_URL') . '/' . $educational_program->image_path }}">
 
                     @if ($educational_program->status_code == 'INSCRIPTION')
                         <div class="text-center mb-[30px]">
-                            <a href="/cart/educational_program/{{ $educational_program->uid }}">
+                            <a aria-label="enlace" href="/cart/educational_program/{{ $educational_program->uid }}">
                                 <button type="button" class="btn btn-primary">Inscribirme ahora
                                     {{ e_heroicon('chevron-right', 'outline') }}</button>
                             </a>
@@ -173,7 +173,7 @@
                 </div>
 
                 <div class="flex justify-center items-center">
-                    <a class="no-effect-hover" href="/doubts/educational_program/{{ $educational_program->uid }}"><button
+                    <a aria-label="enlace" class="no-effect-hover" href="/doubts/educational_program/{{ $educational_program->uid }}"><button
                             type="button" class="btn btn-primary min-w-[304px]">¿Dudas?
                             {{ e_heroicon('chat-bubble-bottom-center-text', 'outline') }}</button></a>
                 </div>

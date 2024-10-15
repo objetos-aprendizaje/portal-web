@@ -10,7 +10,7 @@
                 @foreach ($items as $item)
                     <div class="swiper-slide">
                         <div>
-                            <a title="{{ $item->title }}" class="no-effect-hover"
+                            <a aria-label="enlace" title="{{ $item->title }}" class="no-effect-hover"
                                 href="{{ $item->type == 'course' ? '/course' : 'educational_program' }}/{{ $item->uid }}">
                                 <div class="h-[224px] relative">
                                     @if ($item['image_path'])
@@ -31,7 +31,7 @@
                                 <div class="flex flex-col gap-[14px]">
                                     <div class="min-h-[110px]">
                                         <h4 class="text-[24px] font-bold line-clamp line-clamp-3">
-                                            <a title="{{ $item->title }}" class="no-effect-hover"
+                                            <a aria-label="enlace" title="{{ $item->title }}" class="no-effect-hover"
                                                 href="{{ $item->type == 'course' ? '/course' : 'educational_program' }}/{{ $item->uid }}">
                                                 {{ $item->title }}
                                             </a>
@@ -43,7 +43,7 @@
 
                                 <p
                                     class="text-color_1 text-[20px font-bold leading-[22px] overflow-hidden line-clamp line-clamp-3 min-h-[66px]">
-                                    <a title="{{ $item->title }}" class="no-effect-hover"
+                                    <a aria-label="enlace" title="{{ $item->title }}" class="no-effect-hover"
                                         href="{{ $item->type == 'course' ? '/course' : 'educational_program' }}/{{ $item->uid }}">
                                         {{ $item->description }}
                                     </a>
@@ -112,7 +112,7 @@
                 @foreach ($items as $item)
                     <div class="swiper-slide min-h-[520px]">
                         <div>
-                            <a title="{{ $item['title'] }}" class="no-effect-hover" href="/resource/{{ $item['uid'] }}">
+                            <a aria-label="enlace" title="{{ $item['title'] }}" class="no-effect-hover" href="/resource/{{ $item['uid'] }}">
                                 <div class="h-[224px] relative">
 
                                     @if ($item['image_path'])
@@ -133,7 +133,7 @@
                             <div class="p-[20px] flex flex-col gap-[19px]">
                                 <div class="flex flex-col gap-[14px]">
                                     <h4 class="text-[24px] font-bold line-clamp line-clamp-3 min-h-[84px]">
-                                        <a title="{{ $item['title'] }}" class="no-effect-hover" href="/resource/{{ $item['uid'] }}">
+                                        <a aria-label="enlace" title="{{ $item['title'] }}" class="no-effect-hover" href="/resource/{{ $item['uid'] }}">
 
                                             {{ $item['title'] }}
                                         </a>
@@ -141,7 +141,7 @@
                                 </div>
                                 <div
                                     class="text-color_1 text-[20px font-bold leading-[22px] overflow-hidden line-clamp line-clamp-3 min-h-[66px]">
-                                    <a title="{{ $item['title'] }}" class="no-effect-hover" href="/resource/{{ $item['uid'] }}">
+                                    <a aria-label="enlace" title="{{ $item['title'] }}" class="no-effect-hover" href="/resource/{{ $item['uid'] }}">
                                         <p class="text-color_1">{{ $item['description'] }}</p>
                                     </a>
                                 </div>

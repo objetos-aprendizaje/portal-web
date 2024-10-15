@@ -38,14 +38,14 @@
             class="flex items-center shadow-md rounded-[8px] course-block lg:flex-row flex-col gap-[11px] lg:gap-[28px] mb-[16px] lg:h-[190px] flex-grow p-[12px] lg:p-0">
 
             <div class="h-auto w-full lg:h-[190px] lg:w-[190px] flex-none">
-                <a class="course-link" href="#">
-                    <img src="{{ asset('images/articulo1.png') }}"
+                <a aria-label="enlace" class="course-link" href="#">
+                    <img alt="imagen" src="{{ asset('images/articulo1.png') }}"
                         class="image w-full lg:w-[190px] h-full object-cover lg:rounded-tl-[8px] lg:rounded-bl-[8px]">
                 </a>
             </div>
 
             <div class="flex-grow">
-                <a class="course-link" href="#">
+                <a aria-label="enlace" class="course-link" href="#">
                     <h2 class="title line-clamp line-clamp-2 mb-[12px]"></h2>
                 </a>
 
