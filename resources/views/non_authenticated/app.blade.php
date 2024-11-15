@@ -39,12 +39,6 @@
 </head>
 
 <body>
-    @if (session('success'))
-        @foreach (session('success') as $message)
-            {{ $message }}
-        @endforeach
-    @endif
-
     @yield('content')
 
     @include('partials.loading')

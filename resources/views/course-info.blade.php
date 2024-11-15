@@ -13,53 +13,31 @@
                     {{ $course->description }}
                 </p>
 
-                @if (!empty($competences))
-                    <div class="hidden lg:block">
+                @if (!empty($course->blocks))
+                    <div class="mb-4">
                         <h2 class="text-black">
-                            Competencias
+                            Bloques
                         </h2>
                         <div>
                             <ul class="list-disc pl-5">
-                                @foreach ($competences as $competence)
-                                    <li>{{ $competence->name }}</li>
+                                @foreach ($course->blocks as $block)
+                                    <li>{{ $block->name }}</li>
                                 @endforeach
                             </ul>
                         </div>
                     </div>
                 @endif
 
-
-                @if (!empty($competences))
-                    <div class="accordion lg:hidden">
-
-                        <div class="accordion-item group" tabindex="1">
-                            <div class="accordion-header">
-                                <h3 class="text-color_3">Competencias</h3>
-                                <div class="arrow-down border p-[10px] rounded-[8px]">
-                                    {{ e_heroicon('chevron-down', 'outline') }}
-                                </div>
-
-                                <div class="arrow-up hidden arrow-down border p-[10px] rounded-[8px]">
-                                    {{ e_heroicon('chevron-up', 'outline') }}
-                                </div>
-                            </div>
-
-                            <div class="accordion-collapsed">
-
-                                <div class="accordion-body">
-                                    @if (!empty($competences))
-                                        <ul class="list-disc pl-5">
-                                            @foreach ($competences as $competence)
-                                                <li>{{ $competence->name }}</li>
-                                            @endforeach
-                                        </ul>
-                                    @else
-                                        <p>No hay competencias asociadas a este curso</p>
-                                    @endif
-                                </div>
-
-                            </div>
-                        </div>
+                @if (!empty($learningResults))
+                    <h2 class="text-black">
+                        Resultados de aprendizaje
+                    </h2>
+                    <div>
+                        <ul class="list-disc pl-5">
+                            @foreach ($learningResults as $learningResult)
+                                <li>{{ $learningResult->name }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 @endif
 
@@ -230,8 +208,8 @@
                 </div>
 
                 <div class="flex justify-center items-center">
-                    <a aria-label="enlace" class="no-effect-hover" href="/doubts/course/{{ $course->uid }}"><button type="button"
-                            class="btn btn-primary min-w-[304px]">¿Dudas?
+                    <a aria-label="enlace" class="no-effect-hover" href="/doubts/course/{{ $course->uid }}"><button
+                            type="button" class="btn btn-primary min-w-[304px]">¿Dudas?
                             {{ e_heroicon('chat-bubble-bottom-center-text', 'outline') }}</button></a>
                 </div>
             </div>

@@ -207,7 +207,7 @@ class EnrolledCoursesControllerTest extends TestCase
         //Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
 
@@ -257,7 +257,7 @@ class EnrolledCoursesControllerTest extends TestCase
         //Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo    
@@ -301,7 +301,7 @@ class EnrolledCoursesControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -362,6 +362,90 @@ class EnrolledCoursesControllerTest extends TestCase
         ]);
     }
 
+
+    /**
+     * @test
+     * Prueba la obtención de los cursos en los que el usuario está inscrito con la estructura correcta.
+     */
+    public function testGetEnrolledCoursesReturnsCorrectDataWithUpdatedStructure()
+    {
+        // Buscar o crear el usuario
+        $user = UsersModel::where('email', 'admin@admin.com')->first() ?? UsersModel::factory()->create(['email' => 'admin@admin.com']);
+
+        // Autenticar al usuario
+        $this->actingAs($user);
+
+        // Crear estado de curso
+        $status = CourseStatusesModel::where('code', 'ENROLLING')->first() ?? CourseStatusesModel::factory()->create(['code' => 'ENROLLING']);
+
+        // Crear cursos de prueba asociados al estado
+        $courses = CoursesModel::factory()->count(2)->withCourseType()->create(['course_status_uid' => $status->uid]);
+
+        // Simular que el usuario está inscrito en estos cursos y crear términos de pago
+        foreach ($courses as $course) {
+            $user->courses_students()->attach($course->uid, ['uid' => generate_uuid(), 'status' => 'ENROLLED']);
+
+            // Crear términos de pago y asociarlos al curso
+            $paymentTerm = CoursesPaymentTermsModel::factory()->create(['course_uid' => $course->uid]);
+
+            // Crear pago del usuario para el término de pago y agregar en forma de colección
+            CoursesPaymentTermsUsersModel::factory()->create([
+                'course_payment_term_uid' => $paymentTerm->uid,
+                'user_uid' => $user->uid,
+                'is_paid' => true,
+            ]);
+        }
+
+        // Simular la solicitud con paginación y búsqueda vacía
+        $requestData = [
+            'items_per_page' => 10,
+            'search' => null,
+        ];
+
+        // Hacer la solicitud POST a la ruta de obtener cursos inscritos
+        $response = $this->postJson(route('get-enrolled-courses'), $requestData);
+
+        // Verificar que la respuesta es exitosa
+        $response->assertStatus(200);
+
+        // Comprobar que la estructura de respuesta coincide con la esperada
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'uid',
+                    'title',
+                    'image_path',
+                    'payment_mode',
+                    'enrolling_start_date',
+                    'enrolling_finish_date',
+                    'realization_start_date',
+                    'realization_finish_date',
+                    'status_code',
+                    'payment_terms' => [
+                        '*' => [
+                            'uid',
+                            'name',
+                            'start_date',
+                            'finish_date',
+                            'cost',
+                            'user_payment' => [
+                                '*' => [
+                                    'is_paid'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        // Verificar que los títulos de los cursos están presentes en la respuesta JSON
+        $response->assertJsonFragment(['title' => $courses[0]->title]);
+        $response->assertJsonFragment(['title' => $courses[1]->title]);
+    }
+
+
+
     /**
      * @test
      * Prueba el acceso a un curso cuando el estado del curso es 'DEVELOPMENT'.
@@ -373,7 +457,7 @@ class EnrolledCoursesControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -413,7 +497,7 @@ class EnrolledCoursesControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         

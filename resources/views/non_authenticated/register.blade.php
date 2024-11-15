@@ -163,7 +163,7 @@
 
                     @if ($cert_login != '')
                         <div class="text-center p-4"><a aria-label="enlace"
-                                href="https://{{ env('DOMINIO_CERTIFICADO') }}/certificate-access">Acceso mediante
+                                href="/certificate-access">Acceso mediante
                                 Certificado Digital</a></div>
                     @endif
 

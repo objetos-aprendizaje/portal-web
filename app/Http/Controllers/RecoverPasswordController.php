@@ -14,9 +14,7 @@ class RecoverPasswordController extends BaseController
 {
     protected $mailService;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function index()
     {
@@ -38,7 +36,8 @@ class RecoverPasswordController extends BaseController
         if ($user) $this->sendEmailRecoverPassword($user);
 
         return redirect()->route('login')->with([
-            'success' => ['Se ha enviado un email para reestablecer la contraseña'],
+            'sent_email_recover_password' => true,
+            'email' => $user->email ?? ""
         ]);
     }
 

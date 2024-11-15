@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AcceptancePoliciesController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CertificateAccessController;
 use App\Http\Controllers\CourseInfoController;
 use App\Http\Controllers\DoubtsController;
 use App\Http\Controllers\EducationalProgramInfoController;
@@ -19,7 +20,6 @@ use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ResourceInfoController;
 use App\Http\Controllers\SuggestionsController;
 use App\Http\Controllers\Webhooks\ProcessPaymentRedsys;
-use App\Http\Controllers\CertificateAccessController;
 use App\Http\Controllers\HeaderFooterPagesController;
 use App\Http\Controllers\Profile\CompetencesLearningResultsController;
 use App\Http\Controllers\Profile\MyCourses\EnrolledCoursesController;
@@ -29,6 +29,7 @@ use App\Http\Controllers\Profile\MyEducationalPrograms\EnrolledEducationalProgra
 use App\Http\Controllers\Profile\MyEducationalPrograms\HistoricEducationalProgramsController;
 use App\Http\Controllers\Profile\MyEducationalPrograms\InscribedEducationalProgramsController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\GetEmailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -160,11 +161,13 @@ Route::get('password/reset/{token}', [ResetPasswordController::class, 'index'])-
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword'])->name('password.update');
 Route::get('/error/{code}', [ErrorController::class, 'index'])->name('error');
 
-Route::get('/certificate-access', [CertificateAccessController::class, 'index'])->name('certificate-access');
+Route::get('/get-email', [GetEmailController::class, 'index'])->name('get-email');
+Route::post('/get-email/add', [GetEmailController::class, 'addUser'])->name('add-user');
 Route::get('/token_login/{token}', [LoginController::class, 'tokenLogin']);
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'index'])->name('login');
+    Route::get('/login/certificate', [CertificateAccessController::class, 'loginCertificate'])->name('login-certificate');
     Route::get('/register', [RegisterController::class, 'index'])->name('register');
 
 

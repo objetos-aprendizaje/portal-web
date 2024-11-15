@@ -7,62 +7,54 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use App\Models\UserRolesModel;
-use App\Models\UserRoleRelationshipsModel;
 
 class CertificateAccessController extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    public function index()
+    public function loginCertificate()
     {
+        $data = $_GET['data'];
+        $expiration = $_GET['expiration'];
+        $hash = $_GET['hash'];
 
-        if ($_SERVER["REDIRECT_SSL_CLIENT_VERIFY"]=="SUCCESS"){
+        $hashCheck = md5($data . $expiration . env('KEY_CHECK_CERTIFICATE_ACCESS'));
 
-            $user = UsersModel::where('email', strtolower($_SERVER["REDIRECT_SSL_CLIENT_SAN_Email_0"]))->first();
+        if ($expiration < time() || $hash != $hashCheck) return redirect('/login');
 
-            if ($user){
+        $data = json_decode($data);
 
-                return redirect($this->redirectWithTokenX509($user));
+        $user = UsersModel::whereRaw('UPPER(nif) = ?', [strtoupper($data->nif)])->first();
 
-            }else{
+        if (!$user) $user = $this->createUser($data);
 
-                $user = new UsersModel();
-                $user->uid = generate_uuid();
-                $user->first_name = $_SERVER["REDIRECT_SSL_CLIENT_S_DN_G"];
-                $user->last_name = $_SERVER["REDIRECT_SSL_CLIENT_S_DN_G"];
-                $nif_temp = explode(" - ",$_SERVER["SSL_CLIENT_S_DN_CN"]);
-                $user->nif = $nif_temp[1];
-                $user->email = $_SERVER["REDIRECT_SSL_CLIENT_SAN_Email_0"];
-                $user->logged_x509 = 1;
-                $user->save();
+        if (!$user->verified) {
+            session(['dataCertificate' => $user]);
+            return redirect()->route('get-email');
+        }
 
-                $rol = UserRolesModel::where("code", "TEACHER")->first();
-                $rol_relation = new UserRoleRelationshipsModel();
-                $rol_relation->uid = generate_uuid();
-                $rol_relation->user_uid = $user->uid;
-                $rol_relation->user_role_uid = $rol;
-                $rol_relation->save();
+        return $this->authUser($user->email);
+    }
 
-                $user = UsersModel::where('email', strtolower($_SERVER["REDIRECT_SSL_CLIENT_SAN_Email_0"]))->first();
+    private function authUser($email)
+    {
+        $user = UsersModel::where('email', strtolower($email))->first();
 
-                return redirect($this->redirectWithTokenX509($user));
-
-            }
-
-        }else{
-
-            return redirect("https://".env('DOMINIO_PRINCIPAL')."/login?e=certificate-error");
-
+        if ($user) {
+            Auth::login($user);
+            return redirect()->to('/');
         }
     }
-    private function redirectWithTokenX509($user){
 
-        $user->token_x509 = generateToken();
+    private function createUser($data) {
+        $user = new UsersModel();
+        $user->uid = generate_uuid();
+        $user->email = "";
+        $user->first_name = $data->first_name;
+        $user->last_name = $data->last_name;
+        $user->nif = strtoupper($data->nif);
         $user->save();
-        $url = "https://".env('DOMINIO_PRINCIPAL')."/token_login/".$user->token_x509;
-        return $url;
 
+        return $user;
     }
 }

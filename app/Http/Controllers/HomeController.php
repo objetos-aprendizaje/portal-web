@@ -111,6 +111,8 @@ class HomeController extends BaseController
             })
             ->paginate($items_per_page);
 
+        $this->transformCollection($courses);
+
         return $courses;
     }
 
@@ -141,11 +143,17 @@ class HomeController extends BaseController
             ->wherePivot('status', 'ENROLLED')
             ->paginate($items_per_page);
 
+        $this->transformCollection($courses_students);
+
         return response()->json($courses_students);
     }
 
     public function getRecommendedCourses(Request $request)
     {
+        if (!app('general_options')['enabled_recommendation_module']) {
+            throw new OperationFailedException();
+        }
+
         $items_per_page = $request->items_per_page;
         $page = $request->page;
 
@@ -161,11 +169,17 @@ class HomeController extends BaseController
 
         $similarCourses = $this->embeddingsService->getSimilarCoursesList($coursesUser, $categoriesUser, $learningResultsUser, $items_per_page, $page);
 
+        $this->transformCollection($similarCourses);
+
         return response()->json($similarCourses);
     }
 
     public function getRecommendedEducationalResources(Request $request)
     {
+        if (!app('general_options')['enabled_recommendation_module']) {
+            throw new OperationFailedException();
+        }
+
         $items_per_page = $request->items_per_page;
         $page = $request->page;
 
@@ -179,6 +193,8 @@ class HomeController extends BaseController
         $learningResultsUser = auth()->user()->learningResultsPreferences->pluck('uid')->toArray();
 
         $similarEducationalResources = $this->embeddingsService->getSimilarEducationalResourcesList($educationalResourcesUser, $categoriesUser, $learningResultsUser, $items_per_page, $page);
+
+        $this->transformCollection($similarEducationalResources);
 
         return response()->json($similarEducationalResources);
     }
@@ -195,6 +211,8 @@ class HomeController extends BaseController
                     ->where('user_uid', Auth::user()->uid);
             })
             ->paginate($items_per_page);
+
+        $this->transformCollection($educationalResources);
 
         return response()->json($educationalResources);
     }
@@ -216,6 +234,8 @@ class HomeController extends BaseController
 
         // Filtrar cursos con resultados de aprendizaje del alumno
         $paginatedFilteredCourses = $this->filterCoursesLearningResults($paginatedCourses, $userLearningResultsNotCovered, $itemsPerPage);
+
+        $this->transformCollection($paginatedFilteredCourses);
 
         return response()->json($paginatedFilteredCourses);
     }
@@ -408,6 +428,8 @@ class HomeController extends BaseController
             ->wherePivot('status', 'INSCRIBED')
             ->paginate($items_per_page);
 
+        $this->transformCollection($courses_students);
+
         return response()->json($courses_students);
     }
 
@@ -479,5 +501,23 @@ class HomeController extends BaseController
         }
 
         return response()->json(['success' => true]);
+    }
+
+    private function transformCollection($collection)
+    {
+        $collection->transform(function ($item) {
+            return [
+                'uid' => $item->uid,
+                'title' => $item->title,
+                'description' => $item->description,
+                'lms_url' => $item->lms_url,
+                'realization_start_date' => $item->realization_start_date,
+                'realization_finish_date' => $item->realization_finish_date,
+                'image_path' => $item->image_path,
+                "status_code" => $item->status->code
+            ];
+        });
+
+        return $collection;
     }
 }

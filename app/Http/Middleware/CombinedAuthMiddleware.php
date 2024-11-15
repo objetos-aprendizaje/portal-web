@@ -19,7 +19,6 @@ class CombinedAuthMiddleware
             $request->session()->put('url.current', $urlCurrent);
         }
 
-        $request->session()->regenerate();
         // Comprobamos si tenemos usuario
         if (Auth::check()) {
             try {
@@ -44,7 +43,6 @@ class CombinedAuthMiddleware
         }
 
         View::share('roles', $user->roles->toArray());
-        Auth::login($user);
     }
 
 }

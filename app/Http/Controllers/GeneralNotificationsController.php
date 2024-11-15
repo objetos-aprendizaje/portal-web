@@ -35,7 +35,7 @@ class GeneralNotificationsController extends BaseController
                 ->where('user_general_notifications.user_uid', $user_uid)
                 ->limit(1)
         ])
-            ->first()->toArray();
+            ->first();
 
         if (!$general_notification) {
             return response()->json(['message' => 'La notificación general no existe'], 406);
@@ -52,7 +52,15 @@ class GeneralNotificationsController extends BaseController
             $user_general_notification->save();
         }
 
-        return response()->json($general_notification, 200);
+        $generalNotificationMapped = [
+            "uid" => $general_notification->uid,
+            "title" => $general_notification->title,
+            "description" => $general_notification->description,
+            "start_date" => $general_notification->start_date,
+            "end_date" => $general_notification->end_date,
+        ];
+
+        return response()->json($generalNotificationMapped, 200);
     }
 
     public function getGeneralNotificationAutomaticUser($generalNotificationAutomaticUid)
@@ -60,9 +68,6 @@ class GeneralNotificationsController extends BaseController
         $user_uid = Auth::user()['uid'];
 
         $generalNotificationAutomatic = GeneralNotificationsAutomaticModel::where('uid', $generalNotificationAutomaticUid)
-            ->with(['users' => function ($query) use ($user_uid) {
-                $query->where('users.uid', $user_uid);
-            }])
             ->whereHas('users', function ($query) use ($user_uid) {
                 $query->where('users.uid', $user_uid);
             })
@@ -76,6 +81,12 @@ class GeneralNotificationsController extends BaseController
             $generalNotificationAutomatic->users[0]->pivot->save();
         }
 
-        return response()->json($generalNotificationAutomatic->toArray(), 200);
+        $generalNotificationAutomatic = [
+            "title" => $generalNotificationAutomatic->title,
+            "description" => $generalNotificationAutomatic->description,
+            "entity" => $generalNotificationAutomatic->entity
+        ];
+
+        return response()->json($generalNotificationAutomatic, 200);
     }
 }

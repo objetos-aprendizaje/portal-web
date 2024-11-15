@@ -15,17 +15,19 @@ class CourseInfoController extends BaseController
     {
         $course = $this->getCourse($uid);
 
-        // Extraemos un array con las competencias
-        $competences = [];
-        foreach ($course->blocks as $block) {
-            foreach ($block->competences as $competence) {
-                $competences[] = $competence;
+        adaptDatesCourseEducationalProgram($course);
+
+        // Todos los resultados de aprendizaje
+        $learningResults = [];
+        foreach($course->blocks as $block) {
+            foreach($block->learningResults as $learningResult) {
+                $learningResults[] = $learningResult;
             }
         }
 
         return view("course-info", [
             'course' => $course,
-            'competences' => $competences,
+            'learningResults' => $learningResults,
             "resources" => [
                 'resources/js/course_info.js'
             ],
@@ -49,7 +51,7 @@ class CourseInfoController extends BaseController
 
     private function getCourse($uid) {
         $course = CoursesModel::select('courses.*', 'califications_avg.average_calification')->where('uid', $uid)->with([
-            'status', 'tags', 'teachers', 'course_type', 'paymentTerms'
+            'blocks.learningResults', 'status', 'tags', 'teachers', 'course_type', 'paymentTerms'
         ])
             ->leftJoinSub(
                 CoursesAssessmentsModel::select('course_uid', DB::raw('ROUND(AVG(calification), 1) as average_calification'))

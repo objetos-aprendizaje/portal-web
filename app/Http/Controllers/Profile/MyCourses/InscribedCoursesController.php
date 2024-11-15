@@ -38,7 +38,7 @@ class InscribedCoursesController extends BaseController
             ->with([
                 'status',
                 'course_documents',
-                'course_documents.course_student_document' => function ($query) use ($user) {
+                'course_documents.courses_students_documents' => function ($query) use ($user) {
                     $query->where('user_uid', $user->uid);
                 },
                 'paymentTerms',
@@ -56,6 +56,42 @@ class InscribedCoursesController extends BaseController
         }
 
         $coursesStudents = $coursesStudentsQuery->paginate($items_per_page);
+
+        $coursesStudents->getCollection()->transform(function ($courseStudent) {
+            return [
+                "uid" => $courseStudent->uid,
+                "title" => $courseStudent->title,
+                "description" => $courseStudent->description,
+                "image_path" => $courseStudent->image_path,
+                "enrolling_start_date" => adaptDateTimezoneDisplay($courseStudent->enrolling_start_date),
+                "enrolling_finish_date" => adaptDateTimezoneDisplay($courseStudent->enrolling_finish_date),
+                "realization_start_date" => adaptDateTimezoneDisplay($courseStudent->realization_start_date),
+                "realization_finish_date" => adaptDateTimezoneDisplay($courseStudent->realization_finish_date),
+                "cost" => $courseStudent->cost,
+                "course_documents" => $courseStudent->course_documents->map(function ($courseDocument) {
+                    $courseDocumentMapped = [
+                        "uid" => $courseDocument->uid,
+                        "document_name" => $courseDocument->document_name,
+                    ];
+
+                    $courseStudentDocument = $courseDocument->course_student_document;
+                    if ($courseStudentDocument) {
+                        $courseStudentDocument = $courseStudentDocument->toArray();
+                        $courseDocumentMapped['course_student_document'] = [
+                            "uid" => $courseStudentDocument['uid'],
+                            "document_path" => $courseStudentDocument['document_path'],
+                            "course_document_uid" => $courseStudentDocument['course_document_uid'],
+                        ];
+                    }
+
+                    return $courseDocumentMapped;
+                }),
+                "acceptance_status" => $courseStudent->pivot->acceptance_status,
+                "status_code" => $courseStudent->status->code,
+                "evaluation_criteria" => $courseStudent->evaluation_criteria,
+                "validate_student_registrations" => $courseStudent->validate_student_registrations,
+            ];
+        });
 
         return response()->json($coursesStudents);
     }

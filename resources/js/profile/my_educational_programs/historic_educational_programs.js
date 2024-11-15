@@ -247,10 +247,10 @@ function setEducationalProgramIndicators(template, educationalProgram) {
     let indicator = template.querySelector(".indicator");
     let indicatorLabel = template.querySelector(".indicator-label");
 
-    if (["INSCRIPTION", "ENROLLING"].includes(educationalProgram.status.code)) {
+    if (["INSCRIPTION", "ENROLLING"].includes(educationalProgram.status_code)) {
         indicator.classList.add("pending");
         indicatorLabel.innerHTML = "Disponible próximamente";
-    } else if (educationalProgram.status.code === "DEVELOPMENT") {
+    } else if (educationalProgram.status_code === "DEVELOPMENT") {
         indicator.classList.add("openned");
         indicatorLabel.innerHTML = "En realización";
     }

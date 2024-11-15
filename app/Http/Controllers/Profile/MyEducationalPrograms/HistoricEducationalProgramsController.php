@@ -43,6 +43,26 @@ class HistoricEducationalProgramsController extends BaseController
 
         $educationalProgramsStudent = $educationalProgramsStudentQuery->paginate($items_per_page);
 
+        $educationalProgramsStudent->getCollection()->transform(function ($educationalProgram) {
+            return [
+                "uid" => $educationalProgram->uid,
+                "name" => $educationalProgram->name,
+                "image_path" => $educationalProgram->image_path,
+                "realization_start_date" => adaptDateTimezoneDisplay($educationalProgram->realization_start_date),
+                "realization_finish_date" => adaptDateTimezoneDisplay($educationalProgram->realization_finish_date),
+                "lms_url" => $educationalProgram->lms_url,
+                "courses" => $educationalProgram->courses ? $educationalProgram->courses->map(function ($course) {
+                    return [
+                        "uid" => $course->uid,
+                        "title" => $course->title,
+                        "description" => $course->description,
+                        "ects_workload" => $course->ects_workload,
+                        "lms_url" => $course->lms_url,
+                    ];
+                }) : null,
+            ];
+        });
+
         return response()->json($educationalProgramsStudent);
     }
 

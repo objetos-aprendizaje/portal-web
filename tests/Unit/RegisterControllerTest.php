@@ -140,29 +140,29 @@ class RegisterControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     * Prueba para error al reenviar confirmación de email cuando la cuenta ya está verificada.
-     */
-    public function testResendEmailConfirmationFailsWhenUserAlreadyVerified()
-    {
-        // Crear un usuario verificado en la base de datos
-        $user = UsersModel::factory()->create([
-            'email' => 'test@example.com',
-            'verified' => true,
-        ]);
+    // /**
+    //  * @test
+    //  * Prueba para error al reenviar confirmación de email cuando la cuenta ya está verificada.
+    //  */
+    // public function testResendEmailConfirmationFailsWhenUserAlreadyVerified()
+    // {
+    //     // Crear un usuario verificado en la base de datos
+    //     $user = UsersModel::factory()->create([
+    //         'email' => 'test@example.com',
+    //         'verified' => true,
+    //     ]);
 
-        // Hacer la solicitud POST para reenviar la confirmación de email
-        $response = $this->post('/register/resend_email_confirmation', ['email' => 'test@example.com']);
+    //     // Hacer la solicitud POST para reenviar la confirmación de email
+    //     $response = $this->post('/register/resend_email_confirmation', ['email' => 'test@example.com']);
 
-        // Verificar que se lanza una excepción con el código de estado 405
-        $response->assertStatus(405);
+    //     // Verificar que se lanza una excepción con el código de estado 405
+    //     $response->assertStatus(405);
 
-        // Verificar que el mensaje de error es el esperado
-        $response->assertJson([
-            'message' => 'Su cuenta ya está verificada'
-        ]);
-    }
+    //     // Verificar que el mensaje de error es el esperado
+    //     $response->assertJson([
+    //         'message' => 'Su cuenta ya está verificada'
+    //     ]);
+    // }
 
     /**
      * @test

@@ -20,6 +20,17 @@
                     <p class="text-center mb-[20px]">¿No tienes cuenta? <a class="text-color_1"
                             href="/register">Regístrate</a></p>
 
+                    @if (session('sent_email_recover_password'))
+                        <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                            <p>Se ha enviado un link para reestablecer la contraseña</p>
+                            <p>
+                                ¿No has recibido nada? <a href="javascript:void(0)"
+                                    data-email-account="{{ session('email') }}"
+                                    class="text-color_1 resend-email-confirmation">Reenviar email</a>
+                            </p>
+                        </div>
+                    @endif
+
                     @if (session('account_created'))
                         <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
                             <p>Su cuenta ha sido creada correctamente. Por favor, verifíquela con el email de confirmación
@@ -80,7 +91,8 @@
 
                             <div class="flex flex-col mb-[8px]">
                                 <label class="px-3 mb-[8px]">Contraseña</label>
-                                <input aria-label="contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3"
+                                <input aria-label="contraseña"
+                                    class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3"
                                     name="password" type="password" />
                             </div>
 
@@ -136,7 +148,8 @@
                                 <a aria-label="enlace" class="no-effect-hover" href="/auth/facebook">
                                     <button title="facebook login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img alt="login" class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
+                                        <img alt="login" class="w-[45px] h-[45px]"
+                                            src="data/images/login_icons/facebook.png" />
                                     </button>
                                 </a>
                             @endif
@@ -145,7 +158,8 @@
                                 <a aria-label="enlace" class="no-effect-hover" href="/auth/twitter">
                                     <button title="twitter login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img alt="login" class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
+                                        <img alt="login" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/x_icon.png" />
                                     </button>
                                 </a>
                             @endif
@@ -154,7 +168,8 @@
                                 <a aria-label="enlace" class="no-effect-hover" href="/auth/linkedin-openid">
                                     <button title="linkedin login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img alt="login" class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
+                                        <img alt="login" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/linkedin_icon.png" />
                                     </button>
                                 </a>
                             @endif
@@ -163,7 +178,8 @@
                                 <a aria-label="enlace" class="no-effect-hover" href="/auth/google">
                                     <button title="google login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img alt="login" class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
+                                        <img alt="login" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/google_icon.png" />
                                     </button>
                                 </a>
                             @endif
@@ -172,7 +188,8 @@
                                 <a aria-label="enlace" class="no-effect-hover" href="{{ $urlRediris }}">
                                     <button title="rediris login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img alt="login" class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
+                                        <img alt="login" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/rediris.png" />
                                     </button>
                                 </a>
                             @endif
@@ -183,7 +200,7 @@
 
                     @if ($cert_login != '')
                         <div class="text-center p-4"><a aria-label="enlace"
-                                href="https://{{ env('DOMINIO_CERTIFICADO') }}/certificate-access">Acceso mediante
+                                href="/certificate-access">Acceso mediante
                                 Certificado Digital</a></div>
                     @endif
 
@@ -202,7 +219,8 @@
 
         <div class="text-[28px] font-bold text-center mb-[15px]">Inicia sesión</div>
 
-        <p class="text-center mb-[20px]">¿No tienes cuenta? <a aria-label="enlace" class="text-color_1" href="/register">Regístrate</a></p>
+        <p class="text-center mb-[20px]">¿No tienes cuenta? <a aria-label="enlace" class="text-color_1"
+                href="/register">Regístrate</a></p>
 
         @if (session('account_created'))
             <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
@@ -264,16 +282,19 @@
 
                 <div class="flex flex-col mb-[8px]">
                     <label class="px-3 mb-[8px]">Contraseña</label>
-                    <input aria-label="contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3" type="password" />
+                    <input aria-label="contraseña"
+                        class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3" type="password" />
                 </div>
 
                 <div class="block px-3 mb-[20px]">
-                    <a aria-label="enlace" href="{{ route('recover-password') }}" class="text-color_1 text-[16px]">¿Olvidaste
+                    <a aria-label="enlace" href="{{ route('recover-password') }}"
+                        class="text-color_1 text-[16px]">¿Olvidaste
                         la
                         contraseña?</a>
                 </div>
 
-                <button title="iniciar sesión" class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Iniciar sesión
+                <button title="iniciar sesión" class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Iniciar
+                    sesión
                     {{ e_heroicon('arrow-up-right', 'outline') }}</button>
 
             </form>

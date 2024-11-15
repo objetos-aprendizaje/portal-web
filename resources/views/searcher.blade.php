@@ -165,8 +165,8 @@
         <template id="learning-object-template">
             <div class="learning-object-block shadow-lg">
                 <div class="learning-object-img-container">
-                    <a aria-label="enlace" title="objeto de aprendizaje" class="no-effect-hover" class="learning-object-url"
-                        href="javascript:void(0)">
+                    <a aria-label="enlace" title="objeto de aprendizaje" class="learning-object-url no-effect-hover"
+                        href="javascript:void(0)" target="_blank">
                         <img alt="objeto de aprendizaje" src="" class="learning-object-image">
                     </a>
                     <div class="learning-object-img-container-title learning-object-type"></div>
@@ -176,7 +176,7 @@
 
                     <div class="block-container-title">
                         <div>
-                            <a aria-label="enlace" title="objeto de aprendizaje" class="learning-object-url" href="javascript:void(0)">
+                            <a aria-label="enlace" title="objeto de aprendizaje" class="learning-object-url" href="javascript:void(0)" target="_blank">
                                 <h2 class="block-title"></h2>
                             </a>
                         </div>

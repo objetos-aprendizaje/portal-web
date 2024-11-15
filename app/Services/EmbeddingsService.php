@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CoursesEmbeddingsModel;
 use App\Models\CoursesModel;
 use App\Models\EducationalResourcesModel;
 use App\Models\GeneralOptionsModel;
@@ -42,17 +43,21 @@ class EmbeddingsService
         Log::error('Embedding generated for course ' . $course->uid . ': ' . json_encode($embedding));
 
         // Update the course with the new embedding
-        $course->update([
-            'embeddings' => $embedding,
-        ]);
+        if ($embedding) {
+            CoursesEmbeddingsModel::updateOrCreate(
+                ['course_uid' => $course->uid],
+                ['embeddings' => $embedding]
+            );
+        }
     }
 
     public function getSimilarCourses(CoursesModel $course, $limit = 5)
     {
-        $embedding = $course->embeddings;
+        $embedding = $course->embeddings();
 
         $similarCourses = CoursesModel::select('courses.*')
-            ->selectRaw('1 - (embeddings <=> ?) AS similarity', [$embedding])
+            ->leftJoin('courses_embeddings', 'courses.uid', '=', 'courses_embeddings.course_uid')
+            ->selectRaw('1 - (courses_embeddings.embeddings <=> ?) AS similarity', [$embedding])
             ->where('embeddings', '!=', null)
             ->where('uid', '!=', $course->uid) // Exclude the current course
             ->orderByDesc('similarity')
@@ -64,10 +69,13 @@ class EmbeddingsService
 
     public function getSimilarCoursesList(Collection $courses, $filterCategories = [], $filterLearningResults = [], $limit = 5, $page = 1)
     {
+        $courses->load('embeddings');
+        $courses = $courses->filter(function ($course) {
+            return $course->embeddings != null;
+        });
         $uids = $courses->map(fn($course) => $course->uid)->toArray();
         $embeddings = $courses->pluck('embeddings')->map(function ($embedding) {
-            // Convert the string of embeddings into an array
-            return array_map('floatval', explode(',', trim($embedding, '()')));
+            return $embedding->embeddings;
         })->toArray();
 
         // Calculate the average embedding by averaging the values for each dimension
@@ -84,18 +92,21 @@ class EmbeddingsService
             $value /= $embeddingCount;
         }
 
-        // Convert the average embedding into a PostgreSQL vector string format
-        $embeddingVectorString = '[' . implode(',', $averageEmbedding) . ']';
-
         $similarCoursesQuery = CoursesModel::select('courses.*')
-            ->selectRaw('1 - (embeddings <=> ?) AS similarity', [$embeddingVectorString])
-            ->where('embeddings', '!=', null)
             ->whereNotIn('uid', $uids)
-            ->orderByDesc('similarity')
             ->with(['status', 'categories', 'blocks.learningResults'])
             ->whereHas('status', function ($query) {
                 $query->where('code', 'INSCRIPTION');
             });
+
+        if (count($averageEmbedding)) {
+            // Convert the average embedding into a PostgreSQL vector string format
+            $embeddingVectorString = '[' . implode(',', $averageEmbedding) . ']';
+            $similarCoursesQuery->leftJoin('courses_embeddings', 'courses.uid', '=', 'courses_embeddings.course_uid')
+                ->selectRaw('1 - (courses_embeddings.embeddings <=> ?) AS similarity', [$embeddingVectorString])
+                ->where('courses_embeddings.embeddings', '!=', null)
+                ->orderByDesc('similarity');
+        }
 
         if (count($filterCategories)) {
             $similarCoursesQuery->whereHas('categories', function ($query) use ($filterCategories) {
@@ -116,10 +127,16 @@ class EmbeddingsService
 
     public function getSimilarEducationalResourcesList(Collection $educationalResources, $filterCategories = [], $filterLearningResults = [], $limit = 5, $page = 1)
     {
+        $educationalResources->load('embeddings');
+        $educationalResources = $educationalResources->filter(function ($educationalResource) {
+            return $educationalResource->embeddings != null;
+        });
+
         $uids = $educationalResources->map(fn($educationalResource) => $educationalResource->uid)->toArray();
         $embeddings = $educationalResources->pluck('embeddings')->map(function ($embedding) {
             // Convert the string of embeddings into an array
-            return array_map('floatval', explode(',', trim($embedding, '()')));
+            if (isset($embedding->embeddings)) return $embedding->embeddings;
+            else return null;
         })->toArray();
 
         // Calculate the average embedding by averaging the values for each dimension
@@ -136,18 +153,21 @@ class EmbeddingsService
             $value /= $embeddingCount;
         }
 
-        // Convert the average embedding into a PostgreSQL vector string format
-        $embeddingVectorString = '[' . implode(',', $averageEmbedding) . ']';
-
         $similarEducationalResourcesQuery = EducationalResourcesModel::select('educational_resources.*')
-            ->selectRaw('1 - (embeddings <=> ?) AS similarity', [$embeddingVectorString])
-            ->where('embeddings', '!=', null)
             ->whereNotIn('uid', $uids)
-            ->orderByDesc('similarity')
             ->with(['status', 'categories', 'learningResults'])
             ->whereHas('status', function ($query) {
                 $query->where('code', 'PUBLISHED');
             });
+
+        if (count($averageEmbedding)) {
+            // Convert the average embedding into a PostgreSQL vector string format
+            $embeddingVectorString = '[' . implode(',', $averageEmbedding) . ']';
+            $similarEducationalResourcesQuery->leftJoin('educational_resources_embeddings', 'educational_resources.uid', '=', 'educational_resources_embeddings.educational_resource_uid')
+                ->selectRaw('1 - (educational_resources_embeddings.embeddings <=> ?) AS similarity', [$embeddingVectorString])
+                ->where('educational_resources_embeddings.embeddings', '!=', null)
+                ->orderByDesc('similarity');
+        }
 
         if (count($filterCategories)) {
 
@@ -166,5 +186,4 @@ class EmbeddingsService
 
         return $similarEducationalResources;
     }
-
 }

@@ -16,7 +16,7 @@ class EducationalResourcesModel extends Model
     protected $fillable = [
         'name', 'description', 'image_path', 'resource_path',
         'status_uid', 'educational_resource_type_uid', 'license_type', 'resource_way',
-        'resource_url', 'embeddings'
+        'resource_url'
     ];
 
     public function status()
@@ -61,5 +61,10 @@ class EducationalResourcesModel extends Model
             'educational_resource_uid',
             'learning_result_uid'
         );
+    }
+
+    public function embeddings()
+    {
+        return $this->hasOne(EducationalResourcesEmbeddingsModel::class, 'educational_resource_uid', 'uid');
     }
 }
