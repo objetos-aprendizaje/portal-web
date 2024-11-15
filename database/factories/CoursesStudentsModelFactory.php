@@ -19,8 +19,7 @@ class CoursesStudentsModelFactory extends Factory
     public function definition(): array
     {
         return [
-            'uid'               => generate_uuid(),
-            'calification_type' => 'NUMERIC',
+            'uid'               => generate_uuid(),            
             'status'            => 'INSCRIBED',
             'acceptance_status' => 'PENDING',
         ];

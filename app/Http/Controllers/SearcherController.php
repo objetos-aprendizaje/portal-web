@@ -87,6 +87,22 @@ class SearcherController extends Controller
 
         $learning_objects = $learning_objects_query->orderBy('inscription_start_date')->paginate($itemsPerPage);
 
+        $learning_objects->transform(function ($learningObject) {
+            return [
+                "uid" => $learningObject->uid,
+                "title" => $learningObject->title,
+                "description" => $learningObject->description,
+                "image_path" => $learningObject->image_path,
+                "learning_object_type" => $learningObject->learning_object_type,
+                "ects_workload" => $learningObject->ects_workload,
+                "inscription_start_date" => adaptDateTimezoneDisplay($learningObject->inscription_start_date),
+                "inscription_finish_date" => adaptDateTimezoneDisplay($learningObject->inscription_finish_date),
+                "realization_start_date" => adaptDateTimezoneDisplay($learningObject->realization_start_date),
+                "realization_finish_date" => adaptDateTimezoneDisplay($learningObject->realization_finish_date),
+                "status_code" => $learningObject->status_code,
+            ];
+        });
+
         return response()->json($learning_objects);
     }
 

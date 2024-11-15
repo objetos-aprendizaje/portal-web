@@ -18,6 +18,8 @@ class EducationalProgramInfoController extends BaseController
 
         $educational_program = $this->getEducationalProgram($uid);
 
+        adaptDatesCourseEducationalProgram($educational_program);
+
         // Hacemos un array único con los profesores de cada curso
         $teachers = $this->getTeachersUnique($educational_program);
 

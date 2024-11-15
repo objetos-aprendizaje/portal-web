@@ -1,3 +1,4 @@
+$header-mobile-height: 60px;
 
 body {
     @apply bg-white font-regular;
@@ -289,11 +290,12 @@ body.modal-open {
     }
 
     .menu-mobile {
-        @apply bg-white w-full z-50 p-[24px] flex-col flex  ;
+        @apply bg-white w-full z-50 p-[24px] flex-col flex overflow-auto;
+        max-height: calc(100vh - #{$header-mobile-height});
     }
 
     .option-label {
-        @apply my-[10px]
+        @apply my-[10px];
     }
 
     .submenu {
@@ -301,6 +303,11 @@ body.modal-open {
     }
 
     @apply w-full z-50 lg:hidden top-[60px] lg:top-[110px] fixed;
+}
+
+.mobile-navbar {
+    @apply lg:hidden bg-white border-b fixed w-full z-50 top-0 flex justify-between items-center;
+    height: $header-mobile-height;
 }
 
 .overlay-layer-menu {

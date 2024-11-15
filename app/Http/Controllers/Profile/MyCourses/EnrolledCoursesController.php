@@ -48,6 +48,34 @@ class EnrolledCoursesController extends BaseController
 
         $coursesStudent = $coursesStudentQuery->paginate($items_per_page);
 
+        $coursesStudent->getCollection()->transform(function ($courseStudent) {
+            return [
+                "uid" => $courseStudent->uid,
+                "title" => $courseStudent->title,
+                "image_path" => $courseStudent->image_path,
+                "payment_mode" => $courseStudent->payment_mode,
+                "enrolling_start_date" => adaptDateTimezoneDisplay($courseStudent->enrolling_start_date),
+                "enrolling_finish_date" => adaptDateTimezoneDisplay($courseStudent->enrolling_finish_date),
+                "realization_start_date" => adaptDateTimezoneDisplay($courseStudent->realization_start_date),
+                "realization_finish_date" => adaptDateTimezoneDisplay($courseStudent->realization_finish_date),
+                "status_code" => $courseStudent->status->code,
+                "payment_terms" => $courseStudent->paymentTerms ? $courseStudent->paymentTerms->map(function ($paymentTerm) {
+                    return [
+                        "uid" => $paymentTerm->uid,
+                        "name" => $paymentTerm->name,
+                        "start_date" => $paymentTerm->start_date,
+                        "finish_date" => $paymentTerm->finish_date,
+                        "cost" => $paymentTerm->cost,
+                        "user_payment" => $paymentTerm->userPayment ? $paymentTerm->userPayment->map(function ($userPayment) {
+                            return [
+                                "is_paid" => $userPayment->is_paid,
+                            ];
+                        }) : null
+                    ];
+                }) : [],
+            ];
+        });
+
         return response()->json($coursesStudent);
     }
 

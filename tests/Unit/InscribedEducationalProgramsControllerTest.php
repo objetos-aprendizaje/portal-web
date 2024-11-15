@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use App\Models\UsersModel;
+use App\Models\ApiKeysModel;
 use App\Models\HeaderPagesModel;
 use Illuminate\Http\UploadedFile;
 use App\Models\GeneralOptionsModel;
@@ -307,6 +308,57 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function testUserEnrollNotFreeProgram()
+    {
+        // Simular la autenticación del usuario
+        $user = UsersModel::factory()->create();
+        $this->actingAs($user);
+
+        $status = EducationalProgramStatusesModel::where('code', 'ENROLLING')->first();
+
+        app()->instance(
+            'general_options',
+            [
+                'payment_gateway' => true,
+                'redsys_commerce_code'=>true,
+                'redsys_currency' => true,
+                'redsys_transaction_type'=> false,
+                'redsys_terminal' => true,
+                'redsys_encryption_key'=>true,
+            ]
+        );
+
+        // Crear algunos programas formativos inscritos para el usuario
+        $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+            'educational_program_status_uid' => $status->uid,
+            'cost' => 100,
+        ])->first();
+
+        // Agregar al usuario como estudiante pero no aprobado
+        $educationalProgram->students()->attach($user->uid, ['acceptance_status' => 'ACCEPTED', 'uid' => generate_uuid()]);
+
+        // Preparar los datos de la solicitud
+        $data = [
+            'educationalProgramUid' => $educationalProgram->uid,
+            // 'payment_gateway' => 'gateway_test',
+        ];
+
+        // Realizar una solicitud POST a la ruta definida
+        $response = $this->post(route('enroll-educational-program-inscribed'), $data);
+
+        // Verificar que no se requiere pago y que el usuario está matriculado correctamente
+        $response->assertStatus(200);
+        // $response->assertJson(['requirePayment' => true, 'message' => 'Matriculado en el curso correctamente']);
+
+        // Verificar que el usuario esté matriculado en el programa educativo
+        $this->assertDatabaseHas('educational_programs_students', [
+            'user_uid' => $user->uid,
+            'educational_program_uid' => $educationalProgram->uid,
+            // 'status' => 'ENROLLED',
+        ]);
+    }
+
 
     /** @test download documento programa*/
     public function testDownloadsDocumentProgram()
@@ -422,40 +474,41 @@ class InscribedEducationalProgramsControllerTest extends TestCase
      * @test
      * Prueba que guarda correctamente los documentos del programa educativo.
      */
-    // public function testSaveDocumentsEducationalProgram()
-    // {
-    //     // Simular autenticación de usuario
-    //     $user = UsersModel::factory()->create();
-    //     $this->actingAs($user);
+    public function testSaveDocumentsEducationalProgram()
+    {
+        
+         // Buscamos un usuario  
+         $user = UsersModel::where('email', 'admin@admin.com')->first();
+         // Si no existe el usuario lo creamos
+         if (!$user) {
+             $user = UsersModel::factory()->create([
+                 'email'=>'admin@admin.com'
+             ])->first();
+         }
+         // Lo autenticarlo         
+        $this->actingAs($user);      
 
-    //     // Crear un archivo simulado
-    //     Storage::fake('documents');
-    //     $file = UploadedFile::fake()->create('document.pdf', 100);
+        // Crear un archivo simulado
+        Storage::fake('documents');
+        $file = UploadedFile::fake()->create('document.pdf', 100);     
 
-    //     // Mockear la respuesta del backend
-    //     $filePath = 'documents/document.pdf';
-    //     // $this->mockFunction('sendFileToBackend', ['file_path' => $filePath]);
+        // Mockear la respuesta del backend
+        $filePath = 'documents/document.pdf';
+        // $this->mockFunction('sendFileToBackend', ['file_path' => $filePath]);
 
-    //     // Preparar los datos de la solicitud
-    //     $requestData = [
-    //         'documentUid' => $file,
-    //     ];
+        $educationalDocument = EducationalProgramsDocumentsModel::factory()->withEducationalProgram()->create()->first();
 
-    //     // Hacer la solicitud POST a la ruta
-    //     $response = $this->postJson('/profile/my_educational_programs/save_documents_educational_program', $requestData);
+        // Preparar los datos de la solicitud
+        $requestData = [
+            $educationalDocument->uid => $file,
+        ];
 
-    //     // Verificar que se guarde el archivo en la ruta correcta
-    //     // Storage::disk('documents')->assertExists($filePath);
+        // Hacer la solicitud POST a la ruta
+        $response = $this->postJson('/profile/my_educational_programs/save_documents_educational_program', $requestData);
 
-    //     // Verificar que el documento se haya guardado en la base de datos
-    //     // $this->assertDatabaseHas('educational_programs_students_documents', [
-    //     //     'educational_program_document_uid' => generate_uuid(),
-    //     //     'user_uid' => $user->uid,
-    //     //     'document_path' => $filePath,
-    //     // ]);
-
-    //     // Verificar que la respuesta sea exitosa
-    //     $response->assertStatus(200);
-    //     $response->assertJson(['message' => 'Documentos guardados correctamente']);
-    // }
+       
+        // Verificar que la respuesta sea exitosa
+        $response->assertStatus(200);
+        $response->assertJson(['message' => 'Documentos guardados correctamente']);
+    }
 }

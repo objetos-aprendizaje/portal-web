@@ -15,7 +15,7 @@
                     <div class="content-container">
 
                         <div class="poa-input-image">
-                            <img id="photo_path_preview"
+                            <img alt="imagen" id="photo_path_preview"
                                 src="{{ $user->photo_path ? env('BACKEND_URL') . '/' . $user->photo_path : asset('images/no-user.svg') }}" />
 
                             <span class="dimensions">*Dimensiones: Alto: 50px x Ancho: 300px. Formato: PNG, JPG. Tam. Máx.:

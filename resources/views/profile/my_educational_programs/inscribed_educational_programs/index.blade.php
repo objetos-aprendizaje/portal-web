@@ -48,15 +48,15 @@
                 <div class="w-full">
                     <div class="flex w-full gap-[11px] items-center lg:flex-row flex-col">
                         <div class="h-auto w-full lg:h-[210px] lg:w-[210px] flex-none">
-                            <a class="educational-program-link" href="#">
-                                <img src="{{ asset('images/articulo1.png') }}"
+                            <a aria-label="enlace" class="educational-program-link" href="#">
+                                <img alt="imagen" src="{{ asset('images/articulo1.png') }}"
                                     class="image w-full lg:w-[190px] h-full object-cover lg:rounded-tl-[8px] lg:rounded-bl-[8px]">
                             </a>
                         </div>
 
                         <div class="flex-grow w-full">
                             <div class="flex justify-between gap-1">
-                                <a class="educational-program-link" href="#">
+                                <a aria-label="enlace" class="educational-program-link" href="#">
                                     <div class="hidden lg:block">
                                         <h2 class="title line-clamp line-clamp-2 mb-[12px]"></h2>
                                     </div>

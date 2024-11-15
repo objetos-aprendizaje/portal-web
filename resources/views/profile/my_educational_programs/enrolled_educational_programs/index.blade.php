@@ -44,14 +44,14 @@
             <div
                 class="flex items-center educational-program-block lg:flex-row flex-col gap-[11px] lg:gap-[28px]  lg:h-[210px] flex-grow mb-6">
                 <div class="h-auto w-full lg:h-[210px] lg:w-[210px] flex-none">
-                    <a class="no-effect-hover educational-program-link" href="#">
-                        <img src="{{ asset('images/articulo1.png') }}"
+                    <a aria-label="enlace" class="no-effect-hover educational-program-link" href="#">
+                        <img alt="imagen" src="{{ asset('images/articulo1.png') }}"
                             class="image w-full lg:w-[190px] h-full object-cover lg:rounded-tl-[8px] lg:rounded-bl-[8px]">
                     </a>
                 </div>
 
                 <div class="flex-grow w-full ">
-                    <a class="educational-program-link" href="#">
+                    <a aria-label="enlace" class="educational-program-link" href="#">
                         <h2 class="title line-clamp line-clamp-2 mb-[12px]"></h2>
                     </a>
 

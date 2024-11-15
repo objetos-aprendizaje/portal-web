@@ -13,7 +13,7 @@
         </p>
 
         @if (isset($registerButton) && $registerButton)
-            <a href="{{ $registerLink ?? '#' }}"
+            <a aria-label="enlace" href="{{ $registerLink ?? '#' }}"
                 class="mx-auto rounded-[6px] justify-center text-white">
                 <div style="color: {{ $colorFont }}; border-color: {{ $colorFont }}" class="rounded-[6px] border flex gap-[10px] px-[20px] py-[10px] m-auto items-center">
                     <span>Registrarme</span>

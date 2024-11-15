@@ -9,7 +9,7 @@
 
         <div class="flex sm:flex-row flex-col justify-center gap-2">
             <div class="hidden" id="action-btn-container">
-                <a id="notification-action-href" href="javascript:void(0)">
+                <a aria-label="enlace" id="notification-action-href" href="javascript:void(0)">
                     <button id="notification-action-btn"
                         class="btn btn-primary w-full sm:w-[200px] close-modal-btn"><span></span>
                         {{ e_heroicon('arrow-up-right', 'outline') }}</button>

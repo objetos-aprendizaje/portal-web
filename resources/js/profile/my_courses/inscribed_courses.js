@@ -309,8 +309,8 @@ function setCourseEnrollingBtn(template, course) {
     }
 
     if (
-        course.status.code !== "ENROLLING" ||
-        course.pivot.acceptance_status !== "ACCEPTED"
+        course.status_code !== "ENROLLING" ||
+        course.acceptance_status !== "ACCEPTED"
     ) {
         btnActionCourse.classList.add("btn-blocked");
     }
@@ -337,14 +337,14 @@ function setIndicatorStudentStatus(template, course) {
         ".indicator-student-status-label"
     );
 
-    if (course.pivot.acceptance_status === "ACCEPTED") {
+    if (course.acceptance_status === "ACCEPTED") {
         indicatorStudentStatus.classList.add("openned");
         indicatorStudentStatusLabel.innerHTML = "Aprobado";
         setIndicatorCourseStatus(template, course);
-    } else if (course.pivot.acceptance_status === "PENDING") {
+    } else if (course.acceptance_status === "PENDING") {
         indicatorStudentStatus.classList.add("pending");
         indicatorStudentStatusLabel.innerHTML = "Pendiente de aprobación";
-    } else if (course.pivot.acceptance_status === "REJECTED") {
+    } else if (course.acceptance_status === "REJECTED") {
         indicatorStudentStatus.classList.add("soon");
         indicatorStudentStatusLabel.innerHTML = "No aprobado";
     }
@@ -363,10 +363,10 @@ function setIndicatorCourseStatus(template, course) {
         ".indicator-course-status-label"
     );
 
-    if (course.status.code == "ENROLLING") {
+    if (course.status_code == "ENROLLING") {
         indicatorCourseStatus.classList.add("openned");
         indicatorCourseStatusLabel.innerHTML = "Listo para matriculación";
-    } else if (course.status.code == "INSCRIPTION") {
+    } else if (course.status_code == "INSCRIPTION") {
         indicatorCourseStatus.classList.add("pending");
         indicatorCourseStatusLabel.innerHTML = "Pendiente de matriculación";
     }

@@ -47,14 +47,14 @@
             <div class="w-full">
                 <div class="flex w-full gap-[11px] items-center lg:flex-row flex-col">
                     <div class="h-auto w-full lg:h-[190px] lg:w-[190px] flex-none">
-                        <a class="course-link" href="#">
-                            <img src="{{ asset('images/articulo1.png') }}"
+                        <a aria-label="enlace" class="course-link" href="#">
+                            <img alt="imagen" src="{{ asset('images/articulo1.png') }}"
                                 class="image w-full lg:w-[190px] h-full object-cover rounded-[8px]">
                         </a>
                     </div>
 
                     <div class="w-full flex-grow">
-                        <a class="course-link" href="#">
+                        <a aria-label="enlace" class="course-link" href="#">
                             <h2 class="title line-clamp line-clamp-2 mb-[12px]"></h2>
                         </a>
 

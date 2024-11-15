@@ -245,7 +245,7 @@ function fillEducationalProgramCourses(template, educationalProgram) {
         courseTemplateCloned.querySelector(".course-ects-workload").innerHTML =
             course.ects_workload;
 
-        if (educationalProgram.status.code === "DEVELOPMENT" && course.lms_url) {
+        if (educationalProgram.status_code === "DEVELOPMENT" && course.lms_url) {
             courseTemplateCloned
                 .querySelector(".btn-action-container")
                 .classList.remove("hidden");
@@ -274,10 +274,10 @@ function setEducationalProgramIndicators(template, educationalProgram) {
     let indicator = template.querySelector(".indicator");
     let indicatorLabel = template.querySelector(".indicator-label");
 
-    if (["INSCRIPTION", "ENROLLING"].includes(educationalProgram.status.code)) {
+    if (["INSCRIPTION", "ENROLLING"].includes(educationalProgram.status_code)) {
         indicator.classList.add("pending");
         indicatorLabel.innerHTML = "Disponible próximamente";
-    } else if (educationalProgram.status.code === "DEVELOPMENT") {
+    } else if (educationalProgram.status_code === "DEVELOPMENT") {
         indicator.classList.add("openned");
         indicatorLabel.innerHTML = "En realización";
     }

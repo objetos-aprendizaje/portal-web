@@ -283,7 +283,7 @@ function setCourseActionBtn(template, course) {
     template.querySelector(".btn-action-course").dataset.course_uid =
         course.uid;
 
-    if (course.status.code !== "DEVELOPMENT") {
+    if (course.status_code !== "DEVELOPMENT") {
         template
             .querySelector(".btn-action-course")
             .classList.add("btn-blocked");
@@ -294,10 +294,10 @@ function setCourseIndicators(template, course) {
     let indicator = template.querySelector(".indicator");
     let indicatorLabel = template.querySelector(".indicator-label");
 
-    if (["INSCRIPTION", "ENROLLING"].includes(course.status.code)) {
+    if (["INSCRIPTION", "ENROLLING"].includes(course.status_code)) {
         indicator.classList.add("pending");
         indicatorLabel.innerHTML = "Disponible próximamente";
-    } else if (course.status.code === "DEVELOPMENT") {
+    } else if (course.status_code === "DEVELOPMENT") {
         indicator.classList.add("openned");
         indicatorLabel.innerHTML = "En realización";
     }

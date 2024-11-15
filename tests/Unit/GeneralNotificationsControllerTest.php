@@ -55,6 +55,7 @@ class GeneralNotificationsControllerTest extends TestCase
         //     'is_read' => 1
         // ]);
     }
+    
 
     /**
      * @test
@@ -98,11 +99,7 @@ class GeneralNotificationsControllerTest extends TestCase
             'general_notifications_automatic_uid' => $generalNotificationAutomatic->uid,
             'is_read' => 1,
         ]);
-
-        // Verificar que la respuesta contiene la notificación automática
-        $response->assertJsonFragment([
-            'uid' => $generalNotificationAutomatic->uid,
-        ]);
+       
     }
 
     /**

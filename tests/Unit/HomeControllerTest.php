@@ -21,6 +21,7 @@ use App\Http\Controllers\HomeController;
 use App\Models\EducationalProgramsModel;
 use App\Models\EducationalResourcesModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\EducationalResourcesEmbeddingsModel;
 
 class HomeControllerTest extends TestCase
 {
@@ -36,7 +37,7 @@ class HomeControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -129,7 +130,7 @@ class HomeControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -173,7 +174,7 @@ class HomeControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -210,7 +211,7 @@ class HomeControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=> 'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -244,7 +245,7 @@ class HomeControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -330,7 +331,7 @@ class HomeControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -475,7 +476,7 @@ class HomeControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -507,7 +508,7 @@ class HomeControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -561,13 +562,13 @@ class HomeControllerTest extends TestCase
      */
     public function testGetRecommendedCoursesReturnsCorrectData()
     {
-        
+
         // Buscamos un usuario  
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -647,13 +648,13 @@ class HomeControllerTest extends TestCase
      */
     public function testGetRecommendedEducationalResourcesReturnsCorrectRecommendations()
     {
-        
+
         // Buscamos un usuario  
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -674,12 +675,24 @@ class HomeControllerTest extends TestCase
             ->withCreatorUser()
             ->withEducationalResourceType()
             ->withStatus()
-            ->create(['embeddings' => $embeddingVector]);
+            ->create();
+
+            EducationalResourcesEmbeddingsModel::factory()->create(
+                [
+                    'educational_resource_uid' => $resource1->uid,
+                ]
+            );
 
         $resource2 = EducationalResourcesModel::factory()
             ->withCreatorUser()
             ->withEducationalResourceType()
-            ->withStatus()->create(['embeddings' => $embeddingVector]);
+            ->withStatus()->create();
+
+        EducationalResourcesEmbeddingsModel::factory()->create(
+            [
+                'educational_resource_uid' =>  $resource2->uid,
+            ]
+        );
 
         $user->educationalResources()->attach(
             $resource1->uid,
@@ -700,8 +713,13 @@ class HomeControllerTest extends TestCase
         $similarResource = EducationalResourcesModel::factory()
             ->withCreatorUser()
             ->withEducationalResourceType()
-            ->withStatus()->create(['embeddings' => $embeddingVector]);
+            ->withStatus()->create();
 
+        EducationalResourcesEmbeddingsModel::factory()->create(
+            [
+                'educational_resource_uid' => $similarResource->uid,
+            ]
+        );
 
         $similarResources = new \Illuminate\Pagination\LengthAwarePaginator(
             collect([$similarResource]), // Los datos
@@ -738,13 +756,13 @@ class HomeControllerTest extends TestCase
      * Prueba que el itinerario recomendado se devuelve correctamente.
      */
     public function testGetRecommendedItineraryReturnsCorrectItinerary()
-    {       
+    {
         // Buscamos un usuario  
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         

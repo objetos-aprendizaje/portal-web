@@ -285,7 +285,6 @@ use RefreshDatabase;
         $user = UsersModel::factory()->create();
         $this->actingAs($user);
 
-
         $course = CoursesModel::factory()->withCourseType()->withCourseStatus()->create([
             'uid' => generate_uuid(),
             'cost' => 0,
@@ -293,8 +292,11 @@ use RefreshDatabase;
 
         // Crea un documento simulado en la base de datos
         $documentPath = 'documents/test_document.pdf';
+
         Storage::fake('local');
+
         Storage::put($documentPath, 'Contenido del documento');
+
         $courseDocument = CourseDocumentsModel::factory()->create([
             'uid' => generate_uuid(),
             'document_name' => 'test_document.pdf',
@@ -306,7 +308,6 @@ use RefreshDatabase;
             'user_uid' => $user->uid,
             'document_path' => $documentPath,
             'course_document_uid' => $courseDocument->uid,
-
 
         ]);
 
@@ -325,13 +326,5 @@ use RefreshDatabase;
             'token' => $response->json('token'),
         ]);
     }
-
-
-
-
-
-
-
-
 
 }

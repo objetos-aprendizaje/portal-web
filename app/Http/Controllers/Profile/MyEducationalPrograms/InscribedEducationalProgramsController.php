@@ -34,11 +34,12 @@ class InscribedEducationalProgramsController extends BaseController
 
         $search = $request->search;
 
-        $coursesStudentsQuery = $user->educationalPrograms()
+        $educationalProgramsStudentQuery = $user->educationalPrograms()
             ->with([
                 'courses',
                 'status',
                 'educationalProgramDocuments',
+                'paymentTerms',
                 'educationalProgramDocuments.educationalProgramStudentDocument' => function ($query) use ($user) {
                     $query->where('user_uid', $user->uid);
                 }
@@ -50,12 +51,55 @@ class InscribedEducationalProgramsController extends BaseController
 
 
         if ($search) {
-            $coursesStudentsQuery->where('name', 'ilike', '%' . $search . '%')->orWhere('description', 'ilike', '%' . $search . '%');
+            $educationalProgramsStudentQuery->where('name', 'ilike', '%' . $search . '%')->orWhere('description', 'ilike', '%' . $search . '%');
         }
 
-        $coursesStudents = $coursesStudentsQuery->paginate($items_per_page);
+        $educationalProgramsStudents = $educationalProgramsStudentQuery->paginate($items_per_page);
 
-        return response()->json($coursesStudents);
+        $educationalProgramsStudents->getCollection()->transform(function ($educationalProgram) {
+            return [
+                "uid" => $educationalProgram->uid,
+                "name" => $educationalProgram->name,
+                "description" => $educationalProgram->description,
+                "enrolling_start_date" => adaptDateTimezoneDisplay($educationalProgram->enrolling_start_date),
+                "enrolling_finish_date" => adaptDateTimezoneDisplay($educationalProgram->enrolling_finish_date),
+                "realization_start_date" => adaptDateTimezoneDisplay($educationalProgram->realization_start_date),
+                "realization_finish_date" => adaptDateTimezoneDisplay($educationalProgram->realization_finish_date),
+                "cost" => $educationalProgram->cost,
+                "status_code" => $educationalProgram->status->code,
+                "acceptance_status" => $educationalProgram->pivot->acceptance_status,
+                "validate_student_registrations" => $educationalProgram->validate_student_registrations,
+                "image_path" => $educationalProgram->image_path,
+                "evaluation_criteria" => $educationalProgram->evaluation_criteria,
+                "courses" => $educationalProgram->courses ? $educationalProgram->courses->map(function ($course) {
+                    return [
+                        "uid" => $course->uid,
+                        "title" => $course->title,
+                        "description" => $course->description,
+                        "ects_workload" => $course->ects_workload,
+
+                    ];
+                }) : null,
+                "educational_program_documents" => $educationalProgram->educationalProgramDocuments ? $educationalProgram->educationalProgramDocuments->map(function ($educationalProgramDocument) {
+                    $educationalProgramDocumentsMapped = [
+                        "uid" => $educationalProgramDocument->uid,
+                        "document_name" => $educationalProgramDocument->document_name,
+                    ];
+
+                    if($educationalProgramDocument->educationalProgramStudentDocument) {
+                        $educationalProgramDocumentsMapped['educational_program_student_document'] = [
+                            "uid" => $educationalProgramDocument->educationalProgramStudentDocument->uid,
+                            "document_path" => $educationalProgramDocument->educationalProgramStudentDocument->document_path
+                        ];
+                    }
+
+                    return $educationalProgramDocumentsMapped;
+                }) : null,
+                "payment_mode" => $educationalProgram->payment_mode,
+            ];
+        });
+
+        return response()->json($educationalProgramsStudents);
     }
 
     public function enrollEducationalProgram(Request $request)

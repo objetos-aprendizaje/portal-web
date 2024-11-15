@@ -372,13 +372,13 @@ function loadResources(learningObjectsContainer, learning_objects, type) {
         let url = "#";
         if (
             type == "courses" &&
-            learning_object.status.code == "DEVELOPMENT" &&
+            learning_object.status_code == "DEVELOPMENT" &&
             learning_object.lms_url
         ) {
             url = learning_object.lms_url;
         } else if (
             type == "courses" &&
-            learning_object.status.code == "INSCRIPTION"
+            learning_object.status_code == "INSCRIPTION"
         ) {
             url = `/course/${learning_object.uid}`;
         } else if (type == "educationalResources") {

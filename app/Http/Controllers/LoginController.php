@@ -133,7 +133,7 @@ class LoginController extends BaseController
         if ($loginMethod == "google") {
             $user->email = $userSocialLogin->email;
             $user->first_name = $userSocialLogin->user['given_name'];
-            $user->last_name = $userSocialLogin->user['family_name'];
+            $user->last_name = $userSocialLogin->user['family_name'] ?? null;
         } else if ($loginMethod == "facebook") {
             $user->email = $userSocialLogin->email;
             $user->first_name = $userSocialLogin->email;

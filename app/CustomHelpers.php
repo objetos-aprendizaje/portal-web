@@ -5,6 +5,10 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Client;
 use App\Libraries\RedsysAPI;
 use Carbon\Carbon;
+use App\Models\EmailVerifyModel;
+use Illuminate\Support\Facades\URL;
+use App\Jobs\SendEmailJob;
+use Illuminate\Support\Facades\DB;
 
 function generate_uuid()
 {
@@ -185,6 +189,8 @@ function generateRedsysObject($amount, $orderNumber, $merchantData, $description
 
 function formatDateTimeNotifications($date)
 {
+    Carbon::setLocale('es');
+
     $pastDate = new Carbon($date);
     $currentDate = Carbon::now();
     $interval = $currentDate->diff($pastDate);
@@ -312,3 +318,85 @@ function downloadFileFromBackend($url, $params, $pathDownload, $header = [])
     file_put_contents($fullPath, $response);
     return $pathDownload;
 }
+
+function adaptDatesCourseEducationalProgram($courseOrEducationalProgram, $collection = false)
+{
+    $dateFields = [
+        'inscription_start_date',
+        'inscription_finish_date',
+        'realization_start_date',
+        'realization_finish_date',
+        'enrolling_start_date',
+        'enrolling_finish_date'
+    ];
+
+    if ($collection) {
+        $courseOrEducationalProgram->transform(function ($course) use ($dateFields) {
+            foreach ($dateFields as $field) {
+                if (isset($course->$field)) {
+                    $course->$field = Carbon::parse($course->$field)->setTimezone(env('TIMEZONE_DISPLAY'))->format('Y-m-d H:i:s');
+                }
+            }
+
+            return $course;
+        });
+    } else {
+        foreach ($dateFields as $field) {
+            if (isset($courseOrEducationalProgram->$field)) {
+                $courseOrEducationalProgram->$field = Carbon::parse($courseOrEducationalProgram->$field)->setTimezone(env('TIMEZONE_DISPLAY'))->format('Y-m-d H:i:s');
+            }
+        }
+    }
+}
+
+function adaptDateTimezoneDisplay($date) {
+    return Carbon::parse($date)->setTimezone(env('TIMEZONE_DISPLAY'))->format('Y-m-d H:i:s');
+}
+
+function sendEmail($user)
+    {
+        $token = generateToken(12);
+
+        // Generar el enlace de verificación
+        $verificationUrl = generateVerificationUrl($user->uid, $token);
+
+        //guardar token y enviarlo en parametros para devolverlo con el botón del email
+        saveEmailVerification($user->uid, $token);
+
+        // Enviar la notificación
+        sendEmailVerification($verificationUrl, $token, $user->email);
+    }
+
+function saveEmailVerification($userUid, $token)
+    {
+
+        DB::transaction(function () use ($userUid) {
+            EmailVerifyModel::where('user_uid', $userUid)->delete();
+        });
+        $emailverify = new EmailVerifyModel();
+        $emailverify->user_uid = $userUid;
+        $emailverify->token = $token;
+        $emailverify->expires_at = now()->addMinutes(60);
+        $emailverify->save();
+    }
+
+function generateVerificationUrl($userUid, $token)
+    {
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $userUid, 'token' => $token]
+        );
+
+        return $verificationUrl;
+    }
+
+function sendEmailVerification($verificationUrl, $token, $userEmail)
+    {
+        $parameters = [
+            'url' => $verificationUrl,
+            'token' => $token
+        ];
+
+        dispatch(new SendEmailJob($userEmail, 'Verificación de contraseña', $parameters, 'emails.email_verify'));
+    }

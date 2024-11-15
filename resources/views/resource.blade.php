@@ -15,7 +15,7 @@
         <div class="flex flex-col gap-[50px]">
             <div class="max-w-[475px] bg-white xl:border xl:border-gray-200 xl:rounded-lg xl:shadow flex flex-col gap-[30px] pb-4">
                 <div class="max-h-[424px]">
-                    <img class="xl:rounded-t-lg" src="/images/resource.png" alt="" />
+                    <img class="xl:rounded-t-lg" src="/images/resource.png" alt="Imagen" />
                 </div>
                 <div class="flex">
                     <button class="resource-send-button">

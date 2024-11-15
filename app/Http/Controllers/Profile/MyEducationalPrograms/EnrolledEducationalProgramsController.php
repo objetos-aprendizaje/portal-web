@@ -49,6 +49,46 @@ class EnrolledEducationalProgramsController extends BaseController
 
         $educationalProgramsStudent = $educationalProgramsStudentQuery->paginate($items_per_page);
 
+        $educationalProgramsStudent->getCollection()->transform(function ($educationalProgram) {
+            return [
+                "uid" => $educationalProgram->uid,
+                "name" => $educationalProgram->name,
+                "description" => $educationalProgram->description,
+                "enrolling_start_date" => adaptDateTimezoneDisplay($educationalProgram->enrolling_start_date),
+                "enrolling_finish_date" => adaptDateTimezoneDisplay($educationalProgram->enrolling_finish_date),
+                "realization_start_date" => adaptDateTimezoneDisplay($educationalProgram->realization_start_date),
+                "realization_finish_date" => adaptDateTimezoneDisplay($educationalProgram->realization_finish_date),
+                "cost" => $educationalProgram->cost,
+                "status_code" => $educationalProgram->status->code,
+                "acceptance_status" => $educationalProgram->pivot->acceptance_status,
+                "validate_student_registrations" => $educationalProgram->validate_student_registrations,
+                "image_path" => $educationalProgram->image_path,
+                "payment_mode" => $educationalProgram->payment_mode,
+                "courses" => $educationalProgram->courses ? $educationalProgram->courses->map(function ($course) {
+                    return [
+                        "uid" => $course->uid,
+                        "title" => $course->title,
+                        "description" => $course->description,
+                        "ects_workload" => $course->ects_workload,
+                        "lms_url" => $course->lms_url,
+                    ];
+                }) : null,
+                "payment_terms" => $educationalProgram->paymentTerms ? $educationalProgram->paymentTerms->map(function ($paymentTerm) {
+                    return [
+                        "uid" => $paymentTerm->uid,
+                        "name" => $paymentTerm->name,
+                        "start_date" => $paymentTerm->start_date,
+                        "finish_date" => $paymentTerm->finish_date,
+                        "cost" => $paymentTerm->cost,
+                        "user_payment" => $paymentTerm->userPayment ? $paymentTerm->userPayment->map(function ($userPayment) {
+                            return [
+                                "is_paid" => $userPayment->is_paid,
+                            ];
+                        }) : null
+                    ];
+                }) : null
+            ];
+        });
         return response()->json($educationalProgramsStudent);
     }
 
@@ -110,7 +150,7 @@ class EnrolledEducationalProgramsController extends BaseController
 
         $course = CoursesModel::where('uid', $courseUid)->with(['educationalProgram', 'educationalProgram.status'])->first();
 
-        if($course->educationalProgram->status->code != 'DEVELOPMENT') {
+        if ($course->educationalProgram->status->code != 'DEVELOPMENT') {
             throw new OperationFailedException("El programa formativo no se encuentra en desarrollo");
         }
 

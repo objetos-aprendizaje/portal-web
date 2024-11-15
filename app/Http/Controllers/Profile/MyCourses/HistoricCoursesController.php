@@ -41,6 +41,16 @@ class HistoricCoursesController extends BaseController
 
         $coursesStudent = $coursesStudentQuery->paginate($items_per_page);
 
+        $coursesStudent->getCollection()->transform(function ($courseStudent) {
+            return [
+                "uid" => $courseStudent->uid,
+                "title" => $courseStudent->title,
+                "image_path" => $courseStudent->image_path,
+                "realization_start_date" => adaptDateTimezoneDisplay($courseStudent->realization_start_date),
+                "realization_finish_date" => adaptDateTimezoneDisplay($courseStudent->realization_finish_date),
+                "lms_url" => $courseStudent->lms_url
+            ];
+        });
         return response()->json($coursesStudent);
     }
 

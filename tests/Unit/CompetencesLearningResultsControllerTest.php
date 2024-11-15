@@ -80,7 +80,7 @@ class CompetencesLearningResultsControllerTest extends TestCase
             'resources/js/renderer_infinite_tree.js'
         ]);
         $response->assertViewHas('currentPage', 'competences_learning_results');
-        $response->assertViewHas('page_title', 'Configuración de competencias y resultados de aprendizaje | POA');
+        $response->assertViewHas('page_title', 'Configuración de competencias y resultados de aprendizaje');
     }
 
     /**

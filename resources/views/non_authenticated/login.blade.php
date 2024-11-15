@@ -3,7 +3,7 @@
     <section class="md:flex hidden">
 
         <div class="w-1/2">
-            <img id="image-background" src="{{ asset('data/images/background_login.png') }}"
+            <img alt="login" id="image-background" src="{{ asset('data/images/background_login.png') }}"
                 class="object-cover w-full h-screen">
         </div>
 
@@ -11,7 +11,7 @@
             <div class="w-[530px] mb-[25px]">
                 <div class="rounded-[20px] border py-[20px] px-[40px]">
                     @if (app('general_options')['poa_logo_1'])
-                        <img class="mx-auto block max-w-[211px] max-h-[80px] mb-[15px]"
+                        <img alt="login" class="mx-auto block max-w-[211px] max-h-[80px] mb-[15px]"
                             src="{{ env('BACKEND_URL') . '/' . app('general_options')['poa_logo_1'] }}" />
                     @endif
 
@@ -20,12 +20,23 @@
                     <p class="text-center mb-[20px]">¿No tienes cuenta? <a class="text-color_1"
                             href="/register">Regístrate</a></p>
 
+                    @if (session('sent_email_recover_password'))
+                        <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
+                            <p>Se ha enviado un link para reestablecer la contraseña</p>
+                            <p>
+                                ¿No has recibido nada? <a href="javascript:void(0)"
+                                    data-email-account="{{ session('email') }}"
+                                    class="text-color_1 resend-email-confirmation">Reenviar email</a>
+                            </p>
+                        </div>
+                    @endif
+
                     @if (session('account_created'))
                         <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
                             <p>Su cuenta ha sido creada correctamente. Por favor, verifíquela con el email de confirmación
                                 que acaba de recibir. Si no lo encuentra, revise la carpeta de spam. </p>
                             <p>¿No has recibido el email?
-                                <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                                <a aria-label="enlace" href="javascript:void(0)" data-email-account="{{ session('email') }}"
                                     class="text-color_1 resend-email-confirmation">Reenviar
                                     email de
                                     confirmación</a>
@@ -37,7 +48,7 @@
                         <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
                             <p>El link de confirmación ha expirado</p>
                             <p>
-                                <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                                <a aria-label="enlace" href="javascript:void(0)" data-email-account="{{ session('email') }}"
                                     class="text-color_1 resend-email-confirmation">Reenviar email de
                                     confirmación</a>
                             </p>
@@ -60,7 +71,7 @@
                         <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
                             <p>Su cuenta no está verificada</p>
                             <p>¿No has recibido el email?
-                                <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                                <a aria-label="enlace" href="javascript:void(0)" data-email-account="{{ session('email') }}"
                                     class="text-color_1 resend-email-confirmation">Reenviar
                                     email de
                                     confirmación</a>
@@ -80,12 +91,13 @@
 
                             <div class="flex flex-col mb-[8px]">
                                 <label class="px-3 mb-[8px]">Contraseña</label>
-                                <input aria-label="contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3"
+                                <input aria-label="contraseña"
+                                    class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3"
                                     name="password" type="password" />
                             </div>
 
                             <div class="block px-3 mb-[20px]">
-                                <a href="{{ route('recover-password') }}" id="recover-password"
+                                <a aria-label="enlace" href="{{ route('recover-password') }}" id="recover-password"
                                     class="text-color_1 text-[16px]">¿Olvidaste la
                                     contraseña?</a>
                             </div>
@@ -112,12 +124,12 @@
                         @endif
 
                         @if ($urlCas)
-                            <a class="no-effect-hover" href="{{ $urlCas }}">
+                            <a aria-label="enlace" class="no-effect-hover" href="{{ $urlCas }}">
                                 <div class="flex justify-center mb-[25px]">
                                     <div
                                         class="inline-flex border rounded-full items-center justify-center pl-[6px] pr-[14px] py-[6px] gap-2 cursor-pointer hover:border-color_1">
                                         <div>
-                                            <img src="{{ asset('/data/images/logo_min_boton_login.png') }}"
+                                            <img alt="login" src="{{ asset('/data/images/logo_min_boton_login.png') }}"
                                                 class="w-[40px] h-[40px] mx-auto rounded-full  block" />
                                         </div>
 
@@ -133,46 +145,51 @@
 
                         <div class="flex justify-center gap-[32px]">
                             @if ($parameters_login_systems['facebook_login_active'])
-                                <a class="no-effect-hover" href="/auth/facebook">
+                                <a aria-label="enlace" class="no-effect-hover" href="/auth/facebook">
                                     <button title="facebook login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
+                                        <img alt="login" class="w-[45px] h-[45px]"
+                                            src="data/images/login_icons/facebook.png" />
                                     </button>
                                 </a>
                             @endif
 
                             @if ($parameters_login_systems['twitter_login_active'])
-                                <a class="no-effect-hover" href="/auth/twitter">
+                                <a aria-label="enlace" class="no-effect-hover" href="/auth/twitter">
                                     <button title="twitter login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
+                                        <img alt="login" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/x_icon.png" />
                                     </button>
                                 </a>
                             @endif
 
                             @if ($parameters_login_systems['linkedin_login_active'])
-                                <a class="no-effect-hover" href="/auth/linkedin-openid">
+                                <a aria-label="enlace" class="no-effect-hover" href="/auth/linkedin-openid">
                                     <button title="linkedin login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
+                                        <img alt="login" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/linkedin_icon.png" />
                                     </button>
                                 </a>
                             @endif
 
                             @if ($parameters_login_systems['google_login_active'])
-                                <a class="no-effect-hover" href="/auth/google">
+                                <a aria-label="enlace" class="no-effect-hover" href="/auth/google">
                                     <button title="google login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
+                                        <img alt="login" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/google_icon.png" />
                                     </button>
                                 </a>
                             @endif
 
                             @if ($urlRediris)
-                                <a class="no-effect-hover" href="{{ $urlRediris }}">
+                                <a aria-label="enlace" class="no-effect-hover" href="{{ $urlRediris }}">
                                     <button title="rediris login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
+                                        <img alt="login" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/rediris.png" />
                                     </button>
                                 </a>
                             @endif
@@ -182,8 +199,8 @@
                     </form>
 
                     @if ($cert_login != '')
-                        <div class="text-center p-4"><a
-                                href="https://{{ env('DOMINIO_CERTIFICADO') }}/certificate-access">Acceso mediante
+                        <div class="text-center p-4"><a aria-label="enlace"
+                                href="/certificate-access">Acceso mediante
                                 Certificado Digital</a></div>
                     @endif
 
@@ -196,20 +213,21 @@
 
     <section class="md:hidden p-[20px]">
         @if (app('general_options')['poa_logo_1'])
-            <img class="mx-auto block max-w-[146px] h-[51px] mb-[15px]"
+            <img alt="login" class="mx-auto block max-w-[146px] h-[51px] mb-[15px]"
                 src="{{ env('BACKEND_URL') . '/' . app('general_options')['poa_logo_1'] }}" />
         @endif
 
         <div class="text-[28px] font-bold text-center mb-[15px]">Inicia sesión</div>
 
-        <p class="text-center mb-[20px]">¿No tienes cuenta? <a class="text-color_1" href="/register">Regístrate</a></p>
+        <p class="text-center mb-[20px]">¿No tienes cuenta? <a aria-label="enlace" class="text-color_1"
+                href="/register">Regístrate</a></p>
 
         @if (session('account_created'))
             <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
                 <p>Su cuenta ha sido creada correctamente. Por favor, verifíquela con el email de confirmación
                     que acaba de recibir. Si no lo encuentra, revise la carpeta de spam. </p>
                 <p>¿No has recibido el email?
-                    <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                    <a aria-label="enlace" href="javascript:void(0)" data-email-account="{{ session('email') }}"
                         class="text-color_1 resend-email-confirmation">Reenviar
                         email de
                         confirmación</a>
@@ -221,7 +239,7 @@
             <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
                 <p>El link de confirmación ha expirado</p>
                 <p>
-                    <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                    <a aria-label="enlace" href="javascript:void(0)" data-email-account="{{ session('email') }}"
                         class="text-color_1 resend-email-confirmation">Reenviar email de
                         confirmación</a>
                 </p>
@@ -244,7 +262,7 @@
             <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
                 <p>Su cuenta no está verificada</p>
                 <p>¿No has recibido el email?
-                    <a href="javascript:void(0)" data-email-account="{{ session('email') }}"
+                    <a aria-label="enlace" href="javascript:void(0)" data-email-account="{{ session('email') }}"
                         class="text-color_1 resend-email-confirmation">Reenviar
                         email de
                         confirmación</a>
@@ -264,16 +282,19 @@
 
                 <div class="flex flex-col mb-[8px]">
                     <label class="px-3 mb-[8px]">Contraseña</label>
-                    <input aria-label="contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3" type="password" />
+                    <input aria-label="contraseña"
+                        class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3" type="password" />
                 </div>
 
                 <div class="block px-3 mb-[20px]">
-                    <a href="{{ route('recover-password') }}" class="text-color_1 text-[16px]">¿Olvidaste
+                    <a aria-label="enlace" href="{{ route('recover-password') }}"
+                        class="text-color_1 text-[16px]">¿Olvidaste
                         la
                         contraseña?</a>
                 </div>
 
-                <button title="iniciar sesión" class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Iniciar sesión
+                <button title="iniciar sesión" class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Iniciar
+                    sesión
                     {{ e_heroicon('arrow-up-right', 'outline') }}</button>
 
             </form>
@@ -295,12 +316,12 @@
         @endif
 
         @if ($urlCas)
-            <a class="no-effect-hover" href="{{ $urlCas }}">
+            <a aria-label="enlace" class="no-effect-hover" href="{{ $urlCas }}">
                 <div class="flex justify-center mb-[25px] cursor-pointer ">
                     <div
                         class="hover:border-color_1 inline-flex border rounded-full items-center justify-center pl-[6px] pr-[14px] py-[6px] gap-2">
                         <div>
-                            <img src="{{ asset('data/images/logo_min_boton_login.png') }}"
+                            <img alt="login" src="{{ asset('data/images/logo_min_boton_login.png') }}"
                                 class="w-[40px] h-[40px] mx-auto rounded-full  block" />
                         </div>
 
@@ -316,46 +337,46 @@
 
         <div class="flex justify-center gap-[32px] flex-wrap">
             @if ($parameters_login_systems['facebook_login_active'])
-                <a class="no-effect-hover" href="/auth/facebook">
+                <a aria-label="enlace" class="no-effect-hover" href="/auth/facebook">
                     <button title="facebook login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                        <img class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
+                        <img alt="login" class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
                     </button>
                 </a>
             @endif
 
             @if ($parameters_login_systems['twitter_login_active'])
-                <a class="no-effect-hover" href="/auth/twitter">
+                <a aria-label="enlace" class="no-effect-hover" href="/auth/twitter">
                     <button title="twitter login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
+                        <img alt="login" class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
                     </button>
                 </a>
             @endif
 
             @if ($parameters_login_systems['linkedin_login_active'])
-                <a class="no-effect-hover" href="/auth/linkedin-openid">
+                <a aria-label="enlace" class="no-effect-hover" href="/auth/linkedin-openid">
                     <button title="linkedin login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
+                        <img alt="login" class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
                     </button>
                 </a>
             @endif
 
             @if ($parameters_login_systems['google_login_active'])
-                <a class="no-effect-hover" href="/auth/google">
+                <a aria-label="enlace" class="no-effect-hover" href="/auth/google">
                     <button title="google login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
+                        <img alt="login" class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
                     </button>
                 </a>
             @endif
 
             @if ($urlRediris)
-                <a class="no-effect-hover" href="{{ $urlRediris }}">
+                <a aria-label="enlace" class="no-effect-hover" href="{{ $urlRediris }}">
                     <button title="rediris login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                        <img class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
+                        <img alt="login" class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
                     </button>
                 </a>
             @endif

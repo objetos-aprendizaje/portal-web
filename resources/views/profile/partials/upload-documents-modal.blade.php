@@ -50,7 +50,7 @@
                     </div>
                 </div>
 
-                <a class="link-label download-document hidden" data-document_uid=""
+                <a aria-label="enlace" class="link-label download-document hidden" data-document_uid=""
                     href="javascript:void(0)">Descargar</a>
             </div>
         </div>

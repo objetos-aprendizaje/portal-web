@@ -117,7 +117,7 @@ class RegisterController extends BaseController
                 'updated_at' => now()
             ]);
 
-            $this->sendEmail($user);
+            sendEmail($user);
         });
 
         return redirect("/login")->with([
@@ -163,10 +163,6 @@ class RegisterController extends BaseController
             throw new OperationFailedException('No se ha encontrado ninguna cuenta con esa dirección de correo', 404);
         }
 
-        if ($user->verified) {
-            throw new OperationFailedException('Su cuenta ya está verificada', 405);
-        }
-
         DB::transaction(function () use ($user) {
             // Inhabilitamos todos los tokens anteriores
             EmailVerifyModel::where('user_uid', $user->uid)->delete();
@@ -174,49 +170,5 @@ class RegisterController extends BaseController
         });
 
         return response()->json(['message' => 'Se ha reenviado el email']);
-    }
-
-    private function sendEmail($user)
-    {
-        $token = generateToken(12);
-
-        // Generar el enlace de verificación
-        $verificationUrl = $this->generateVerificationUrl($user->uid, $token);
-
-        //guardar token y enviarlo en parametros para devolverlo con el botón del email
-        $this->saveEmailVerification($user->uid, $token);
-
-        // Enviar la notificación
-        $this->sendEmailVerification($verificationUrl, $token, $user->email);
-    }
-
-    private function saveEmailVerification($userUid, $token)
-    {
-        $emailverify = new EmailVerifyModel();
-        $emailverify->user_uid = $userUid;
-        $emailverify->token = $token;
-        $emailverify->expires_at = now()->addMinutes(60);
-        $emailverify->save();
-    }
-
-    private function generateVerificationUrl($userUid, $token)
-    {
-        $verificationUrl = URL::temporarySignedRoute(
-            'verification.verify',
-            now()->addMinutes(60),
-            ['id' => $userUid, 'token' => $token]
-        );
-
-        return $verificationUrl;
-    }
-
-    private function sendEmailVerification($verificationUrl, $token, $userEmail)
-    {
-        $parameters = [
-            'url' => $verificationUrl,
-            'token' => $token
-        ];
-
-        dispatch(new SendEmailJob($userEmail, 'Verificación de contraseña', $parameters, 'emails.email_verify'));
     }
 }

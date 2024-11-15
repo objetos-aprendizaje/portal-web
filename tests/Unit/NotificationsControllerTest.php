@@ -66,7 +66,7 @@ class NotificationsControllerTest extends TestCase
         // $response->assertViewHas('automaticNotificationTypes', $automaticNotificationTypes);
         $response->assertViewHas('user', $user);
         $response->assertViewHas('currentPage', 'notifications');
-        $response->assertViewHas('page_title', 'Configuración de notificaciones | POA');
+        $response->assertViewHas('page_title', 'Configuración de notificaciones');
     }
 
 

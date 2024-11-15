@@ -15,7 +15,7 @@
 
                 @switch($educational_resource->resource_way)
                     @case('IMAGE')
-                        <img class="mb-[30px]" src="{{ env('BACKEND_URL') . '/' . $educational_resource->resource_path }}">
+                        <img alt="{{ $educational_resource->title }}" class="mb-[30px]" src="{{ env('BACKEND_URL') . '/' . $educational_resource->resource_path }}">
                     @break
 
                     @case('VIDEO')
@@ -42,7 +42,7 @@
                 <div class="lg:min-w-[475px] lg:max-w-[475px] mb-[31px] lg:mb-0 rounded-[12px]">
 
                     <div class="shadow-xl pb-[20px] mb-[50px]">
-                        <img class="mb-[30px]" src="{{ env('BACKEND_URL') . '/' . $educational_resource->image_path }}">
+                        <img alt="{{ $educational_resource->title }}" class="mb-[30px]" src="{{ env('BACKEND_URL') . '/' . $educational_resource->image_path }}">
 
                         <div class="text-center mb-[30px]">
 
@@ -53,7 +53,7 @@
                                     {{ e_heroicon('arrow-down-tray', 'outline') }}
                                 </button>
                             @elseif ($educational_resource->resource_way == 'URL')
-                                <a data-destination="{{ $educational_resource->resource_url }}"
+                                <a aria-label="enlace" data-destination="{{ $educational_resource->resource_url }}"
                                     href="{{ $educational_resource->resource_url }}" target="_blank"><button type="button"
                                         class="btn btn-primary">Ir
                                         al recurso
@@ -116,7 +116,7 @@
                     </div>
 
                     <div class="flex justify-center items-center">
-                        <a class="no-effect-hover" href="/doubts/educational_resource/{{ $educational_resource->uid }}"><button
+                        <a aria-label="enlace" class="no-effect-hover" href="/doubts/educational_resource/{{ $educational_resource->uid }}"><button
                                 type="button" class="btn btn-primary min-w-[304px]">¿Dudas?
                                 {{ e_heroicon('chat-bubble-bottom-center-text', 'outline') }}</button></a>
                     </div>

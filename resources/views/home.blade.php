@@ -50,10 +50,10 @@
             @endforeach
 
             <!-- Next and previous buttons -->
-            <a title="anterior" class="prev">
+            <a aria-label="anterior" title="anterior" class="prev">
                 {{ e_heroicon('chevron-left', 'outline', 'white', 20, 20) }}
             </a>
-            <a title="siguiente" class="next">
+            <a aria-label="siguiente" title="siguiente" class="next">
                 {{ e_heroicon('chevron-right', 'outline', 'white', 20, 20) }}
             </a>
 
@@ -83,12 +83,14 @@
                         </h2>
                     @endif
 
-                    <h2 data-lane="courses-recommended" class="m-0 lane-tab row-button whitespace-nowrap">Cursos
-                        Recomendados</h2>
+                    @if ($general_options['enabled_recommendation_module'])
+                        <h2 data-lane="courses-recommended" class="m-0 lane-tab row-button whitespace-nowrap">Cursos
+                            Recomendados</h2>
 
-                    <h2 data-lane="educational-resources-recommended" class="m-0 lane-tab row-button whitespace-nowrap">
-                        Recursos
-                        Recomendados</h2>
+                        <h2 data-lane="educational-resources-recommended" class="m-0 lane-tab row-button whitespace-nowrap">
+                            Recursos
+                            Recomendados</h2>
+                    @endif
 
                     <h2 data-lane="my-educational-resources" class="m-0 lane-tab row-button whitespace-nowrap">
                         Mis Recursos</h2>
@@ -167,8 +169,8 @@
                 </h1>
                 <div
                     class="flex gap-[10px] text-color_1 arrow-see-more items-center hover:scale-110 cursor-pointer mx-auto md:mx-0">
-                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los objeto de aprendizaje"
-                            href="/searcher?resources=courses">Ver todos los
+                    <p class="leading-[150%] text-center text-color_1"><a aria-label="enlace"
+                            title="ver todos los objeto de aprendizaje" href="/searcher?resources=courses">Ver todos los
                             cursos</a></p>
                     {{ e_heroicon('chevron-right', 'outline', 'black') }}
                 </div>
@@ -195,8 +197,8 @@
                 </h1>
                 <div
                     class="flex gap-[10px] text-color_1 arrow-see-more items-center hover:scale-110 cursor-pointer mx-auto md:mx-0">
-                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los programas"
-                            href="/searcher?resources=programs">Ver todos los
+                    <p class="leading-[150%] text-center text-color_1"><a aria-label="enlace"
+                            title="ver todos los programas" href="/searcher?resources=programs">Ver todos los
                             programas</a></p>
                     {{ e_heroicon('chevron-right', 'outline', 'black') }}
                 </div>
@@ -223,7 +225,7 @@
                 </h1>
                 <div
                     class="flex gap-[10px] text-color_1 arrow-see-more items-center hover:scale-110 cursor-pointer mx-auto md:mx-0">
-                    <p class="leading-[150%] text-center text-color_1"><a title="ver todos los recursos"
+                    <p class="leading-[150%] text-center text-color_1"><a aria-label="enlace" title="ver todos los recursos"
                             href="/searcher?resources=resources">Ver todos los
                             recursos</a></p>
                     {{ e_heroicon('chevron-right', 'outline', 'black') }}
@@ -249,10 +251,11 @@
 
             <div class="grid lg:grid-cols-3 lg:grid-flow-row gap-[14px] lg:gap-[29px]">
                 @foreach ($categories as $category)
-                    <a title="categoría" class="no-effect-hover" href="/searcher?category_uid={{ $category['uid'] }}">
+                    <a aria-label="enlace" title="categoría" class="no-effect-hover"
+                        href="/searcher?category_uid={{ $category['uid'] }}">
                         <div style="background-color: {{ $category['color'] }}"
                             class="flex p-[17px] gap-[17px] rounded-[8px] cursor-pointer h-[135px] items-center">
-                            <img class="w-[88px] h-[88px] rounded-[4px]"
+                            <img alt="{{ $category['name'] }}" class="w-[88px] h-[88px] rounded-[4px]"
                                 src="{{ env('BACKEND_URL') . '/' . $category['image_path'] }}" alt="">
                             <div class="flex flex-col">
                                 <h2 class="text-black mb-[8px] line-clamp line-clamp-2">{{ $category['name'] }}</h2>
@@ -271,12 +274,13 @@
     <template id="learning-object-template">
         <div class="learning-object-block shadow-lg">
             <div class="learning-object-img-container">
-                <a title="objeto de aprendizaje" class="no-effect-hover block-url" href="#"><img
-                        alt="objeto de aprendizaje" src="" class="learning-object-image"></a>
+                <a aria-label="enlace" title="objeto de aprendizaje" class="no-effect-hover block-url"
+                    href="#"><img alt="objeto de aprendizaje" src="" class="learning-object-image"></a>
             </div>
             <div class="block-container">
                 <div class="block-container-title">
-                    <a title="objeto de aprendizaje" class="no-effect-hover block-url" href="#">
+                    <a aria-label="enlace" title="objeto de aprendizaje" class="no-effect-hover block-url"
+                        href="#">
                         <h2 class="block-title"></h2>
                     </a>
                 </div>

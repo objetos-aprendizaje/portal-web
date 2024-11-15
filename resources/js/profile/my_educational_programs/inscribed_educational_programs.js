@@ -157,7 +157,7 @@ function enrollEducationalProgram(educationalProgramUid) {
     });
 }
 
-function setPaymentTerms(template, course) {
+function setPaymentTerms(template, educationalProgram) {
     // Mostrar el contenedor de términos de pago
     const paymentTermsContainer = template.querySelector(
         ".payment-terms-container"
@@ -168,7 +168,7 @@ function setPaymentTerms(template, course) {
     const paymentTermsTemplate = document.getElementById("payment-terms");
 
     // Iterar sobre los términos de pago del curso
-    course.payment_terms.forEach((paymentTerm) => {
+    educationalProgram.payment_terms.forEach((paymentTerm) => {
         // Clonar la plantilla de términos de pago
         const paymentTermsCloned = paymentTermsTemplate.content.cloneNode(true);
 
@@ -438,8 +438,8 @@ function setEducationalProgramEnrollingBtn(template, educationalProgram) {
     }
 
     if (
-        educationalProgram.status.code !== "ENROLLING" ||
-        educationalProgram.pivot.acceptance_status !== "ACCEPTED"
+        educationalProgram.status_code !== "ENROLLING" ||
+        educationalProgram.acceptance_status !== "ACCEPTED"
     ) {
         btnActionEducationalProgram.classList.add("btn-blocked");
     }
@@ -466,14 +466,14 @@ function setIndicatorStudentStatus(template, educationalProgram) {
         ".indicator-student-status-label"
     );
 
-    if (educationalProgram.pivot.acceptance_status === "ACCEPTED") {
+    if (educationalProgram.acceptance_status === "ACCEPTED") {
         indicatorStudentStatus.classList.add("openned");
         indicatorStudentStatusLabel.innerHTML = "Aprobado";
         setIndicatorEducationalProgramStatus(template, educationalProgram);
-    } else if (educationalProgram.pivot.acceptance_status === "PENDING") {
+    } else if (educationalProgram.acceptance_status === "PENDING") {
         indicatorStudentStatus.classList.add("pending");
         indicatorStudentStatusLabel.innerHTML = "Pendiente de aprobación";
-    } else if (educationalProgram.pivot.acceptance_status === "REJECTED") {
+    } else if (educationalProgram.acceptance_status === "REJECTED") {
         indicatorStudentStatus.classList.add("soon");
         indicatorStudentStatusLabel.innerHTML = "No aprobado";
     }
@@ -492,11 +492,11 @@ function setIndicatorEducationalProgramStatus(template, educationalProgram) {
         ".indicator-educational-program-status-label"
     );
 
-    if (educationalProgram.status.code == "ENROLLING") {
+    if (educationalProgram.status_code == "ENROLLING") {
         indicatorEducationalProgramStatus.classList.add("openned");
         indicatorEducationalProgramStatusLabel.innerHTML =
             "Listo para matriculación";
-    } else if (educationalProgram.status.code == "INSCRIPTION") {
+    } else if (educationalProgram.status_code == "INSCRIPTION") {
         indicatorEducationalProgramStatus.classList.add("pending");
         indicatorEducationalProgramStatusLabel.innerHTML =
             "Pendiente de matriculación";
