@@ -401,11 +401,25 @@ function loadResources(learningObjectsContainer, learning_objects, type) {
             const idsHidde = [
                 ".learning-objects-dates-container",
                 ".separator-dates",
+                ".status-user-course",
             ];
 
             idsHidde.forEach((id) => {
                 templateCloned.querySelector(id).classList.add("hidden");
             });
+        }
+
+        const statusUserCourse = templateCloned.querySelector(
+            ".status-user-course"
+        );
+
+        if (learning_object.status_user) {
+            statusUserCourse.innerHTML =
+                learning_object.status_user == "INSCRIBED"
+                    ? "Inscrito"
+                    : "Matriculado";
+        } else {
+            statusUserCourse.classList.add("hidden");
         }
 
         templateCloned.querySelector(

@@ -423,9 +423,8 @@ class HomeController extends BaseController
         $user = Auth::user();
         $courses_students = $user->courses_students()->with('status')
             ->whereHas('status', function ($query) {
-                $query->where('code', 'DEVELOPMENT');
+                $query->whereIn('code', ['INSCRIPTION', 'ENROLLING', 'DEVELOPMENT']);
             })
-            ->wherePivot('status', 'INSCRIBED')
             ->paginate($items_per_page);
 
         $this->transformCollection($courses_students);
@@ -514,7 +513,9 @@ class HomeController extends BaseController
                 'realization_start_date' => $item->realization_start_date,
                 'realization_finish_date' => $item->realization_finish_date,
                 'image_path' => $item->image_path,
-                "status_code" => $item->status->code
+                "status_code" => $item->status->code,
+                "acceptance_status" => $item->pivot ? $item->pivot->acceptance_status : null,
+                "status_user" => $item->pivot ? $item->pivot->status : null
             ];
         });
 
