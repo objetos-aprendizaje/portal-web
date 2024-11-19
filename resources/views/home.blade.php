@@ -74,8 +74,7 @@
                 <div id="scroll-container" class="row-buttons-lanes overflow-x-auto scrollbar-hide">
                     <h2 data-lane="courses-actived" class="m-0 lane-tab row-button selected whitespace-nowrap ">Cursos
                         Activos</h2>
-                    <h2 data-lane="courses-inscribed" class="m-0 lane-tab row-button whitespace-nowrap">Cursos Inscritos
-                    </h2>
+                    <h2 data-lane="courses-inscribed" class="m-0 lane-tab row-button whitespace-nowrap">Cursos Inscritos / En Matriculación</h2>
 
                     @if (Auth::user()->hasAnyRole(['TEACHER']))
                         <h2 data-lane="courses-teacher" class="m-0 lane-tab row-button whitespace-nowrap">Cursos como
@@ -285,6 +284,8 @@
                     </a>
                 </div>
                 <p class="block-description block-description-small"></p>
+
+                <small class="status-user-course"></small>
 
                 <hr class="separator-dates border-t border-dashed">
 
