@@ -207,11 +207,14 @@
                     </div>
                 </div>
 
-                <div class="flex justify-center items-center">
-                    <a aria-label="enlace" class="no-effect-hover" href="/doubts/course/{{ $course->uid }}"><button
-                            type="button" class="btn btn-primary min-w-[304px]">¿Dudas?
-                            {{ e_heroicon('chat-bubble-bottom-center-text', 'outline') }}</button></a>
-                </div>
+                @if ($showDoubtsButton)
+                    <div class="flex justify-center items-center">
+                        <a aria-label="enlace" class="no-effect-hover" href="/doubts/course/{{ $course->uid }}"><button
+                                type="button" class="btn btn-primary min-w-[304px]">¿Dudas?
+                                {{ e_heroicon('chat-bubble-bottom-center-text', 'outline') }}</button></a>
+                    </div>
+                @endif
+
             </div>
         </div>
 

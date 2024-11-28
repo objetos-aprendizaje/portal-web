@@ -60,17 +60,16 @@ class EnrolledCoursesController extends BaseController
                 "realization_finish_date" => adaptDateTimezoneDisplay($courseStudent->realization_finish_date),
                 "status_code" => $courseStudent->status->code,
                 "payment_terms" => $courseStudent->paymentTerms ? $courseStudent->paymentTerms->map(function ($paymentTerm) {
+                    $userPayment = $paymentTerm->userPayment ? $paymentTerm->userPayment->toArray() : null;
                     return [
                         "uid" => $paymentTerm->uid,
                         "name" => $paymentTerm->name,
                         "start_date" => $paymentTerm->start_date,
                         "finish_date" => $paymentTerm->finish_date,
                         "cost" => $paymentTerm->cost,
-                        "user_payment" => $paymentTerm->userPayment ? $paymentTerm->userPayment->map(function ($userPayment) {
-                            return [
-                                "is_paid" => $userPayment->is_paid,
-                            ];
-                        }) : null
+                        "user_payment" => $userPayment ? [
+                            "is_paid" => $userPayment['is_paid'],
+                        ] : null
                     ];
                 }) : [],
             ];

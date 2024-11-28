@@ -49,9 +49,11 @@ class InscribedEducationalProgramsController extends BaseController
                 $query->whereIn('code', ['INSCRIPTION', 'ENROLLING']);
             });
 
-
         if ($search) {
-            $educationalProgramsStudentQuery->where('name', 'ilike', '%' . $search . '%')->orWhere('description', 'ilike', '%' . $search . '%');
+            $educationalProgramsStudentQuery->where(function ($query) use ($search) {
+                $query->where('name', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%');
+            });
         }
 
         $educationalProgramsStudents = $educationalProgramsStudentQuery->paginate($items_per_page);
@@ -86,7 +88,7 @@ class InscribedEducationalProgramsController extends BaseController
                         "document_name" => $educationalProgramDocument->document_name,
                     ];
 
-                    if($educationalProgramDocument->educationalProgramStudentDocument) {
+                    if ($educationalProgramDocument->educationalProgramStudentDocument) {
                         $educationalProgramDocumentsMapped['educational_program_student_document'] = [
                             "uid" => $educationalProgramDocument->educationalProgramStudentDocument->uid,
                             "document_path" => $educationalProgramDocument->educationalProgramStudentDocument->document_path

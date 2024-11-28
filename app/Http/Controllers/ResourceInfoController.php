@@ -17,12 +17,14 @@ class ResourceInfoController extends BaseController
     {
         $educational_resource = $this->getResourceDatabase($uid);
 
+        $showDoubtsButton = $educational_resource->contactEmails->count() ? true : false;
         if (!$educational_resource) abort(404);
 
         // Grabar acceso
-        if (Auth::check()) $this->storeResourceAccess($uid);
+        $this->storeResourceAccess($uid);
 
         return view("resource-info", [
+            'showDoubtsButton' => $showDoubtsButton,
             'educational_resource' => $educational_resource,
             "resources" => [
                 'resources/js/educational_resource_info.js'
@@ -42,7 +44,7 @@ class ResourceInfoController extends BaseController
 
     private function getResourceDatabase($resource_uid)
     {
-        $educational_resource = EducationalResourcesModel::with('status')->select('educational_resources.*', 'califications_avg.average_calification')->with('licenseType')->whereHas('status', function ($query) {
+        $educational_resource = EducationalResourcesModel::with('status', 'contactEmails', 'educationalResourceType.redirection_queries_educational_program_types')->select('educational_resources.*', 'califications_avg.average_calification')->with('licenseType')->whereHas('status', function ($query) {
             $query->where('code', 'PUBLISHED');
         })
             ->leftJoinSub(
@@ -95,7 +97,7 @@ class ResourceInfoController extends BaseController
     {
         $educationalResourceAccess = new EducationalResourceAccessModel();
         $educationalResourceAccess->uid = generate_uuid();
-        $educationalResourceAccess->user_uid = auth()->user()->uid;
+        if (auth()->user()) $educationalResourceAccess->user_uid = auth()->user()->uid;
         $educationalResourceAccess->educational_resource_uid = $resourceUid;
         $educationalResourceAccess->date = now();
         $educationalResourceAccess->save();

@@ -74,7 +74,8 @@
                 <div id="scroll-container" class="row-buttons-lanes overflow-x-auto scrollbar-hide">
                     <h2 data-lane="courses-actived" class="m-0 lane-tab row-button selected whitespace-nowrap ">Cursos
                         Activos</h2>
-                    <h2 data-lane="courses-inscribed" class="m-0 lane-tab row-button whitespace-nowrap">Cursos Inscritos / En Matriculación</h2>
+                    <h2 data-lane="courses-inscribed" class="m-0 lane-tab row-button whitespace-nowrap">Cursos Inscritos /
+                        En Matriculación</h2>
 
                     @if (Auth::user()->hasAnyRole(['TEACHER']))
                         <h2 data-lane="courses-teacher" class="m-0 lane-tab row-button whitespace-nowrap">Cursos como
@@ -94,8 +95,10 @@
                     <h2 data-lane="my-educational-resources" class="m-0 lane-tab row-button whitespace-nowrap">
                         Mis Recursos</h2>
 
-                    <h2 data-lane="recommended-itinerary" class="m-0 lane-tab row-button whitespace-nowrap">
-                        Itinerario recomendado</h2>
+                    @if ($general_options['lane_featured_itineraries'])
+                        <h2 data-lane="recommended-itinerary" class="m-0 lane-tab row-button whitespace-nowrap">
+                            Itinerario recomendado</h2>
+                    @endif
                 </div>
 
                 <div id="scroll-buttons-custom-lanes" class="flex gap-[13px]">

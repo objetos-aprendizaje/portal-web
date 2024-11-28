@@ -166,7 +166,7 @@ class RegisterController extends BaseController
         DB::transaction(function () use ($user) {
             // Inhabilitamos todos los tokens anteriores
             EmailVerifyModel::where('user_uid', $user->uid)->delete();
-            $this->sendEmail($user);
+            sendEmail($user);
         });
 
         return response()->json(['message' => 'Se ha reenviado el email']);

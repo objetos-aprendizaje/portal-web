@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CoursesAssessmentsModel;
 use App\Models\CoursesModel;
+use App\Models\CoursesVisitsModel;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -25,9 +26,19 @@ class CourseInfoController extends BaseController
             }
         }
 
+        // Grabar la visita
+        CoursesVisitsModel::insert([
+            'uid' => generate_uuid(),
+            'course_uid' => $course->uid,
+            'user_uid' => Auth::user() ? Auth::user()->uid : null,
+            'access_date' => now()
+        ]);
+
+        $showDoubtsButton = $course->contact_emails->count() || $course->educational_program_type->redirection_queries->count();
         return view("course-info", [
             'course' => $course,
             'learningResults' => $learningResults,
+            'showDoubtsButton' => $showDoubtsButton,
             "resources" => [
                 'resources/js/course_info.js'
             ],
@@ -51,7 +62,7 @@ class CourseInfoController extends BaseController
 
     private function getCourse($uid) {
         $course = CoursesModel::select('courses.*', 'califications_avg.average_calification')->where('uid', $uid)->with([
-            'blocks.learningResults', 'status', 'tags', 'teachers', 'course_type', 'paymentTerms'
+            'blocks.learningResults', 'status', 'tags', 'teachers', 'course_type', 'paymentTerms', 'contact_emails', 'educational_program_type.redirection_queries'
         ])
             ->leftJoinSub(
                 CoursesAssessmentsModel::select('course_uid', DB::raw('ROUND(AVG(calification), 1) as average_calification'))

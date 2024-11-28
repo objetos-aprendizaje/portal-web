@@ -8,8 +8,8 @@
                     <img alt="logotipo" src="{{ env('BACKEND_URL') . '/' . $general_options['poa_logo_1'] }}"
                         class="mr-3 w-[212px] h-[75px]" alt="Logo header">
                 @else
-                    <img alt="logotipo" src="/data/images/default_images/logo-default.png" class="mr-3 w-[100px] h-[100px]"
-                        alt="Logo header">
+                    <img alt="logotipo" src="/data/images/default_images/logo-default.png"
+                        class="mr-3 w-[100px] h-[100px]" alt="Logo header">
                 @endif
             </a>
         </div>
@@ -36,6 +36,11 @@
                     </li>
                 @endforeach
 
+                <li>
+                    <a aria-label="enlace" href="/suggestions" class="text-color_3">
+                        Envío de sugerencias
+                    </a>
+                </li>
             </ul>
         </div>
 
@@ -54,7 +59,7 @@
                 <button title="Buscar" type="button"
                     class="bg-color_1 absolute w-[32px] h-[32px] flex items-center justify-center rounded-[8px] ">
                     {{ e_heroicon('magnifying-glass', 'outline', 'white', 20, 20, null, '3') }}
-                <!--<div tabindex="0"
+                    <!--<div tabindex="0"
                     class="bg-color_1 p-2 cursor-pointer mx-1 rounded-[10px] input-search transition duration-300 hover:bg-color_2">
                     {{ e_heroicon('magnifying-glass', 'outline', 'white') }}
                 </div>-->
@@ -63,7 +68,7 @@
     </div>
 
     <div class="container mx-auto mt-[51px] mb-[30px] flex justify-center">
-        <img alt="logotipo" class="max-w-[600px] w-full" src="images/logo-financed-ue.png"/>
+        <img alt="logotipo" class="max-w-[600px] w-full" src="images/logo-financed-ue.png" />
     </div>
 
     <hr>
@@ -84,8 +89,8 @@
 
                 @if ($general_options['facebook_url'])
                     <div>
-                        <a aria-label="enlace" href="{{ $general_options['facebook_url'] }}" rel="noreferrer" target="_blank"
-                            class="text-gray-700 transition hover:opacity-75">
+                        <a aria-label="enlace" href="{{ $general_options['facebook_url'] }}" rel="noreferrer"
+                            target="_blank" class="text-gray-700 transition hover:opacity-75">
                             <span class="sr-only">Facebook</span>
 
                             <svg class="h-6 w-6 fill-color_1" fill="currentColor" viewBox="0 0 24 24"
@@ -100,8 +105,8 @@
 
                 @if ($general_options['instagram_url'])
                     <div>
-                        <a aria-label="enlace" href="{{ $general_options['instagram_url'] }}" rel="noreferrer" target="_blank"
-                            class="text-gray-700 transition hover:opacity-75">
+                        <a aria-label="enlace" href="{{ $general_options['instagram_url'] }}" rel="noreferrer"
+                            target="_blank" class="text-gray-700 transition hover:opacity-75">
                             <span class="sr-only">Instagram</span>
 
                             <svg class="h-6 w-6 fill-color_1" fill="currentColor" viewBox="0 0 24 24"
@@ -142,8 +147,8 @@
 
                 @if ($general_options['youtube_url'])
                     <div>
-                        <a aria-label="enlace" href="{{ $general_options['youtube_url'] }}" rel="noreferrer" target="_blank"
-                            class="text-gray-700 transition hover:opacity-75">
+                        <a aria-label="enlace" href="{{ $general_options['youtube_url'] }}" rel="noreferrer"
+                            target="_blank" class="text-gray-700 transition hover:opacity-75">
                             <span class="sr-only">YouTube</span>
 
                             <svg class="h-6 w-6 fill-color_1" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
@@ -158,8 +163,8 @@
 
                 @if ($general_options['linkedin_url'])
                     <div>
-                        <a aria-label="enlace" href="{{ $general_options['linkedin_url'] }}" rel="noreferrer" target="_blank"
-                            class="text-gray-700 transition hover:opacity-75">
+                        <a aria-label="enlace" href="{{ $general_options['linkedin_url'] }}" rel="noreferrer"
+                            target="_blank" class="text-gray-700 transition hover:opacity-75">
                             <span class="sr-only">Linkedin</span>
 
                             <svg class="h-6 w-6 fill-color_1" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
