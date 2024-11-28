@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\GeneralNotificationsAutomaticModel;
+use App\Models\GeneralNotificationsAutomaticUsersModel;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Routing\Controller as BaseController;
@@ -77,8 +78,9 @@ class GeneralNotificationsController extends BaseController
 
         // Marcamos como vista la notificación al usuario
         if ($generalNotificationAutomatic) {
-            $generalNotificationAutomatic->users[0]->pivot->is_read = 1;
-            $generalNotificationAutomatic->users[0]->pivot->save();
+            GeneralNotificationsAutomaticUsersModel::where('general_notifications_automatic_uid', $generalNotificationAutomatic->uid)
+                ->where('user_uid', $user_uid)
+                ->update(['is_read' => true]);
         }
 
         $generalNotificationAutomatic = [

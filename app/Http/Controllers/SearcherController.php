@@ -6,6 +6,7 @@ use App\Exceptions\OperationFailedException;
 use App\Models\CategoriesModel;
 use App\Models\CoursesAssessmentsModel;
 use App\Models\CoursesModel;
+use App\Models\EducationalProgramsAssessmentsModel;
 use App\Models\EducationalProgramsModel;
 use App\Models\EducationalResourcesAssessmentsModel;
 use App\Models\EducationalResourcesModel;
@@ -79,10 +80,14 @@ class SearcherController extends Controller
 
         $orderBy = $request->get("orderBy");
 
+        // Envolver la consulta UNION en una subconsulta
+        $learning_objects_query = DB::table(DB::raw("({$learning_objects_query->toSql()}) as temp_table"))
+            ->mergeBindings($learning_objects_query->getQuery());
+
         if ($orderBy == "closer") {
-            $learning_objects_query->orderByRaw('ISNULL(inscription_start_date), inscription_start_date ASC');
+            $learning_objects_query->orderByRaw('ISNULL(temp_table.inscription_start_date), temp_table.inscription_start_date ASC');
         } else if ($orderBy == "puntuation") {
-            $learning_objects_query->orderBy('average_calification', 'desc');
+            $learning_objects_query->orderByRaw('temp_table.average_calification IS NULL, temp_table.average_calification DESC');
         }
 
         $learning_objects = $learning_objects_query->orderBy('inscription_start_date')->paginate($itemsPerPage);
@@ -100,13 +105,15 @@ class SearcherController extends Controller
                 "realization_start_date" => adaptDateTimezoneDisplay($learningObject->realization_start_date),
                 "realization_finish_date" => adaptDateTimezoneDisplay($learningObject->realization_finish_date),
                 "status_code" => $learningObject->status_code,
+                "average_calification" => $learningObject->average_calification,
             ];
         });
 
         return response()->json($learning_objects);
     }
 
-    public function searchLearningResults($query) {
+    public function searchLearningResults($query)
+    {
         $learningResults = LearningResultsModel::where('name', 'ilike', '%' . $query . '%')->select("uid", "name")->get();
 
         return response()->json($learningResults);
@@ -125,11 +132,11 @@ class SearcherController extends Controller
             'educational_programs.uid',
             'educational_programs.name as title',
             'educational_programs.description',
-            DB::raw("null as average_calification"),
+            'califications_avg.average_calification',
             'inscription_start_date',
             'inscription_finish_date',
-            DB::raw("null as realization_start_date"),
-            DB::raw("null as realization_finish_date"),
+            'realization_start_date',
+            'realization_finish_date',
             "educational_program_statuses.code as status_code",
             DB::raw("'educational_program' as learning_object_type"),
             'image_path',
@@ -140,6 +147,14 @@ class SearcherController extends Controller
                     $query->select(DB::raw("SUM(ects_workload)"));
                 }
             ])
+            ->leftJoinSub(
+                EducationalProgramsAssessmentsModel::select('educational_program_uid', DB::raw('ROUND(AVG(calification)) as average_calification'))
+                    ->groupBy('educational_program_uid'),
+                'califications_avg',
+                'califications_avg.educational_program_uid',
+                '=',
+                'educational_programs.uid'
+            )
             ->with('courses', 'courses.average_calification', 'courses.blocks.learningResults');
 
         if (isset($filters['learningObjectStatus'])) {
@@ -158,7 +173,8 @@ class SearcherController extends Controller
             $competences = $filters['competences'];
 
             $educational_programs_query->with([
-                'courses.blocks', 'courses.blocks.competences'
+                'courses.blocks',
+                'courses.blocks.competences'
             ])->whereHas('courses.blocks.competences', function ($query) use ($competences) {
                 $query->whereIn('competences.uid', $competences);
             });
@@ -168,12 +184,15 @@ class SearcherController extends Controller
             $educational_programs_query->whereBetween('inscription_start_date', [$filters['inscription_start_date'], $filters['inscription_finish_date']]);
         }
 
+        if (isset($filters['realization_start_date']) && isset($filters['realization_finish_date'])) {
+            $educational_programs_query->whereBetween('realization_start_date', [$filters['realization_start_date'], $filters['realization_finish_date']]);
+        }
 
         if (isset($filters['search'])) {
             $educational_programs_query->where('educational_programs.name', 'ilike', '%' . $filters['search'] . '%')->orWhere('description', 'ilike', '%' . $filters['search'] . '%');
         }
 
-        if(isset($filters["learningResults"])) {
+        if (isset($filters["learningResults"])) {
             $learningResults = $filters["learningResults"];
             $educational_programs_query->whereHas('courses.blocks.learningResults', function ($query) use ($learningResults) {
                 $query->whereIn('learning_results.uid', $learningResults);
@@ -314,7 +333,7 @@ class SearcherController extends Controller
             });
         }
 
-        if(isset($filters["learningResults"])) {
+        if (isset($filters["learningResults"])) {
             $learningResults = $filters["learningResults"];
             $courses_query->whereHas('blocks.learningResults', function ($query) use ($learningResults) {
                 $query->whereIn('learning_results.uid', $learningResults);

@@ -23,10 +23,13 @@ class EducationalProgramInfoController extends BaseController
         // Hacemos un array único con los profesores de cada curso
         $teachers = $this->getTeachersUnique($educational_program);
 
+        $showDoubtsButton = $educational_program->contact_emails->count() || $educational_program->educational_program_type->redirection_queries->count();
+
         return view("educational-program-info", [
             "resources" => [
                 'resources/js/educational_program_info.js'
             ],
+            'showDoubtsButton' => $showDoubtsButton,
             "educational_program" => $educational_program,
             "teachers" => $teachers,
             'page_title' => $educational_program->name,
@@ -116,7 +119,9 @@ class EducationalProgramInfoController extends BaseController
                         );
                 },
                 'courses.teachers',
-                'educational_program_type'
+                'educational_program_type',
+                'contact_emails',
+                'educational_program_type.redirection_queries'
             ])
             ->addSelect(DB::raw('(SELECT SUM(CAST(ects_workload AS numeric)) FROM courses WHERE courses.educational_program_uid = educational_programs.uid) as total_ects_workload'))
             ->addSelect(['total_cost' => CoursesModel::select(DB::raw('SUM(cost)'))
