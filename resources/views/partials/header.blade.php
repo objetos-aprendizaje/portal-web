@@ -118,8 +118,9 @@
     <div class="w-[282px] p-[24px] z-50 fixed right-[6px] origin-top-left divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
         role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
         <div class="py-1 flex flex-col gap-[24px]" role="none">
-            <a aria-label="enlace" href="/profile/update_account" class="hover:bg-color_hover_2 block p-[10px] text-sm no-effect-hover"
-                role="menuitem" tabindex="-1" id="menu-item-0">Perfil</a>
+            <a aria-label="enlace" href="/profile/update_account"
+                class="hover:bg-color_hover_2 block p-[10px] text-sm no-effect-hover" role="menuitem" tabindex="-1"
+                id="menu-item-0">Perfil</a>
 
             @if (Auth::check() && Auth::user()->hasAnyRole(['ADMINISTRATOR', 'MANAGEMENT', 'TEACHER']))
                 <a aria-label="enlace" href="{{ env('BACKEND_URL') }}"
@@ -171,7 +172,7 @@
     </div>
 
     <div class="p-2 cursor-pointer mx-1 transition input-search-mobile ">
-        <a aria-label="enlace"  href="/searcher">{{ e_heroicon('magnifying-glass', 'outline', 'grey') }}</a>
+        <a aria-label="enlace" href="/searcher">{{ e_heroicon('magnifying-glass', 'outline', 'grey') }}</a>
     </div>
 </header>
 
@@ -352,6 +353,26 @@
                 </li>
             @endif
         @endif
+
+        <hr class="my-[24px]">
+
+        @if (Auth::user())
+            <a aria-label="enlace" href="http://localhost:8086/logout"
+                class="hover:bg-color_hover_2 text-sm flex gap-[8px] items-center no-effect-hover" role="menuitem"
+                tabindex="-1" id="menu-item-3">
+                <span class="rounded-full  bg-gray-100 close-sesion p-[10px]">
+                    {{ e_heroicon('lock-closed', 'outline', '#2B4C7E', 20, 20) }}
+                </span>
+                Cerrar sesión</a>
+        @else
+            <a aria-label="enlace" href="/login"
+                class="w-full mb-[12px] m-auto border border-color_1 justify-center rounded-[6px] bg-white text-color_1 px-[10px] py-[10px] text-center hover:bg-color_1 hover:text-white transition duration-300">Iniciar
+                sesión</a>
+
+            <a aria-label="enlace" href="/register"
+                class=" w-full m-auto border rounded-[6px] bg-color_1 text-center justify-center text-white px-[10px] py-[10px] button-register hover:bg-color_2">Registrarme</a>
+        @endif
+
     </ul>
 
 </header>
