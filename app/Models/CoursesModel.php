@@ -149,4 +149,13 @@ class CoursesModel extends Model
     public function embeddings() {
         return $this->hasOne(CoursesEmbeddingsModel::class, 'course_uid', 'uid');
     }
+
+    public function center()
+    {
+        return $this->belongsTo(
+            CentersModel::class,
+            'center_uid',
+            'uid'
+        );
+    }
 }

@@ -19,17 +19,18 @@ class EducationalProgramsAssessmentsModelFactory extends Factory
     public function definition(): array
     {
         return [
-            'uid'=>  generate_uuid(),     
-            'calification'=> 6
+            'uid' =>  generate_uuid(),
+            // 'calification'=> 6
+            'calification' => $this->faker->randomNumber(2)
         ];
     }
 
     public function withEducationalProgram(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'course_status_uid' => EducationalProgramsModel::factory()
-            ->withEducationalProgramType()
-            ->create()->first(),
+                ->withEducationalProgramType()
+                ->create()->first(),
         ]);
     }
 
@@ -37,7 +38,7 @@ class EducationalProgramsAssessmentsModelFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'user_uid'          => UsersModel::factory()->create()->first(),
+                'user_uid' => UsersModel::factory()->create()->first(),
             ];
         });
     }

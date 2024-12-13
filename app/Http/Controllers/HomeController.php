@@ -411,7 +411,10 @@ class HomeController extends BaseController
             $query->whereHas('status', function ($query) {
                 $query->whereIn('code', ['INSCRIPTION', 'ACCEPTED_PUBLICATION']);
             });
-        }])->get();
+        }])
+        ->orderBy('courses_count', 'desc')
+        ->limit(9)
+        ->get();
 
         return $categories;
     }

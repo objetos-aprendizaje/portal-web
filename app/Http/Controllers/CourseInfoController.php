@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CoursesAssessmentsModel;
 use App\Models\CoursesModel;
+use App\Models\CoursesStudentsModel;
 use App\Models\CoursesVisitsModel;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,12 @@ class CourseInfoController extends BaseController
     public function index($uid)
     {
         $course = $this->getCourse($uid);
+
+        if(Auth::check()) {
+            $studentCourseInfo = CoursesStudentsModel::where('course_uid', $course->uid)->where('user_uid', Auth::user()->uid)->first();
+        } else {
+            $studentCourseInfo = null;
+        }
 
         adaptDatesCourseEducationalProgram($course);
 
@@ -37,6 +44,7 @@ class CourseInfoController extends BaseController
         $showDoubtsButton = $course->contact_emails->count() || $course->educational_program_type->redirection_queries->count();
         return view("course-info", [
             'course' => $course,
+            'studentCourseInfo' => $studentCourseInfo,
             'learningResults' => $learningResults,
             'showDoubtsButton' => $showDoubtsButton,
             "resources" => [
@@ -72,6 +80,7 @@ class CourseInfoController extends BaseController
                 '=',
                 'courses.uid'
             )
+            ->with(["categories", "center", "status"])
             ->first();
 
         if (!$course) abort(404);

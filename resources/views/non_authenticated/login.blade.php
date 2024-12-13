@@ -1,6 +1,6 @@
 @extends('non_authenticated.app')
 @section('content')
-    <section class="md:flex hidden">
+    <section class="md:flex hidden gap-2">
 
         <div class="w-1/2">
             <img alt="login" id="image-background" src="{{ asset('data/images/background_login.png') }}"
@@ -8,7 +8,7 @@
         </div>
 
         <div class="w-1/2 justify-center flex items-center">
-            <div class="w-[530px] mb-[25px]">
+            <div class="max-w-[530px] w-full mb-[25px]">
                 <div class="rounded-[20px] border py-[20px] px-[40px]">
                     @if (app('general_options')['poa_logo_1'])
                         <img alt="login" class="mx-auto block max-w-[211px] max-h-[80px] mb-[15px]"
@@ -194,13 +194,22 @@
                                 </a>
                             @endif
 
-                        </div>
+                            @if (env('URL_LOGIN_CERT'))
+                                <a aria-label="enlace" class="no-effect-hover"
+                                    href='{{ env('URL_LOGIN_CERT') }}?origin="portal_web"'>
+                                    <button title="certificate login" type="button"
+                                        class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
+                                        <img alt="login" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/certificate_icon.svg" />
+                                    </button>
+                                </a>
+                            @endif
 
+                        </div>
                     </form>
 
                     @if ($cert_login != '')
-                        <div class="text-center p-4"><a aria-label="enlace"
-                                href="/certificate-access">Acceso mediante
+                        <div class="text-center p-4"><a aria-label="enlace" href="/certificate-access">Acceso mediante
                                 Certificado Digital</a></div>
                     @endif
 
@@ -381,6 +390,14 @@
                 </a>
             @endif
 
+            @if (env('URL_LOGIN_CERT'))
+                <a aria-label="enlace" class="no-effect-hover" href='{{ env('URL_LOGIN_CERT') }}?origin="portal_web"'>
+                    <button title="certificado login" type="button"
+                        class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
+                        <img alt="login" class="w-[32px] h-[32px]" src="data/images/login_icons/certificate_icon.svg" />
+                    </button>
+                </a>
+            @endif
         </div>
 
     </section>

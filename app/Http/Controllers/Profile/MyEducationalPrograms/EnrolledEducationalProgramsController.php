@@ -44,7 +44,10 @@ class EnrolledEducationalProgramsController extends BaseController
             });
 
         if ($search) {
-            $educationalProgramsStudentQuery->where('name', 'ilike', '%' . $search . '%')->orWhere('description', 'ilike', '%' . $search . '%');
+            $educationalProgramsStudentQuery->where(function ($query) use ($search) {
+                $query->where('name', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%');
+            });
         }
 
         $educationalProgramsStudent = $educationalProgramsStudentQuery->paginate($items_per_page);

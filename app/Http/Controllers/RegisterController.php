@@ -20,6 +20,10 @@ class RegisterController extends BaseController
 {
     public function index()
     {
+        // Comprobación si el registro está activo
+        $registrationActive = app('general_options')['registration_active'];
+        if (!$registrationActive) return redirect('/login');
+
         $logo_bd = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
 
         if ($logo_bd != null) $logo = $logo_bd['option_value'];

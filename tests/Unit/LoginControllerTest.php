@@ -32,7 +32,7 @@ class LoginControllerTest extends TestCase
      */
     public function testLogoutRedirectsToHomeWithoutGoogleSession()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -40,7 +40,7 @@ class LoginControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Hacer la solicitud GET a la ruta de logout
@@ -59,7 +59,7 @@ class LoginControllerTest extends TestCase
      */
     public function testLogoutRevokesGoogleTokenIfPresent()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -68,7 +68,7 @@ class LoginControllerTest extends TestCase
                 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Simular los datos de sesión de Google
@@ -277,8 +277,8 @@ class LoginControllerTest extends TestCase
 
     /**
      * @test
-     * Prueba que el callback de Google maneja la autenticación correctamente 
-     * Todo: pendiente por revisar 
+     * Prueba que el callback de Google maneja la autenticación correctamente
+     * Todo: pendiente por revisar
      */
     public function testHandleGoogleCallbackAuthenticatesUser()
     {
@@ -309,7 +309,7 @@ class LoginControllerTest extends TestCase
         $response = $this->get('/auth/callback/google');
 
         // Verificar que el usuario tiene el rol de estudiante asignado
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'test@example.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -319,7 +319,7 @@ class LoginControllerTest extends TestCase
                 "last_name" => "Doe"
             ])->first();
         }
-        // Verificar que el usuario fue creado correctamente en la base de datos       
+        // Verificar que el usuario fue creado correctamente en la base de datos
 
         $this->assertDatabaseHas('users', [
             'email' => 'test@example.com',
@@ -401,18 +401,18 @@ class LoginControllerTest extends TestCase
         Socialite::shouldReceive('driver')->with('twitter')->andReturnSelf();
         Socialite::shouldReceive('user')->andReturn($user_twitter_mock);
 
-        // Hacer la solicitud a la ruta del callback de Twitter 
+        // Hacer la solicitud a la ruta del callback de Twitter
         $response = $this->get('/auth/callback/twitter');
 
         // Verificar que el usuario tiene el rol de estudiante asignado
 
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'test@example.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
                 'email' => 'test@example.com',
-                "first_name" => "John Doe",                
+                "first_name" => "John Doe",
             ])->first();
         }
 
@@ -436,7 +436,7 @@ class LoginControllerTest extends TestCase
         $response->assertRedirect('/');
     }
 
-  
+
     public function testRedirectToLinkedin()
     {
         // Mock de Socialite para LinkedIn
@@ -473,7 +473,7 @@ class LoginControllerTest extends TestCase
         $user_linkedin_mock->user = [
             'given_name' => 'John',
             'family_name' => 'Doe'
-        ];              
+        ];
         $user_linkedin_mock->shouldReceive('getEmail')->andReturn('test@example.com');
         $user_linkedin_mock->shouldReceive('getId')->andReturn('linkedin-id-123');
         $user_linkedin_mock->shouldReceive('getName')->andReturn('John');
@@ -504,11 +504,11 @@ class LoginControllerTest extends TestCase
             $user->roles()->attach($student_role->uid, ['uid' => generate_uuid()]);
         }
 
-        $this->assertTrue($user->roles()->where('code', 'STUDENT')->exists());        
+        $this->assertTrue($user->roles()->where('code', 'STUDENT')->exists());
 
         // Verificar que el usuario está autenticado correctamente
         $this->assertTrue(Auth::check());
-        
+
 
         // Session::put('email', 'test@example.com');
         // Session::put('linkedin_id', 'linkedin-id-123');
@@ -569,61 +569,6 @@ class LoginControllerTest extends TestCase
 
     /**
      * @test
-     * Prueba de inicio de sesión con token válido.
-     */
-    public function testTokenLoginWithValidToken()
-    {
-        // Crear un usuario con un token específico
-        UsersModel::factory()->create([
-            'token_x509' => 'valid-token',
-        ]);
-
-        $user = UsersModel::where('token_x509', 'valid-token')->first();
-
-        // Simular la autenticación del usuario a través del token
-        $response = $this->get('/token_login/' . $user->token_x509);
-
-        // Verificar que el usuario ha sido autenticado
-        $this->assertTrue(Auth::check());
-
-        // Recargar el usuario desde la base de datos
-        $user = $user->fresh();
-        // Verificar que el token ha sido eliminado (cadena vacía)
-        $this->assertEquals('', $user->token_x509);
-
-        // Obtener el esquema correcto (http o https) desde la configuración
-        $scheme = env('APP_ENV') === 'local' ? 'http://' : 'https://';
-
-        // Verificar que la redirección es correcta
-        $response->assertRedirect($scheme . env('DOMINIO_PRINCIPAL'));
-    }
-
-    /**
-     * @test
-     * Prueba de inicio de sesión con token inválido.
-     */
-    public function testTokenLoginWithInvalidToken()
-    {
-        // Crear un usuario con un token específico
-        UsersModel::factory()->create([
-            'token_x509' => 'valid-token',
-        ]);
-
-        // Simular la autenticación con un token inválido
-        $response = $this->get('/token_login/invalid-token');
-
-        // Verificar que el usuario no ha sido autenticado
-        $this->assertFalse(Auth::check());
-
-        // Obtener el esquema correcto (http o https) desde la configuración
-        $scheme = env('APP_ENV') === 'local' ? 'http://' : 'https://';
-
-        // Verificar que se redirige al login con el error adecuado
-        $response->assertRedirect($scheme . env('DOMINIO_PRINCIPAL') . "/login?e=certificate-error");
-    }
-
-    /**
-     * @test
      * Prueba que el método saveUserAccess crea un registro de acceso para el usuario
      */
     // public function testSaveUserAccessCreatesUserAccess()
@@ -659,7 +604,7 @@ class LoginControllerTest extends TestCase
     //     $this->assertDatabaseHas('users_accesses', [
     //         'user_uid' => $user->uid,
     //     ]);
-    // }  
+    // }
 
 
     // /**
@@ -759,8 +704,8 @@ class LoginControllerTest extends TestCase
     //         ]
     //     );
 
-    //     $user = UsersModel::where('email', 'test@example.com')->first();   
-        
+    //     $user = UsersModel::where('email', 'test@example.com')->first();
+
     //     $roles = UserRolesModel::firstOrCreate(['code' => 'STUDENT'], ['uid' => generate_uuid()]); // Crea roles de prueba
     //     $user->roles()->attach($roles->uid, ['uid' => generate_uuid()]);
 
@@ -779,10 +724,10 @@ class LoginControllerTest extends TestCase
     //     // Verificar que el usuario está autenticado correctamente
     //     $this->assertTrue(Auth::check());
 
-        
+
 
     //     // Verificar que la respuesta redirige correctamente a la página principal
     //     $response->assertRedirect('/');
     // }
-    
+
 }

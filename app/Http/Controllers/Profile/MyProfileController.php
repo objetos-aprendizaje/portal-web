@@ -34,7 +34,11 @@ class MyProfileController extends BaseController
     {
         $user = Auth::user();
 
-        $user->fill($request->all());
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->nif = $request->nif;
+        $user->department_uid = $request->department_uid != "" ? $request->department_uid : null;
+        $user->curriculum = $request->curriculum;
 
         // Guardar la imagen en el backend
         if ($request->file('photo_path')) {
@@ -50,6 +54,14 @@ class MyProfileController extends BaseController
         $user->save();
 
         return response()->json(['message' => 'Tu perfil se ha actualizado correctamente'], 200);
+    }
+
+    public function deleteImage() {
+        $user = Auth::user();
+        $user->photo_path = null;
+        $user->save();
+
+        return response()->json(['message' => 'Imagen eliminada correctamente'], 200);
     }
 
     // Enviar la imagen al webhook del backend y nos devuelve la ruta asignada

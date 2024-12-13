@@ -1,6 +1,6 @@
 @if (!empty($general_notifications))
 
-    @foreach ($general_notifications as $notification)
+    @foreach ($general_notifications as $index => $notification)
         <div class="notification cursor-pointer" data-notification_uid="{{ $notification['uid'] }}"
             data-notification_type="{{ $notification['type'] }}">
             <div class="select-none py-[18px] flex gap-2">
@@ -12,7 +12,7 @@
                         </svg>
                     </div>
                 @endif
-                <div class=" w-full cursor-pointer {{ $notification['is_read'] ? 'ml-2' : '' }}">
+                <div class=" w-full cursor-pointer">
                     <div class=" flex justify-between items-center gap-2 mb-[4px]">
                         <div class="font-bold flex-shrink truncate">
                             {{ $notification['title'] }}
@@ -22,12 +22,15 @@
                         </p>
                     </div>
                     <p class="truncate">
-                        {{ strip_tags($notification['description'])}}
+                        {{ strip_tags($notification['description']) }}
                     </p>
                 </div>
             </div>
         </div>
-        <hr class="border-gray-300" />
+
+        @if ($index < count($general_notifications) - 1)
+            <hr class="border-gray-300" />
+        @endif
     @endforeach
 @else
     <div class=" text-center mt-[28px]">

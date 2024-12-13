@@ -82,4 +82,23 @@ class EducationalProgramsModel extends Model
             'uid'
         )->orderBy('start_date', 'asc');
     }
+
+    public function categories()
+    {
+        return $this->belongsToMany(
+            CategoriesModel::class,
+            'course_categories',
+            'course_uid',
+            'category_uid'
+        );
+    }
+
+    public function center()
+    {
+        return $this->belongsTo(
+            CentersModel::class,
+            'center_uid',
+            'uid'
+        );
+    }
 }

@@ -52,7 +52,10 @@ class InscribedCoursesController extends BaseController
             });
 
         if ($search) {
-            $coursesStudentsQuery->where('title', 'ilike', '%' . $search . '%')->orWhere('description', 'ilike', '%' . $search . '%');
+            $coursesStudentsQuery->where(function ($query) use ($search) {
+                $query->where('title', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%');
+            });
         }
 
         $coursesStudents = $coursesStudentsQuery->paginate($items_per_page);

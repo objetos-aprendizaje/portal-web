@@ -8,8 +8,11 @@ use App\Models\UsersModel;
 use App\Models\EmailVerifyModel;
 use App\Models\Saml2TenantsModel;
 use App\Models\GeneralOptionsModel;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
+use App\Http\Controllers\RegisterController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class RegisterControllerTest extends TestCase
@@ -18,14 +21,33 @@ class RegisterControllerTest extends TestCase
     use RefreshDatabase;
 
 
-
-
     /**
      * @test
-     * Prueba que la vista de registro se carga con los datos correctos
+     * Este test verifica que el método index retorna la vista correcta con los parámetros esperados.
      */
-    public function testIndexLoadsRegisterPageWithCorrectData()
+    public function testIndexReturnsRegisterViewWithExpectedParameters()
     {
+
+        $general = GeneralOptionsModel::where('option_name', 'registration_active')->first();
+        $general->option_value = true;
+        $general->save();
+
+        $generalOptionsMock = [
+            'registration_active' => true,
+            'cas_active' => true,
+            'rediris_active' => true,
+        ];
+        App::instance('general_options', $generalOptionsMock);
+
+        $generalCas = GeneralOptionsModel::where('option_name', 'cas_active')->first();
+        $generalCas->option_value = true;
+        $generalCas->save();
+
+        $generalRediris = GeneralOptionsModel::where('option_name', 'rediris_active')->first();
+        $generalRediris->option_value = true;
+        $generalRediris->save();
+
+
         // Simular la configuración de parámetros de sistemas de login
         $parameters_login_systems = [
             'google_login_active' => true,
@@ -37,44 +59,50 @@ class RegisterControllerTest extends TestCase
         ];
         Cache::shouldReceive('get')->with('parameters_login_systems')->andReturn($parameters_login_systems);
 
-        // Simular la recuperación de la configuración de CAS y Rediris
-        $casUrl = 'https://example.com/cas-login';
-        $redirisUrl = 'https://example.com/rediris-login';
+        // Simular la obtención del logotipo desde la base de datos       
+        $general_2 = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
+        $general_2->option_value = 'https://example.com/logo.png';
+        $general_2->save();
 
-        $this->mock(Saml2TenantsModel::class, function ($mock) use ($casUrl, $redirisUrl) {
-            $mock->shouldReceive('where->first->uuid')->andReturn('cas-uuid');
-            $mock->shouldReceive('where->first->uuid')->andReturn('rediris-uuid');
-        });
 
-        // Simular la obtención del logotipo desde la base de datos
-        GeneralOptionsModel::factory()->create([
-            'option_name' => 'poa_logo_1',
-            'option_value' => 'https://example.com/logo.png',
+        Saml2TenantsModel::factory()->create([
+            'key' => 'cas',
+            'uuid' => generate_uuid(),
         ]);
 
-        // Hacer la solicitud GET a la ruta de registro
+        Saml2TenantsModel::factory()->create([
+            'key' => 'rediris',
+            'uuid' => generate_uuid(),
+        ]);
+
+        // Simulación de caché
+        Cache::shouldReceive('get')
+            ->with('parameters_login_systems')
+            ->andReturn(['param1' => 'value1']);
+
+        // Configuración de entorno
+        config(['DOMINIO_CERTIFICADO' => 'https://example.com']);
+
+        // Llamada al endpoint
         $response = $this->get(route('register'));
 
-        // Verificar que la respuesta es exitosa
+        // Verificaciones
         $response->assertStatus(200);
-
-        // Verificar que se carga la vista correcta
         $response->assertViewIs('non_authenticated.register');
 
-        // Verificar que los datos pasados a la vista son correctos
-        $response->assertViewHas('page_name', 'Regístrate');
-        $response->assertViewHas('page_title', 'Regístrate');
-        // $response->assertViewHas('logo', 'https://example.com/logo.png');
-        $response->assertViewHas('resources', [
-            'resources/js/register.js',
+        $response->assertViewHasAll([
+            'page_name' => 'Regístrate',
+            'page_title' => 'Regístrate',
+            'logo' => 'https://example.com/logo.png',
+            'resources' => ['resources/js/register.js'],
+            'cert_login' => 'https://example.com',
+            'urlCas' => url('saml2/' . Saml2TenantsModel::where('key', 'cas')->first()->uuid . '/login'),
+            'urlRediris' => url('saml2/' . Saml2TenantsModel::where('key', 'rediris')->first()->uuid . '/login'),
+            'parameters_login_systems' => $parameters_login_systems,
         ]);
-        $response->assertViewHas('cert_login', env('DOMINIO_CERTIFICADO'));
-        // $response->assertViewHas('urlCas', $casUrl);
-        // $response->assertViewHas('urlRediris', $redirisUrl);
-        $response->assertViewHas('parameters_login_systems', $parameters_login_systems);
 
         // Caso 2: Logotipo no existente en la base de datos
-        GeneralOptionsModel::where('option_name','poa_logo_1' )->delete(); // Elimina el logotipo para simular que no existe
+        GeneralOptionsModel::where('option_name', 'poa_logo_1')->delete(); // Elimina el logotipo para simular que no existe
 
         GeneralOptionsModel::factory()->create([
             'option_name' => 'poa_logo_2',
@@ -82,9 +110,82 @@ class RegisterControllerTest extends TestCase
         ]);
 
         $response = $this->get(route('register'));
-
-        
     }
+
+    /**
+     * @test
+     * Este test verifica que el método index retorna la vista correcta con los parámetros esperados.
+     */
+    public function testIndexReturnsRegisterGetCasUrlAndGetRedirisUrlFalse()
+    {
+
+        $general = GeneralOptionsModel::where('option_name', 'registration_active')->first();
+        $general->option_value = true;
+        $general->save();
+
+        $generalOptionsMock = [
+            'registration_active' => true,
+            'cas_active' => true,
+            'rediris_active' => true,
+        ];
+        App::instance('general_options', $generalOptionsMock);      
+
+
+        // Simular la configuración de parámetros de sistemas de login
+        $parameters_login_systems = [
+            'google_login_active' => true,
+            'facebook_login_active' => true,
+            'twitter_login_active' => true,
+            'linkedin_login_active' => true,
+            'cas_active' => false, // Añadir esta clave
+            'rediris_active' => false, // Añadir esta clave
+        ];
+        Cache::shouldReceive('get')->with('parameters_login_systems')->andReturn($parameters_login_systems);
+
+        // Simular la obtención del logotipo desde la base de datos       
+        $general_2 = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
+        $general_2->option_value = 'https://example.com/logo.png';
+        $general_2->save();
+
+
+        Saml2TenantsModel::factory()->create([
+            'key' => 'cas',
+            'uuid' => generate_uuid(),
+        ]);
+
+        Saml2TenantsModel::factory()->create([
+            'key' => 'rediris',
+            'uuid' => generate_uuid(),
+        ]);
+
+        // Simulación de caché
+        Cache::shouldReceive('get')
+            ->with('parameters_login_systems')
+            ->andReturn(['param1' => 'value1']);
+
+        // Configuración de entorno
+        config(['DOMINIO_CERTIFICADO' => 'https://example.com']);
+
+        // Llamada al endpoint
+        $response = $this->get(route('register'));
+
+        // Verificaciones
+        $response->assertStatus(200);
+        $response->assertViewIs('non_authenticated.register');
+
+        $response->assertViewHasAll([
+            'page_name' => 'Regístrate',
+            'page_title' => 'Regístrate',
+            'logo' => 'https://example.com/logo.png',
+            'resources' => ['resources/js/register.js'],
+            'cert_login' => 'https://example.com',
+            'urlCas' => false,
+            'urlRediris' => false,
+            'parameters_login_systems' => $parameters_login_systems,
+        ]);
+       
+    }
+    
 
     /**
      * @test

@@ -18,7 +18,7 @@
         </div>
 
         <div id="no-courses-inscribed" class="hidden">
-            <h2 class="text-center">Aún no te has inscrito en ningún curso</h2>
+            <h2 class="text-center">No te has inscrito en ningún curso</h2>
         </div>
 
         <div id="courses-inscribed-container" class="hidden">
@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        <h2 class="text-center hidden" id="no-courses-found">Aún no te has inscrito en ningún curso</h2>
+        <h2 class="text-center hidden" id="no-courses-found">No te has inscrito en ningún curso</h2>
 
     </div>
 

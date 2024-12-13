@@ -64,16 +64,16 @@
                 <div class="relative inline-block text-left">
                     <div>
                         <button type="button" class="flex items-center z-1000 py-[7px] cursor-pointer notify-icon"
-                            id="bell-btn" aria-expanded="true" aria-haspopup="true">
+                            id="notifications-desktop-btn" aria-expanded="true" aria-haspopup="true">
                             {{ e_heroicon('bell', 'outline', 'black') }}
-                            <div id="notification-dot"
-                                class="notification-dot {{ $unread_general_notifications ? 'block' : 'hidden' }}">
+                            <div
+                                class="notification-dot top-1.5 right-0 {{ $unread_general_notifications ? 'block' : 'hidden' }}">
                             </div>
                         </button>
                         <div id="notification-box"
-                            class="hidden  top-[calc(100%+10px)] right-0 w-[600px] absolute max-h-[300px]">
+                            class="hidden  top-[calc(100%+35px)] right-0 w-[600px] absolute max-h-[300px]">
                             <div
-                                class="notification-box bg-white rounded-lg overflow-y-scroll border-gray-200 border-[3.5px] py-[24px] px-[24px] max-h-[300px]">
+                                class="notification-box bg-white rounded-lg overflow-y-scroll py-[24px] px-[24px] max-h-[300px] shadow-lg">
                                 <div class="font-bold text-[22px] text-color_1 leading-[22px]">Notificaciones</div>
                                 <hr class="mt-[18px] border-gray-300" />
                                 @include('partials.notifications')
@@ -107,14 +107,17 @@
                     class="w-[128px] m-auto border border-color_1 justify-center rounded-[6px] bg-white text-color_1 px-[10px] py-[10px] text-center hover:bg-color_1 hover:text-white transition duration-300">Iniciar
                     sesión</a>
 
-                <a aria-label="enlace" href="/register"
-                    class=" w-[128px] m-auto border rounded-[6px] bg-color_1 text-center justify-center text-white px-[10px] py-[10px] button-register hover:bg-color_2">Registrarme</a>
+                @if ($general_options['registration_active'])
+                    <a aria-label="enlace" href="/register"
+                        class=" w-[128px] m-auto border rounded-[6px] bg-color_1 text-center justify-center text-white px-[10px] py-[10px] button-register hover:bg-color_2">Registrarme</a>
+                @endif
             </div>
         @endif
     </div>
 </header>
 
-<div id="my-account-menu" class="hidden">
+<!-- Menú desplegable de mi cuenta en desktop-->
+<section id="my-account-menu" class="hidden">
     <div class="w-[282px] p-[24px] z-50 fixed right-[6px] origin-top-left divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
         role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
         <div class="py-1 flex flex-col gap-[24px]" role="none">
@@ -124,9 +127,8 @@
 
             @if (Auth::check() && Auth::user()->hasAnyRole(['ADMINISTRATOR', 'MANAGEMENT', 'TEACHER']))
                 <a aria-label="enlace" href="{{ env('BACKEND_URL') }}"
-                    class=" hover:bg-color_hover_2 uth::user()->hasAnyRole(['ADMINISTRblock p-[10px] text-sm no-effect-hover"
-                    role="menuitem" tabindex="-1" id="menu-item-1">Administrar
-                    Portal</a>
+                    class=" hover:bg-color_hover_2 p-[10px] text-sm no-effect-hover" role="menuitem" tabindex="-1"
+                    id="menu-item-1" target="_blank">Portal de administración </a>
             @endif
             <hr>
 
@@ -134,11 +136,12 @@
                 class="hover:bg-color_hover_2 text-sm flex gap-[8px] items-center no-effect-hover" role="menuitem"
                 tabindex="-1" id="menu-item-3">
                 <span
-                    class="rounded-full  bg-gray-100 close-sesion p-[10px]">{{ e_heroicon('lock-closed', 'outline', '#2B4C7E', 20, 20) }}</span>
+                    class="rounded-full  bg-gray-100 close-sesion p-[10px]">{{ e_heroicon('lock-closed', 'outline', $general_options['color_1'], 20, 20) }}</span>
                 Cerrar sesión</a>
         </div>
     </div>
-</div>
+</section>
+
 <!-- Menú móvil-->
 <header class="mobile-navbar">
     <div>
@@ -171,15 +174,32 @@
         </div>
     </div>
 
-    <div class="p-2 cursor-pointer mx-1 transition input-search-mobile ">
-        <a aria-label="enlace" href="/searcher">{{ e_heroicon('magnifying-glass', 'outline', 'grey') }}</a>
+    <div class="p-2 cursor-pointer mx-1 transition input-search-mobile flex">
+        @if (Auth::check())
+            @if (Auth::user()->general_notifications_allowed)
+                <div class="relative">
+                    <button id="notifications-btn">{{ e_heroicon('bell', 'outline', 'grey') }}</button>
+                    <div
+                        class="notification-dot top-0 right-0 {{ $unread_general_notifications ? 'block' : 'hidden' }}">
+                    </div>
+                </div>
+            @endif
+
+            <div>
+                <button id="user-menu-mobile-btn">{{ e_heroicon('user-circle', 'solid', 'grey') }}</button>
+            </div>
+        @else
+            <a aria-label="enlace"
+                href="/login">{{ e_heroicon('arrow-right-end-on-rectangle', 'outline', 'grey') }}</a>
+        @endif
     </div>
 </header>
 
-<!-- Menú desplegable para dispositivos móviles-->
+<!-- Overlay de fondo al desplegar menús en móviles-->
 <div id="overlay-layer-menu" class="overlay-layer-menu hidden"></div>
 
-<header class="menu-mobile-container hidden" id="mobile-menu">
+<!-- Menú desplegable en móvil-->
+<section class="menu-mobile-container hidden" id="mobile-menu">
     <ul class="menu-mobile">
 
         @if (Auth::check())
@@ -240,139 +260,139 @@
             @endif
         @endforeach
 
-        @if (Auth::check())
-            <a aria-label="enlace" href="{{ env('BACKEND_URL') }}">
-                <li class="option-label option">
-                    <div>Administrar Portal</div>
-                </li>
-            </a>
-
-            <a aria-label="enlace" href="{{ route('my-profile') }}">
-                <li class="option-label option">
-                    <div>Mi perfil</div>
-                </li>
-            </a>
-
-            <li class="option-submenu">
-                <div class="option-label flex justify-between items-center hover:opacity-75">
-                    <div>Mis cursos</div>
-                    <div class="icon-closed">
-                        {{ e_heroicon('chevron-right', 'outline', null, 16, 16) }}
-                    </div>
-                    <div class="icon-openned hidden">
-                        {{ e_heroicon('chevron-down', 'outline', null, 16, 16) }}
-                    </div>
-                </div>
-
-                <ul class="submenu hidden">
-                    <a aria-label="enlace" href="/profile/my_courses/inscribed">
-                        <li>
-                            <div class="option-label">Inscritos</div>
-                        </li>
-                    </a>
-
-                    <a aria-label="enlace" href="/profile/my_courses/enrolled">
-                        <li>
-                            <div class="option-label">Matriculados</div>
-                        </li>
-                    </a>
-
-                    <a aria-label="enlace" ref="/profile/my_courses/historic">
-                        <li>
-                            <div class="option-label">Histórico</div>
-                        </li>
-                    </a>
-                </ul>
-            </li>
-
-            <li class="option-submenu">
-                <div class="option-label flex justify-between items-center hover:opacity-75">
-                    <div>Mis programas formativos</div>
-                    <div class="icon-closed">
-                        {{ e_heroicon('chevron-right', 'outline', null, 16, 16) }}
-                    </div>
-                    <div class="icon-openned hidden">
-                        {{ e_heroicon('chevron-down', 'outline', null, 16, 16) }}
-                    </div>
-                </div>
-
-                <ul class="submenu hidden">
-                    <a aria-label="enlace" href="/profile/my_educational_programs/inscribed">
-                        <li>
-                            <div class="option-label">Inscritos</div>
-                        </li>
-                    </a>
-
-                    <a aria-label="enlace" href="/profile/my_educational_programs/enrolled">
-                        <li>
-                            <div class="option-label">Matriculados</div>
-                        </li>
-                    </a>
-
-                    <a aria-label="enlace" href="/profile/my_educational_programs/historic">
-                        <li>
-                            <div class="option-label">Histórico</div>
-                        </li>
-                    </a>
-                </ul>
-            </li>
-
-            <a aria-label="enlace" href="{{ route('competences-learning-results') }}">
-                <li class="option-label option">
-                    Competencias y resultados de aprendizaje
-                </li>
-            </a>
-
-            <a aria-label="enlace" href="{{ route('notifications') }}">
-                <li class="option-label option">
-                    Notificaciones
-                </li>
-            </a>
-
-            <a aria-label="enlace" href="{{ route('categories') }}">
-                <li class="option-label option">
-                    Categorías
-                </li>
-            </a>
-
-            @if (Auth::user()->general_notifications_allowed)
-                <li class="option-submenu ">
-                    <div class="option-label flex justify-between items-center hover:opacity-75">
-                        <div>Notificaciones</div>
-                        <div class="icon-closed">
-                            {{ e_heroicon('chevron-right', 'outline', null, 16, 16) }}
-                        </div>
-                        <div class="icon-openned hidden">
-                            {{ e_heroicon('chevron-down', 'outline', null, 16, 16) }}
-                        </div>
-                    </div>
-
-                    <ul class="submenu hidden overflow-y-scroll max-h-[200px]">
-                        @include('partials.notifications')
-                    </ul>
-                </li>
-            @endif
-        @endif
-
         <hr class="my-[24px]">
 
         @if (Auth::user())
-            <a aria-label="enlace" href="http://localhost:8086/logout"
+            <a aria-label="enlace" href="{{ route('logout') }}"
                 class="hover:bg-color_hover_2 text-sm flex gap-[8px] items-center no-effect-hover" role="menuitem"
                 tabindex="-1" id="menu-item-3">
                 <span class="rounded-full  bg-gray-100 close-sesion p-[10px]">
-                    {{ e_heroicon('lock-closed', 'outline', '#2B4C7E', 20, 20) }}
+                    {{ e_heroicon('lock-closed', 'outline', $general_options['color_1'], 20, 20) }}
                 </span>
                 Cerrar sesión</a>
         @else
-            <a aria-label="enlace" href="/login"
+            <a aria-label="enlace" href="{{ route('login') }}"
                 class="w-full mb-[12px] m-auto border border-color_1 justify-center rounded-[6px] bg-white text-color_1 px-[10px] py-[10px] text-center hover:bg-color_1 hover:text-white transition duration-300">Iniciar
                 sesión</a>
 
-            <a aria-label="enlace" href="/register"
-                class=" w-full m-auto border rounded-[6px] bg-color_1 text-center justify-center text-white px-[10px] py-[10px] button-register hover:bg-color_2">Registrarme</a>
+            @if ($general_options['registration_active'])
+                <a aria-label="enlace" href="{{ route('register') }}"
+                    class=" w-full m-auto border rounded-[6px] bg-color_1 text-center justify-center text-white px-[10px] py-[10px] button-register hover:bg-color_2">Registrarme</a>
+            @endif
         @endif
-
     </ul>
+</section>
 
-</header>
+<!-- Menú desplegable de notificaciones en móvil-->
+<section class="menu-mobile-container hidden" id="notifications-mobile-menu">
+    <ul class="menu-mobile">
+        <li>
+            <div class="option-label flex justify-between items-center hover:opacity-75">
+                <div>Notificaciones</div>
+            </div>
+
+            <ul class="submenu overflow-y-scroll max-h-[200px]">
+                @include('partials.notifications')
+            </ul>
+        </li>
+    </ul>
+</section>
+
+<!-- Menú desplegable de mi cuenta en móvil-->
+<section class="menu-mobile-container hidden" id="user-mobile-menu">
+    <ul class="menu-mobile">
+        <a target="_blank" aria-label="enlace" href="{{ env('BACKEND_URL') }}">
+            <li class="option-label option">
+                <div>Portal de administración</div>
+            </li>
+        </a>
+
+        <a aria-label="enlace" href="{{ route('my-profile') }}">
+            <li class="option-label option">
+                <div>Mi perfil</div>
+            </li>
+        </a>
+
+        <li class="option-submenu">
+            <div class="option-label flex justify-between items-center hover:opacity-75">
+                <div>Mis cursos</div>
+                <div class="icon-closed">
+                    {{ e_heroicon('chevron-right', 'outline', null, 16, 16) }}
+                </div>
+                <div class="icon-openned hidden">
+                    {{ e_heroicon('chevron-down', 'outline', null, 16, 16) }}
+                </div>
+            </div>
+
+            <ul class="submenu hidden">
+                <a aria-label="enlace" href="{{ route('my-courses-inscribed') }}">
+                    <li>
+                        <div class="option-label">Inscritos</div>
+                    </li>
+                </a>
+
+                <a aria-label="enlace" href="{{ route('my-courses-enrolled') }}">
+                    <li>
+                        <div class="option-label">Matriculados</div>
+                    </li>
+                </a>
+
+                <a aria-label="enlace" ref="{{ route('my-courses-historic') }}">
+                    <li>
+                        <div class="option-label">Histórico</div>
+                    </li>
+                </a>
+            </ul>
+        </li>
+
+        <li class="option-submenu">
+            <div class="option-label flex justify-between items-center hover:opacity-75">
+                <div>Mis programas formativos</div>
+                <div class="icon-closed">
+                    {{ e_heroicon('chevron-right', 'outline', null, 16, 16) }}
+                </div>
+                <div class="icon-openned hidden">
+                    {{ e_heroicon('chevron-down', 'outline', null, 16, 16) }}
+                </div>
+            </div>
+
+            <ul class="submenu hidden">
+                <a aria-label="enlace" href="{{ route('my-educational-programs-inscribed') }}">
+                    <li>
+                        <div class="option-label">Inscritos</div>
+                    </li>
+                </a>
+
+                <a aria-label="enlace" href="{{ route('my-educational-programs-enrolled') }}">
+                    <li>
+                        <div class="option-label">Matriculados</div>
+                    </li>
+                </a>
+
+                <a aria-label="enlace" href="{{ route('my-educational-programs-historic') }}">
+                    <li>
+                        <div class="option-label">Histórico</div>
+                    </li>
+                </a>
+            </ul>
+        </li>
+
+        <a aria-label="enlace" href="{{ route('competences-learning-results') }}">
+            <li class="option-label option">
+                Competencias y resultados de aprendizaje
+            </li>
+        </a>
+
+        <a aria-label="enlace" href="{{ route('notifications') }}">
+            <li class="option-label option">
+                Configuración de Notificaciones
+            </li>
+        </a>
+
+        <a aria-label="enlace" href="{{ route('categories') }}">
+            <li class="option-label option">
+                Configuración de Categorías
+            </li>
+        </a>
+    </ul>
+</section>

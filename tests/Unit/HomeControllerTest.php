@@ -12,15 +12,21 @@ use App\Models\UserLanesModel;
 use Illuminate\Support\Carbon;
 use App\Models\CategoriesModel;
 use Illuminate\Support\Facades\DB;
+use App\Models\CourseStatusesModel;
 use App\Models\GeneralOptionsModel;
 use App\Services\EmbeddingsService;
 use App\Models\LearningResultsModel;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Config;
+use App\Models\CoursesAssessmentsModel;
 use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\HomeController;
 use App\Models\EducationalProgramsModel;
 use App\Models\EducationalResourcesModel;
+use App\Models\SlidersPrevisualizationsModel;
+use App\Models\EducationalProgramStatusesModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\EducationalProgramsAssessmentsModel;
 use App\Models\EducationalResourcesEmbeddingsModel;
 
 class HomeControllerTest extends TestCase
@@ -30,10 +36,18 @@ class HomeControllerTest extends TestCase
      */
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Configura el módulo de recomendaciones como habilitado
+        Config::set('general_options.enabled_recommendation_module', true);
+    }
+
     public function testIndexReturnsCorrectViewWithData()
     {
         // Buscamos un usuario  
         $user = UsersModel::where('email', 'admin@admin.com')->first();
+        
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
@@ -42,6 +56,8 @@ class HomeControllerTest extends TestCase
         }
         // Lo autenticarlo         
         $this->actingAs($user);
+
+        $user2 = UsersModel::factory()->create();
 
         // Simulamos los datos que debería devolver el modelo GeneralOptions
         GeneralOptionsModel::factory()->create([
@@ -54,37 +70,153 @@ class HomeControllerTest extends TestCase
             'option_value' => 'Descripción del sitio'
         ]);
 
+        $status = CourseStatusesModel::where('code', 'INSCRIPTION')->first();
+
         // Simulamos los datos que debería devolver el modelo Courses
-        CoursesModel::factory()->withCourseStatus()->withCourseType()->create([
+        $course1 = CoursesModel::factory()->withCourseStatus()->withCourseType()->create([
             'featured_big_carrousel' => true,
-            'featured_big_carrousel_approved' => true
+            'featured_big_carrousel_approved' => true,
+            'course_status_uid' => $status->uid,
         ]);
 
-        $featuredCourseSlider = CoursesModel::where('featured_big_carrousel', true)->first();
+        CoursesAssessmentsModel::factory()->create(
+            [
+                'course_uid' => $course1->uid,
+                'user_uid' => $user->uid,
+            ]
+        );
 
-        CoursesModel::factory()->withCourseStatus()->withCourseType()->create([
+        $course3 = CoursesModel::factory()->withCourseType()->create([
             'featured_small_carrousel' => true,
-            'featured_small_carrousel_approved' => true
+            'featured_small_carrousel_approved' => true,
+            'course_status_uid' => $status->uid
         ]);
 
-        $featuredCourseCarrousel = CoursesModel::where('featured_small_carrousel', true)->first();
+        CoursesAssessmentsModel::factory()->create(
+            [
+                'course_uid' => $course3->uid,
+                'user_uid' => $user->uid,
+            ]
+        );
+
+
+        $educationalStatus = EducationalProgramStatusesModel::where('code', 'ACCEPTED_PUBLICATION')->first();
 
         // Simulamos los datos que debería devolver el modelo EducationalPrograms
-        EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+        $educational1 = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
             'featured_slider' => true,
-            'featured_slider_approved' => true
+            'featured_slider_approved' => true,
+            'educational_program_status_uid' => $educationalStatus->uid,
         ]);
 
-        $featuredProgramSlider = EducationalProgramsModel::where('featured_slider', true)->first();
+        EducationalProgramsAssessmentsModel::factory()->create(
+            [
+                'user_uid' => $user->uid,
+                'educational_program_uid' => $educational1->uid,
+            ]
+        );
 
-        EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+        $educational2 = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
             'featured_main_carrousel' => true,
-            'featured_main_carrousel_approved' => true
+            'featured_main_carrousel_approved' => true,
+            'educational_program_status_uid' => $educationalStatus->uid,
         ]);
 
-        $featuredProgramCarrousel = EducationalProgramsModel::where('featured_main_carrousel', true)->first();
+        EducationalProgramsAssessmentsModel::factory()->create(
+            [
+                'user_uid' => $user->uid,
+                'educational_program_uid' => $educational2->uid,
+            ]
+        );
 
+        $slider = SlidersPrevisualizationsModel::factory()->create();
+
+        
         // Hacer una solicitud HTTP a la ruta del método index
+
+        $response = $this->get(route('index', ['previsualize-slider' => $slider->uid]));
+
+        // Comprobamos que el estado de la respuesta es 200
+        $response->assertStatus(200);
+
+        // Comprobamos que la vista cargada es la correcta
+        $response->assertViewIs('home');
+
+        // Verificar que la vista contiene los datos necesarios
+        $response->assertViewHas('resources');
+        $response->assertViewHas('featured_courses');
+        $response->assertViewHas('general_options');
+
+    }
+
+    public function testIndexReturnsCorrectViewWithDataNotLogged()
+    {
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email' => 'admin@admin.com'
+            ])->first();
+        }     
+
+        // Simulamos los datos que debería devolver el modelo GeneralOptions
+        GeneralOptionsModel::factory()->create([
+            'option_name' => 'site_name',
+            'option_value' => 'Mi Sitio'
+        ]);
+
+        GeneralOptionsModel::factory()->create([
+            'option_name' => 'site_description',
+            'option_value' => 'Descripción del sitio'
+        ]);
+
+        $status = CourseStatusesModel::where('code', 'INSCRIPTION')->first();
+
+        // Simulamos los datos que debería devolver el modelo Courses
+        $course1 = CoursesModel::factory()->withCourseStatus()->withCourseType()->create([
+            'featured_big_carrousel' => true,
+            'featured_big_carrousel_approved' => true,
+            'course_status_uid' => $status->uid,
+        ]);       
+
+        $course3 = CoursesModel::factory()->withCourseType()->create([
+            'featured_small_carrousel' => true,
+            'featured_small_carrousel_approved' => true,
+            'course_status_uid' => $status->uid
+        ]);
+
+        $educationalStatus = EducationalProgramStatusesModel::where('code', 'ACCEPTED_PUBLICATION')->first();
+
+        // Simulamos los datos que debería devolver el modelo EducationalPrograms
+        $educational1 = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+            'featured_slider' => true,
+            'featured_slider_approved' => true,
+            'educational_program_status_uid' => $educationalStatus->uid,
+        ]);
+
+        EducationalProgramsAssessmentsModel::factory()->create(
+            [
+                'user_uid' => $user->uid,
+                'educational_program_uid' => $educational1->uid,
+            ]
+        );
+
+        $educational2 = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+            'featured_main_carrousel' => true,
+            'featured_main_carrousel_approved' => true,
+            'educational_program_status_uid' => $educationalStatus->uid,
+        ]);
+
+        EducationalProgramsAssessmentsModel::factory()->create(
+            [
+                'user_uid' => $user->uid,
+                'educational_program_uid' => $educational2->uid,
+            ]
+        );               
+        // Hacer una solicitud HTTP a la ruta del método index
+
         $response = $this->get(route('index'));
 
         // Comprobamos que el estado de la respuesta es 200
@@ -98,30 +230,8 @@ class HomeControllerTest extends TestCase
         $response->assertViewHas('featured_courses');
         $response->assertViewHas('general_options');
 
-        // Verificar que los cursos y programas destacados en el slider se han filtrado correctamente
-        // $response->assertViewHas('featuredCoursesSlider', function ($courses) use ($featuredCourseSlider) {
-        //     dd($courses, $featuredCourseSlider);
-        //     return $courses->contains($featuredCourseSlider);
-        // });
-
-        // $response->assertViewHas('featuredEducationalProgramsSlider', function ($programs) use ($featuredProgramSlider) {
-        //     return $programs->contains($featuredProgramSlider);
-        // });
-
-        // // Verificar que los cursos y programas destacados en el carrousel se han filtrado correctamente
-        // $response->assertViewHas('featuredCoursesCarrousel', function ($courses) use ($featuredCourseCarrousel) {
-        //     return $courses->contains($featuredCourseCarrousel);
-        // });
-
-        // $response->assertViewHas('featuredEducationalProgramsCarrousel', function ($programs) use ($featuredProgramCarrousel) {
-        //     return $programs->contains($featuredProgramCarrousel);
-        // });
-
-        // // Verificar que los objetos de aprendizaje destacados en el carrousel se han combinado correctamente
-        // $response->assertViewHas('featuredLearningObjectsCarrousel', function ($learningObjects) use ($featuredCourseCarrousel, $featuredProgramCarrousel) {
-        //     return $learningObjects->contains($featuredCourseCarrousel) && $learningObjects->contains($featuredProgramCarrousel);
-        // });
     }
+
 
     public function testSaveLanesPreferencesWithValidLane()
     {
@@ -574,6 +684,11 @@ class HomeControllerTest extends TestCase
         // Lo autenticarlo         
         $this->actingAs($user);
 
+
+        $general = GeneralOptionsModel::where('option_name', 'enabled_recommendation_module')->first();
+        $general->option_value = true;
+        $general->save();
+
         // Crear categorías simuladas y asignarlas al usuario
         CategoriesModel::factory()->count(3)->create();
 
@@ -644,6 +759,70 @@ class HomeControllerTest extends TestCase
 
     /**
      * @test
+     * Prueba para obtener los cursos recomendados con error
+     */
+    public function testGetRecommendedCoursesReturnsFailGeneralOption()
+    {
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email' => 'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
+        $this->actingAs($user);
+
+        // Crear datos de la solicitud
+        $requestData = [
+            'items_per_page' => 5,
+            'page' => 1,
+        ];
+
+        $response = $this->post(route('get-recommended-courses'), $requestData);
+
+        // Verificar que la respuesta sea no exitosa
+        $response->assertStatus(406);
+        $response->assertJson(['message' => '']);
+    }
+
+    /**
+     * @test
+     * Prueba para obtener los cursos recomendados con error sin CoursesUser
+     */
+    public function testGetRecommendedCoursesReturnsFailCoursesUser()
+    {
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email' => 'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
+        $this->actingAs($user);
+
+        // Crear datos de la solicitud
+        $requestData = [
+            'items_per_page' => 5,
+            'page' => 1,
+        ];
+
+        $general = GeneralOptionsModel::where('option_name', 'enabled_recommendation_module')->first();
+        $general->option_value = true;
+        $general->save();
+
+        $response = $this->post(route('get-recommended-courses'), $requestData);
+
+        // Verificar que la respuesta sea no exitosa
+        $response->assertStatus(406);
+        $response->assertJson(['message' => 'No courses found for the user']);
+    }
+
+    /**
+     * @test
      * Prueba que el método getRecommendedEducationalResources devuelve los recursos educativos recomendados correctamente
      */
     public function testGetRecommendedEducationalResourcesReturnsCorrectRecommendations()
@@ -660,8 +839,18 @@ class HomeControllerTest extends TestCase
         // Lo autenticarlo         
         $this->actingAs($user);
 
+        $general = GeneralOptionsModel::where('option_name', 'enabled_recommendation_module')->first();
+        $general->option_value = true;
+        $general->save();
+
+        $options = ['enabled_recommendation_module' => true];
+
+        app()->instance('general_options', $options);
+
+
         // Crear categorías y resultados de aprendizaje asociados al usuario
         $category = CategoriesModel::factory()->create();
+
         $learningResult = LearningResultsModel::factory()->withCompetence()->create();
 
         $user->categories()->attach($category->uid, ['uid' => generate_uuid()]);
@@ -672,21 +861,25 @@ class HomeControllerTest extends TestCase
 
         // Crear recursos educativos con los que el usuario ha interactuado
         $resource1 = EducationalResourcesModel::factory()
-            ->withCreatorUser()
             ->withEducationalResourceType()
             ->withStatus()
-            ->create();
-
-            EducationalResourcesEmbeddingsModel::factory()->create(
+            ->create(
                 [
-                    'educational_resource_uid' => $resource1->uid,
+                    'creator_user_uid' => $user->uid,
                 ]
             );
 
+        EducationalResourcesEmbeddingsModel::factory()->create(
+            [
+                'educational_resource_uid' => $resource1->uid,
+            ]
+        );
+
         $resource2 = EducationalResourcesModel::factory()
-            ->withCreatorUser()
             ->withEducationalResourceType()
-            ->withStatus()->create();
+            ->withStatus()->create([
+                'creator_user_uid' => $user->uid,
+            ]);
 
         EducationalResourcesEmbeddingsModel::factory()->create(
             [
@@ -741,15 +934,84 @@ class HomeControllerTest extends TestCase
             'page' => 1,
         ];
 
+
         // Hacer la solicitud POST a la ruta de obtener recursos educativos recomendados
         $response = $this->post(route('get-recommended-educational-resources'), $requestData);
 
         // Verificar que la respuesta sea exitosa
         $response->assertStatus(200);
+        $response->assertViewHas('general_options');
 
         // Verificar que los recursos educativos recomendados se devuelven correctamente
         // $response->assertJsonFragment(['uid' => $similarResource->uid]);
     }
+
+
+    /**
+     * @test
+     * Prueba que el método getRecommendedEducationalResources con error
+     */
+    public function testGetRecommendedEducationalResourcesReturnsFailGeneralOptions()
+    {
+
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email' => 'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
+        $this->actingAs($user);
+
+
+        // Hacer la solicitud POST a la ruta de obtener recursos educativos recomendados
+        $response = $this->post(route('get-recommended-educational-resources'), []);
+
+        // Verificar que la respuesta sea exitosa
+        $response->assertStatus(406);
+    }
+
+
+    /**
+     * @test
+     * Prueba que el método getRecommendedEducationalResources con error
+     */
+    public function testGetRecommendedEducationalResourcesReturnsFailEducationalResourcesUser()
+    {
+
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email' => 'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
+        $this->actingAs($user);
+
+        $general = GeneralOptionsModel::where('option_name', 'enabled_recommendation_module')->first();
+        $general->option_value = true;
+        $general->save();
+
+        // Preparar datos de la solicitud
+        $requestData = [
+            'items_per_page' => 5,
+            'page' => 1,
+        ];
+
+        // Hacer la solicitud POST a la ruta de obtener recursos educativos recomendados
+        $response = $this->post(route('get-recommended-educational-resources'), $requestData);
+
+        // Verificar que la respuesta sea exitosa
+        $response->assertStatus(406);
+
+        $response->assertJson(['message' => 'No educational resources found for the user']);
+
+    }
+
 
     /**
      * @test
@@ -768,6 +1030,8 @@ class HomeControllerTest extends TestCase
         // Lo autenticarlo         
         $this->actingAs($user);
 
+        $user2 = UsersModel::factory()->create();
+
         // Simular resultados de aprendizaje del usuario
         LearningResultsModel::factory()->count(2)->withCompetence()->create();
         $learningResults = LearningResultsModel::get();
@@ -779,23 +1043,23 @@ class HomeControllerTest extends TestCase
 
         // Crear los cursos que cubre uno de los resultados de aprendizaje
 
-
         CoursesModel::factory()
             ->withCourseStatus()->withCourseType()->count(2)
             ->create();
 
         $courses = CoursesModel::get();
 
+        foreach($courses as $course){
+
+            $course->students()->attach($user->uid, ['uid' => generate_uuid()]);            
+        }
 
         $block1 = BlocksModel::factory()->create(['course_uid' => $courses[0]->uid])->first();
 
-        $block1->learningResults()->attach(
-            $learningResults[0]->uid,
-            [
+        $block1->learningResults()->attach( $learningResults[0]->uid, [
                 'uid' => generate_uuid(),
             ]
         );
-
 
         $block2 = BlocksModel::factory()->create(['course_uid' => $courses[1]->uid]);
 
@@ -803,15 +1067,19 @@ class HomeControllerTest extends TestCase
             'uid' => generate_uuid(),
         ]);
 
+        $learning = LearningResultsModel::factory()->withCompetence()->create();
+
         // Simular que el usuario está inscrito en un curso
         $course3 = CoursesModel::factory()
             ->withCourseStatus()
             ->withCourseType()->create();
 
-        $course3->students()->attach($user->uid, ['uid' => generate_uuid()]);
+        $course3->students()->attach($user2->uid, ['uid' => generate_uuid()]);        
+
+        $user2->learningResultsPreferences()->attach($learning->uid);
 
         // Crear la solicitud con el número de elementos por página
-        $requestData = ['items_per_page' => 5];
+        $requestData = ['items_per_page' => 2];
 
         // Hacer la solicitud POST a la ruta de obtener itinerario recomendado
         $response = $this->postJson(route('get-recommended-itinerary'), $requestData);

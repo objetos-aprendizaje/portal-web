@@ -24,9 +24,13 @@
                             <div class="select-file-container">
                                 <input accept="image/*" type="file" id="photo_path" name="photo_path" class="hidden" />
 
-                                <label for="photo_path" class="btn btn-rectangular w-[110px]">
+                                <label for="photo_path" class="btn btn-rectangular min-w-[110px]">
                                     Subir {{ e_heroicon('arrow-up-tray', 'outline') }}
                                 </label>
+
+                                <button type="button" class="btn btn-rectangular min-w-[110px]" id="delete-photo">
+                                    Eliminar {{ e_heroicon('x-mark', 'outline') }}
+                                </button>
 
                                 <span id="image-name" class="image-name text-[14px]">Ningún archivo seleccionado</span>
                             </div>
