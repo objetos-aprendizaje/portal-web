@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     handleMenu();
 });
 
+// Muestra u oculta los submenús de la barra de navegación de mi perfil
 function handleMenu() {
     document.querySelectorAll(".toggle-submenu").forEach((item) => {
         item.addEventListener("click", function () {

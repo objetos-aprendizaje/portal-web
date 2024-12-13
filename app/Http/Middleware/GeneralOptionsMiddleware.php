@@ -6,6 +6,7 @@ use App\Models\FooterPagesModel;
 use Closure;
 use App\Models\GeneralOptionsModel;
 use App\Models\HeaderPagesModel;
+use App\Models\SuggestionSubmissionEmailsModel;
 use Illuminate\Support\Facades\View;
 
 /**
@@ -34,6 +35,10 @@ class GeneralOptionsMiddleware
 
         View::share('footer_pages', $footer_pages);
         View::share('header_pages', $headerPages);
+
+        $existsEmailSuggestions = SuggestionSubmissionEmailsModel::count() ? true : false;
+        app()->instance('existsEmailSuggestions', $existsEmailSuggestions);
+        View::share('existsEmailSuggestions', $existsEmailSuggestions);
 
         return $next($request);
     }

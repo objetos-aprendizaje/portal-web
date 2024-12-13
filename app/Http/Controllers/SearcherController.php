@@ -85,7 +85,7 @@ class SearcherController extends Controller
             ->mergeBindings($learning_objects_query->getQuery());
 
         if ($orderBy == "closer") {
-            $learning_objects_query->orderByRaw('ISNULL(temp_table.inscription_start_date), temp_table.inscription_start_date ASC');
+            $learning_objects_query->orderByRaw('COALESCE(temp_table.inscription_start_date, \'9999-12-31\') ASC');
         } else if ($orderBy == "puntuation") {
             $learning_objects_query->orderByRaw('temp_table.average_calification IS NULL, temp_table.average_calification DESC');
         }
@@ -197,6 +197,18 @@ class SearcherController extends Controller
             $educational_programs_query->whereHas('courses.blocks.learningResults', function ($query) use ($learningResults) {
                 $query->whereIn('learning_results.uid', $learningResults);
             });
+        }
+
+        if (isset($filters['modalityPayment'])) {
+            if ($filters['modalityPayment'] == "FREE") {
+                $educational_programs_query->where(function ($query) {
+                    $query->where('cost', 0)->where('payment_mode', 'SINGLE_PAYMENT');
+                });
+            } else if ($filters['modalityPayment'] == "PAID") {
+                $educational_programs_query->where(function ($query) {
+                    $query->where('cost', '>', 0)->orWhere('payment_mode', 'INSTALLMENT_PAYMENT');
+                });
+            }
         }
 
         return $educational_programs_query;
@@ -313,11 +325,6 @@ class SearcherController extends Controller
             $courses_query->whereBetween('realization_start_date', [$filters['realization_start_date'], $filters['realization_finish_date']]);
         }
 
-        if (isset($filters['modalityPayment'])) {
-            if ($filters['modalityPayment'] == "FREE") $courses_query->where('cost', 0);
-            else if ($filters['modalityPayment'] == "PAID") $courses_query->where('cost', '>', 0);
-        }
-
         if (isset($filters['assessments'])) {
             $courses_query->where('califications_avg.average_calification', $filters['assessments']);
         }
@@ -338,6 +345,18 @@ class SearcherController extends Controller
             $courses_query->whereHas('blocks.learningResults', function ($query) use ($learningResults) {
                 $query->whereIn('learning_results.uid', $learningResults);
             });
+        }
+
+        if (isset($filters['modalityPayment'])) {
+            if ($filters['modalityPayment'] == "FREE") {
+                $courses_query->where(function ($query) {
+                    $query->where('cost', 0)->where('payment_mode', 'SINGLE_PAYMENT');
+                });
+            } else if ($filters['modalityPayment'] == "PAID") {
+                $courses_query->where(function ($query) {
+                    $query->where('cost', '>', 0)->orWhere('payment_mode', 'INSTALLMENT_PAYMENT');
+                });
+            }
         }
 
         return $courses_query;

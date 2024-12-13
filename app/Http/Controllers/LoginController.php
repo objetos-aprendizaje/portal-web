@@ -168,27 +168,6 @@ class LoginController extends BaseController
         }
     }
 
-    public function tokenLogin($token)
-    {
-
-        $user = UsersModel::where('token_x509', $token)->first();
-
-        if ($user) {
-            Auth::login($user);
-            $this->deleteTokenLogin($user);
-            return redirect("https://" . env('DOMINIO_PRINCIPAL'));
-        } else {
-            // $this->deleteTokenLogin($user); // Se comento esta linea ya que nunca obtendremos el valor de $user
-            return redirect("https://" . env('DOMINIO_PRINCIPAL') . "/login?e=certificate-error");
-        }
-    }
-
-    private function deleteTokenLogin($user)
-    {
-        $user->token_x509 = "";
-        $user->save();
-    }
-
     private function getRedirectUrlAfterLogin($request)
     {
         $urlCurrent = $request->session()->get('url.current');

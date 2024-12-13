@@ -40,7 +40,8 @@
               {
                 "name": "ghcr.io/objetos-aprendizaje/portal-web:latest"
               }
-            ]
+            ],
+            "./release-remoterepo-helm-upgrader.cjs"
         ]
     }
 }

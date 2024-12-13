@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserRoleRelationshipsModel;
+use App\Models\UserRolesModel;
 use App\Models\UsersModel;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CertificateAccessController extends BaseController
 {
@@ -46,14 +49,27 @@ class CertificateAccessController extends BaseController
         }
     }
 
-    private function createUser($data) {
+    private function createUser($data)
+    {
         $user = new UsersModel();
         $user->uid = generate_uuid();
         $user->email = "";
         $user->first_name = $data->first_name;
         $user->last_name = $data->last_name;
         $user->nif = strtoupper($data->nif);
-        $user->save();
+        $user->identity_verified = true;
+
+        // Asignar el rol de estudiante
+        $studentRol = UserRolesModel::where("code", "STUDENT")->first();
+        DB::transaction(function () use ($user, $studentRol) {
+            $user->save();
+
+            UserRoleRelationshipsModel::create([
+                'uid' => generate_uuid(),
+                'user_uid' => $user->uid,
+                'user_role_uid' => $studentRol->uid
+            ]);
+        });
 
         return $user;
     }

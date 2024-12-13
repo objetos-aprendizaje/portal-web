@@ -43,7 +43,10 @@ class EnrolledCoursesController extends BaseController
             });
 
         if ($search) {
-            $coursesStudentQuery->where('title', 'ilike', '%' . $search . '%')->orWhere('description', 'ilike', '%' . $search . '%');
+            $coursesStudentQuery->where(function ($query) use ($search) {
+                $query->where('title', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%');
+            });
         }
 
         $coursesStudent = $coursesStudentQuery->paginate($items_per_page);

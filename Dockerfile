@@ -85,8 +85,6 @@ RUN a2enmod rewrite headers
 RUN chown -R www-data:www-data /var/www/html
 RUN chmod -R 775 /var/www/html
 
-ENV DB_HOST=93.93.116.42
-ENV DB_PORT=5439
 # Ajustamos entrypoint y scripts de inicio
 COPY ./docker_files/10-wait-pgsql.sh /etc/cont-init.d/10-wait-pgsql.sh
 COPY ./docker_files/20-directory-permissions.sh /etc/cont-init.d/20-directory-permissions.sh
@@ -103,6 +101,7 @@ done
 # Define the Laravel log file path
 LOGFILE="/var/www/html/storage/logs/laravel.log"
 touch \$LOGFILE
+chown -R www-data:www-data \$LOGFILE
 
 # Ensure both Apache logs and Laravel logs are streamed to stdout and the log file
 tail -f \$LOGFILE &

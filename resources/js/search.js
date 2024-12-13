@@ -242,14 +242,20 @@ function handleChecksResourceTypes() {
                     if (!resourceTypes.includes(this.id)) {
                         resourceTypes.push(this.id);
                     }
+                    searchLearningObjects();
                 } else {
-                    let index = resourceTypes.indexOf(this.id);
-                    if (index !== -1) {
-                        resourceTypes.splice(index, 1);
+                    // Verificar si es la última casilla marcada
+                    if (resourceTypes.length > 1) {
+                        let index = resourceTypes.indexOf(this.id);
+                        if (index !== -1) {
+                            resourceTypes.splice(index, 1);
+                            searchLearningObjects();
+                        }
+                    } else {
+                        // Si es la última, volver a marcar la casilla y no llamar a searchLearningObjects
+                        this.checked = true;
                     }
                 }
-
-                searchLearningObjects();
             });
     });
 }

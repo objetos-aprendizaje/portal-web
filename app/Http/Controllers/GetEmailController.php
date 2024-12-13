@@ -30,7 +30,7 @@ class GetEmailController extends BaseController
 
         $user = UsersModel::whereRaw('LOWER(nif) = ?', [strtolower($userSession['nif'])])->first();
         $user->email = $request->email;
-        $user->logged_x509 = true;
+        $user->identity_verified = true;
         $user->save();
 
         sendEmail($user);

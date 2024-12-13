@@ -6,16 +6,20 @@
         <!-- FILTROS INICIALES -->
         <section class="flex gap-4 lg:items-center flex-col lg:flex-row mb-[28px]">
             <div class="flex gap-4 justify-between text-black">
-                <div class="flex-none">
-                    <x-checkbox id="courses" label="Cursos" class="primary" gap="8" />
+
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" class="rounded-[3px]" id="courses"/>
+                    <label for="courses">Cursos</label>
                 </div>
 
-                <div class="flex-none">
-                    <x-checkbox id="programs" label="Programa" class="primary" gap="8" />
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" class="rounded-[3px]" id="programs"/>
+                    <label for="programs">Programas</label>
                 </div>
 
-                <div class="flex-none">
-                    <x-checkbox id="resources" label="Recurso" class="primary" gap="8" />
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" class="rounded-[3px]" id="resources"/>
+                    <label for="resources">Recursos</label>
                 </div>
 
             </div>
@@ -122,7 +126,7 @@
 
             <div class="col-span-full learning-results-filter">
                 <select id="learning-results-filter" name="learning_results[]" multiple
-                    placeholder="Selecciona resultados de aprendizaje" aria-label="Selecciona resultados de aprendizaje">
+                    placeholder="Introduce los resultados de aprendizaje..." aria-label="Introduce los resultados de aprendizaje...">
                 </select>
             </div>
         </section>

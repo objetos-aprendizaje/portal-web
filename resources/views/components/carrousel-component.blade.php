@@ -1,7 +1,7 @@
 <div class="containerCarrousel mx-auto z-10 overflow-hidden z-1">
 
     <div class="swiper-container mySwiper flex lg:overflow-hidden ">
-        <div class="swiper-button-prev hidden md:flex my-auto"></div>
+        <div class="swiper-button-prev"></div>
 
         <div class="swiper-wrapper ">
 
@@ -173,8 +173,8 @@
 
 
         </div>
-        <div class="swiper-button-next hidden md:flex my-auto"></div>
-        <div class="swiper-pagination flex md:hidden"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-pagination-prev"></div>
 
     </div>
 

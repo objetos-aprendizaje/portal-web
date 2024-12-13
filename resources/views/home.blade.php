@@ -166,9 +166,7 @@
         <section
             class="container mx-auto mb-[48px] lg:mb-[149px] courses-lane {{ $lanes_preferences['courses'] ? 'block' : 'hidden' }}">
             <div class="flex text-center flex-wrap justify-between mx-auto items-center mb-[40px] gap-[20px]">
-                <h1 class="font-bold font-roboto-bold text-[36px] text-color_1 leading-[120%]">Nuestros cursos más
-                    destacados
-                </h1>
+                <h1 class="font-bold font-roboto-bold text-[36px] text-color_1 leading-[120%]">Cursos destacados</h1>
                 <div
                     class="flex gap-[10px] text-color_1 arrow-see-more items-center hover:scale-110 cursor-pointer mx-auto md:mx-0">
                     <p class="leading-[150%] text-center text-color_1"><a aria-label="enlace"
@@ -195,8 +193,7 @@
             class="container mx-auto mb-[48px] lg:mb-[149px] programs-lane {{ $lanes_preferences['programs'] ? 'block' : 'hidden' }}">
             <div class="flex text-center flex-wrap justify-between mx-auto items-center mb-[40px] gap-[20px]">
                 <h1 class="font-bold font-roboto-bold text-[36px] text-color_1 leading-[120%]">Programas formativos
-                    destacados
-                </h1>
+                    destacados</h1>
                 <div
                     class="flex gap-[10px] text-color_1 arrow-see-more items-center hover:scale-110 cursor-pointer mx-auto md:mx-0">
                     <p class="leading-[150%] text-center text-color_1"><a aria-label="enlace"
@@ -288,6 +285,7 @@
                 </div>
                 <p class="block-description block-description-small"></p>
 
+                <hr class="separator-status-user-course border-t border-dashed">
                 <small class="status-user-course"></small>
 
                 <hr class="separator-dates border-t border-dashed">

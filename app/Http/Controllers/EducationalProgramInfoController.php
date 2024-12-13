@@ -6,9 +6,11 @@ use App\Models\CoursesAssessmentsModel;
 use App\Models\CoursesModel;
 use App\Models\EducationalProgramsAssessmentsModel;
 use App\Models\EducationalProgramsModel;
+use App\Models\EducationalProgramsStudentsModel;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 
 class EducationalProgramInfoController extends BaseController
@@ -17,6 +19,12 @@ class EducationalProgramInfoController extends BaseController
     {
 
         $educational_program = $this->getEducationalProgram($uid);
+
+        if(Auth::check()) {
+            $studentEducationalProgramInfo = EducationalProgramsStudentsModel::where('educational_program_uid', $educational_program->uid)->where('user_uid', Auth::user()->uid)->first();
+        } else {
+            $studentEducationalProgramInfo = null;
+        }
 
         adaptDatesCourseEducationalProgram($educational_program);
 
@@ -33,6 +41,7 @@ class EducationalProgramInfoController extends BaseController
             "educational_program" => $educational_program,
             "teachers" => $teachers,
             'page_title' => $educational_program->name,
+            'studentEducationalProgramInfo' => $studentEducationalProgramInfo
         ]);
     }
 
@@ -130,6 +139,7 @@ class EducationalProgramInfoController extends BaseController
             ->addSelect('educational_program_statuses.code as status_code')
             ->leftJoin('educational_program_statuses', 'educational_programs.educational_program_status_uid', '=', 'educational_program_statuses.uid')
             ->where('educational_programs.uid', $uid)
+            ->with(["categories", "center", "status", "educational_program_type"])
             ->first();
 
         return $educational_program;

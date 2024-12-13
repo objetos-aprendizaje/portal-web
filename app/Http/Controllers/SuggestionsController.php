@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SendEmailJob;
-use App\Models\EmailsSuggestionsModel;
 use App\Models\SuggestionSubmissionEmailsModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -14,6 +13,11 @@ class SuggestionsController extends Controller
         $resources=[
             "resources/js/suggestions.js"
         ];
+
+        if(!app('existsEmailSuggestions')) {
+            return redirect("/");
+        }
+
         return view("suggestions")->with('resources', $resources);
     }
 

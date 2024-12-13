@@ -9,6 +9,10 @@ document.addEventListener("DOMContentLoaded", function () {
     applyPreventDefaultForms();
     controlSubmenus();
     controlSearch();
+
+    window.addEventListener("load", function() {
+        document.getElementById("preloader").classList.add("hidden");
+    });
 });
 
 /**
@@ -792,4 +796,29 @@ export function moreOptionsBtnHandler() {
             moreOptionsBtn.appendChild(optionsList);
         }
     });
+}
+
+/**
+ *
+ * @param {*} buttonId Botón que activa la visibilidad del div
+ * @param {*} targetId Div a mostrar u ocultar
+ *
+ * Controla la visibilidad de un div al hacer clic en un botón.
+ */
+export function toggleVisibility(buttonId, targetId) {
+    const button = document.getElementById(buttonId);
+    const target = document.getElementById(targetId);
+
+    if (button && target) {
+        button.addEventListener("click", function(event) {
+            event.stopPropagation();
+            target.classList.toggle("hidden");
+        });
+
+        document.addEventListener("click", function(event) {
+            if (!target.contains(event.target) && !target.classList.contains("hidden")) {
+                target.classList.add("hidden");
+            }
+        });
+    }
 }

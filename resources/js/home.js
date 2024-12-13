@@ -413,13 +413,19 @@ function loadResources(learningObjectsContainer, learning_objects, type) {
             ".status-user-course"
         );
 
+        const separatorStatusUserCourse = templateCloned.querySelector(
+            ".separator-status-user-course"
+        );
+
         if (learning_object.status_user) {
             statusUserCourse.innerHTML =
                 learning_object.status_user == "INSCRIBED"
                     ? "Inscrito"
                     : "Matriculado";
+            separatorStatusUserCourse.classList.remove("hidden");
         } else {
             statusUserCourse.classList.add("hidden");
+            separatorStatusUserCourse.classList.add("hidden");
         }
 
         templateCloned.querySelector(

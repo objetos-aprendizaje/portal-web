@@ -1,43 +1,11 @@
 import { showModal } from "./modal_handler";
-import { apiFetch, formatDateTime } from "./app";
+import { apiFetch } from "./app";
+import { toggleVisibility } from "./app.js";
 
 document.addEventListener("DOMContentLoaded", function () {
     controlNotification();
-
-    // Configura el botón de la campana para controlar la visibilidad de las notificaciones
-    const bellButton = document.getElementById("bell-btn");
-    const notificationBox = document.getElementById("notification-box");
-
-    // Evento para alternar la visibilidad de notificationBox al hacer clic en bellButton
-    if (bellButton) {
-        bellButton.addEventListener("click", function (event) {
-            event.stopPropagation();
-            toggleNotification();
-        });
-    }
-
-    // Evento para cerrar notificationBox si se hace clic fuera de él
-    if(notificationBox) {
-        document.addEventListener("click", function (event) {
-            if (
-                !notificationBox.contains(event.target) &&
-                !notificationBox.classList.contains("hidden")
-            ) {
-                notificationBox.classList.add("hidden");
-            }
-        });
-    }
-
+    toggleVisibility("notifications-desktop-btn", "notification-box");
 });
-
-// Alterna la visibilidad del contenedor de notificaciones.
-function toggleNotification() {
-    const notificationBox = document.querySelector("#notification-box");
-
-    if (notificationBox) {
-        notificationBox.classList.toggle("hidden");
-    }
-}
 
 // Configura el comportamiento al hacer clic en cada notificación
 function controlNotification() {
@@ -45,21 +13,20 @@ function controlNotification() {
 
     notificationElements.forEach(function (notificationElement) {
         notificationElement.addEventListener("click", function (event) {
-            loadNotification(notificationElement);
+            const notificationUid =
+                notificationElement.dataset.notification_uid;
+            const notificationType =
+                notificationElement.dataset.notification_type;
+
+            if (notificationType === "general_notification")
+                loadGeneralNotification(notificationUid);
+            else
+                loadGeneralNotificationAutomatic(
+                    notificationUid,
+                    notificationElement
+                );
         });
     });
-}
-
-// Carga los detalles de una notificación específica
-function loadNotification(notificationElement) {
-    const notificationUid = notificationElement.dataset.notification_uid;
-    const notificationType = notificationElement.dataset.notification_type;
-
-    if (notificationType === "general_notification") {
-        loadGeneralNotification(notificationUid, notificationElement);
-    } else {
-        loadGeneralNotificationAutomatic(notificationUid, notificationElement);
-    }
 }
 
 function loadGeneralNotification(notificationUid, notificationElement) {
@@ -75,7 +42,7 @@ function loadGeneralNotification(notificationUid, notificationElement) {
             notificationUid,
     }).then((data) => {
         openNotification(data);
-        markReadNotification(notificationElement);
+        markReadNotification(data.uid);
     });
 }
 
@@ -161,15 +128,24 @@ function fillNotification(notification, urlAndText = false) {
 }
 
 // Marca una notificación como leída y actualiza el indicador visual
-function markReadNotification(notificationDiv) {
-    const notReadDiv = notificationDiv.querySelector(".not-read");
+function markReadNotification(notificationUid) {
+    const notificationDivs = document.querySelectorAll(
+        `.notification[data-notification_uid="${notificationUid}"]`
+    );
 
-    if (notReadDiv) notReadDiv.remove();
+    notificationDivs.forEach(notificationDiv => {
+        const notReadDiv = notificationDiv.querySelector(".not-read");
+        if (notReadDiv) notReadDiv.remove();
+    });
 
     const unreadNotifications = checkUnreadNotifications();
 
     if (!unreadNotifications) {
-        document.getElementById("notification-dot").classList.add("hidden");
+        const notificationDots =
+            document.getElementsByClassName("notification-dot");
+        for (let i = 0; i < notificationDots.length; i++) {
+            notificationDots[i].classList.add("hidden");
+        }
     }
 }
 

@@ -70,10 +70,31 @@
                         <hr class="border-dashed border-[#ACACAC] my-[12px]">
 
                         <div class="grid grid-cols-2">
+                            <div class="flex gap-[10px] font-roboto-bold">
+                                {{ e_heroicon('academic-cap', 'outline', null, 20, 20) }}
+                                <h5>Estado del programa</h5>
+                            </div>
+                            <p>{{ $course->status->name }}</p>
+                        </div>
+
+                        @if ($studentEducationalProgramInfo)
+                            <hr class="border-dashed border-[#ACACAC] my-[12px]">
+                            <div class="grid grid-cols-2">
+                                <div class="flex gap-[10px] font-roboto-bold">
+                                    {{ e_heroicon('document-check', 'outline', null, 20, 20) }}
+                                    <h5>Tu estado</h5>
+                                </div>
+                                <p>{{ $studentEducationalProgramInfo->status == 'INSCRIBED' ? 'Inscrito' : 'Matriculado' }}</p>
+                            </div>
+                        @endif
+
+                        <hr class="border-dashed border-[#ACACAC] my-[12px]">
+
+                        <div class="grid grid-cols-2">
                             <div>
                                 <h5 class="flex gap-[10px] font-roboto-bold">
                                     {{ e_heroicon('computer-desktop', 'outline', null, 20, 20) }}
-                                    Tipo de curso</h5>
+                                    Tipo de programa</h5>
                             </div>
                             <div>
                                 <p>{{ $educational_program->educational_program_type->name }}</p>
@@ -132,6 +153,41 @@
                             </div>
                         </div>
 
+                        @if (
+                            $educational_program->validate_student_registrations ||
+                                ($educational_program->payment_mode == 'SINGLE_PAYMENT' && $educational_program->cost > 0))
+                            <hr class="border-dashed border-[#ACACAC] my-[12px]">
+                            <div class="grid grid-cols-2">
+                                <div class="flex gap-[10px] font-roboto-bold">
+                                    {{ e_heroicon('calendar', 'outline', null, 20, 20) }}
+                                    <h5>Fecha de matriculación</h5>
+                                </div>
+                                <div>
+                                    <p>
+                                        {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $educational_program->enrolling_start_date)->format('d/m/y') }}
+                                        -
+                                        {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $educational_program->enrolling_finish_date)->format('d/m/y') }}
+                                    </p>
+                                </div>
+                            </div>
+                        @endif
+
+                        <hr class="border-dashed border-[#ACACAC] my-[12px]">
+
+                        <div class="grid grid-cols-2">
+                            <div class="flex gap-[10px] font-roboto-bold">
+                                {{ e_heroicon('calendar', 'outline', null, 20, 20) }}
+                                <h5>Fecha de realización</h5>
+                            </div>
+                            <div>
+                                <p>
+                                    {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $educational_program->realization_start_date)->format('d/m/y') }}
+                                    -
+                                    {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $educational_program->realization_finish_date)->format('d/m/y') }}
+                                </p>
+                            </div>
+                        </div>
+
                         <hr class="border-dashed border-[#ACACAC] my-[12px]">
 
                         <div class="grid grid-cols-2">
@@ -142,6 +198,19 @@
                             <div>
                                 @foreach ($teachers as $teacher)
                                     <p>{{ $teacher->first_name }} {{ $teacher->last_name }}</p>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <hr class="border-dashed border-[#ACACAC] my-[12px]">
+                        <div class="grid grid-cols-2">
+                            <div class="flex gap-[10px] font-roboto-bold">
+                                {{ e_heroicon('numbered-list', 'outline', null, 20, 20) }}
+                                <h5>Categorías</h5>
+                            </div>
+                            <div>
+                                @foreach ($educational_program->categories as $category)
+                                    <p>{{ $category['name'] }}</p>
                                 @endforeach
                             </div>
                         </div>

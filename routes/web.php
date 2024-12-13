@@ -97,6 +97,7 @@ Route::middleware('policies')->group(function () {
 
         Route::get('/profile/update_account', [MyProfileController::class, 'index'])->name('my-profile');
         Route::post('/profile/update_account/update', [MyProfileController::class, 'updateUser']);
+        Route::delete('/profile/update_account/delete_image', [MyProfileController::class, 'deleteImage']);
 
         Route::get('/profile/my_courses/inscribed', [InscribedCoursesController::class, 'index'])->name('my-courses-inscribed');
 
@@ -146,7 +147,7 @@ Route::get('/page/{slug}', [HeaderFooterPagesController::class, 'index']);
 Route::get('/accept_policies', [AcceptancePoliciesController::class, 'index'])->name('policiesAccept');
 Route::post('/accept_policies/submit', [AcceptancePoliciesController::class, 'acceptPolicies']);
 
-Route::get('/logout', [LoginController::class, 'logout']);
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::post('/register/resend_email_confirmation', [RegisterController::class, 'resendEmailConfirmation']);
 Route::post('/register/submit', [RegisterController::class, 'submit'])->name('registerUser');
 Route::get('/email/verify/{token}', [RegisterController::class, 'verifyEmail'])->name('verification.verify');
@@ -163,7 +164,6 @@ Route::get('/error/{code}', [ErrorController::class, 'index'])->name('error');
 
 Route::get('/get-email', [GetEmailController::class, 'index'])->name('get-email');
 Route::post('/get-email/add', [GetEmailController::class, 'addUser'])->name('add-user');
-Route::get('/token_login/{token}', [LoginController::class, 'tokenLogin']);
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'index'])->name('login');

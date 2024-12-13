@@ -14,10 +14,7 @@
             </a>
         </div>
 
-        <p class="max-w-[526px]">
-            Lorem ipsum dolor sit amet consectetur. At integer et parturient commodo. Egestas dolor suscipit fringilla
-            senectus. Dictum enim lacus.
-        </p>
+        <p class="max-w-[526px]">{{ $general_options['footer_text_1'] }}</p>
     </div>
 
     <hr>
@@ -36,11 +33,13 @@
                     </li>
                 @endforeach
 
-                <li>
-                    <a aria-label="enlace" href="/suggestions" class="text-color_3">
-                        Envío de sugerencias
-                    </a>
-                </li>
+                @if ($existsEmailSuggestions)
+                    <li>
+                        <a aria-label="enlace" href="/suggestions" class="text-color_3">
+                            Envío de sugerencias
+                        </a>
+                    </li>
+                @endif
             </ul>
         </div>
 
@@ -49,7 +48,7 @@
             <h3 class="font-bold text-color_3 text-xl leading-[22px]">¿Aún no encuentras lo que buscas?
             </h3>
 
-            <p class="leading-6">Lorem ipsum dolor sit amet consectetur adipiscing elit aliquam mauris sed ma</p>
+            <p class="leading-6">{{ $general_options['footer_text_2'] }}</p>
             <div
                 class=" bg-white items-center p-1 border rounded-xl my-auto  lg:flex hidden min-w-[150px] w-full max-w-[348px] justify-end searcher-footer">
                 <label for="searcher_button_footer" class="hidden">Introduce texto para buscar</label>
@@ -140,6 +139,21 @@
                                         <rect width="19" height="19" fill="white" transform="translate(0.5)" />
                                     </clipPath>
                                 </defs>
+                            </svg>
+                        </a>
+                    </div>
+                @endif
+
+                @if ($general_options['telegram_url'])
+                    <div>
+                        <a aria-label="enlace" href="{{ $general_options['telegram_url'] }}" rel="noreferrer"
+                            target="_blank" class="text-gray-700 transition hover:opacity-75">
+                            <span class="sr-only">Telegram</span>
+                            <svg class="h-6 w-6 fill-color_1" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                                x="0px" y="0px" width="19" height="19" viewBox="0 0 50 50">
+                                <path
+                                    d="M25,2c12.703,0,23,10.297,23,23S37.703,48,25,48S2,37.703,2,25S12.297,2,25,2z M32.934,34.375	c0.423-1.298,2.405-14.234,2.65-16.783c0.074-0.772-0.17-1.285-0.648-1.514c-0.578-0.278-1.434-0.139-2.427,0.219	c-1.362,0.491-18.774,7.884-19.78,8.312c-0.954,0.405-1.856,0.847-1.856,1.487c0,0.45,0.267,0.703,1.003,0.966	c0.766,0.273,2.695,0.858,3.834,1.172c1.097,0.303,2.346,0.04,3.046-0.395c0.742-0.461,9.305-6.191,9.92-6.693	c0.614-0.502,1.104,0.141,0.602,0.644c-0.502,0.502-6.38,6.207-7.155,6.997c-0.941,0.959-0.273,1.953,0.358,2.351	c0.721,0.454,5.906,3.932,6.687,4.49c0.781,0.558,1.573,0.811,2.298,0.811C32.191,36.439,32.573,35.484,32.934,34.375z">
+                                </path>
                             </svg>
                         </a>
                     </div>

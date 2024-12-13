@@ -1,22 +1,24 @@
 @extends('non_authenticated.app')
 @section('content')
-    <section class="md:flex hidden">
+    <section class="md:flex hidden gap-2">
 
         <div class="w-1/2">
-            <img alt="registro" id="image-background" src="{{ asset('data/images/background_login.png') }}" class="object-cover w-full">
+            <img alt="registro" id="image-background" src="{{ asset('data/images/background_login.png') }}"
+                class="object-cover w-full h-screen">
         </div>
 
         <div class="w-1/2 justify-center flex items-center">
-            <div class="w-[530px] mb-[25px]">
+            <div class="max-w-[530px] mb-[25px] w-full">
                 <div class="rounded-[20px] border py-[20px] px-[40px]">
                     @if (app('general_options')['poa_logo_1'])
                         <img alt="registro" class="mx-auto block max-w-[211px] max-h-[80px] mb-[15px]"
                             src="{{ env('BACKEND_URL') . '/' . app('general_options')['poa_logo_1'] }}" />
                     @endif
 
-                    <h1 class="text-[32px] text-center mb-[15px]">Registrarme</h1>
+                    <h1 class="text-[32px] text-center mb-[15px]">Registro</h1>
 
-                    <p class="text-center mb-[20px]">¿Ya tienes una cuenta? <a aria-label="enlace" class="text-color_1" href="/login">Inicia
+                    <p class="text-center mb-[20px]">¿Ya tienes una cuenta? <a aria-label="enlace" class="text-color_1"
+                            href="/login">Inicia
                             Sesión</a></p>
 
                     <form id="registerFormDesktop" action="/register/submit" method="POST">
@@ -48,13 +50,15 @@
 
                             <div class="flex flex-col mb-[20px]">
                                 <label class="px-3 mb-[8px]">Contraseña</label>
-                                <input aria-label="contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
+                                <input aria-label="contraseña"
+                                    class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
                                     name="password" type="password" />
                             </div>
 
                             <div class="flex flex-col mb-[20px]">
                                 <label class="px-3 mb-[8px]">Confirma la contraseña</label>
-                                <input aria-label="confirmar contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
+                                <input aria-label="confirmar contraseña"
+                                    class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
                                     name="password_confirmation" type="password" />
                             </div>
 
@@ -116,7 +120,8 @@
                                 <a aria-label="enlace" class="no-effect-hover" href="/auth/facebook">
                                     <button title="facebook login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img alt="registro" class="w-[45px] h-[45px]" src="data/images/login_icons/facebook.png" />
+                                        <img alt="registro" class="w-[45px] h-[45px]"
+                                            src="data/images/login_icons/facebook.png" />
                                     </button>
                                 </a>
                             @endif
@@ -125,7 +130,8 @@
                                 <a aria-label="enlace" class="no-effect-hover" href="/auth/twitter">
                                     <button title="twitter login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/x_icon.png" />
+                                        <img alt="registro" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/x_icon.png" />
                                     </button>
                                 </a>
                             @endif
@@ -134,7 +140,8 @@
                                 <a aria-label="enlace" class="no-effect-hover" href="/auth/linkedin">
                                     <button title="linkedin login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/linkedin_icon.png" />
+                                        <img alt="registro" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/linkedin_icon.png" />
                                     </button>
                                 </a>
                             @endif
@@ -143,7 +150,8 @@
                                 <a aria-label="enlace" class="no-effect-hover" href="/auth/google">
                                     <button title="google login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/google_icon.png" />
+                                        <img alt="registro" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/google_icon.png" />
                                     </button>
                                 </a>
                             @endif
@@ -152,7 +160,19 @@
                                 <a aria-label="enlace" class="no-effect-hover" href="{{ $urlRediris }}">
                                     <button title="rediris login" type="button"
                                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                                        <img alt="registro" class="w-[32px] h-[32px]" src="data/images/login_icons/rediris.png" />
+                                        <img alt="registro" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/rediris.png" />
+                                    </button>
+                                </a>
+                            @endif
+
+                            @if (env('URL_LOGIN_CERT'))
+                                <a aria-label="enlace" class="no-effect-hover"
+                                    href='{{ env('URL_LOGIN_CERT') }}?origin="portal_web"'>
+                                    <button title="certificate login" type="button"
+                                        class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
+                                        <img alt="registro" class="w-[32px] h-[32px]"
+                                            src="data/images/login_icons/certificate_icon.svg" />
                                     </button>
                                 </a>
                             @endif
@@ -162,8 +182,7 @@
                     </form>
 
                     @if ($cert_login != '')
-                        <div class="text-center p-4"><a aria-label="enlace"
-                                href="/certificate-access">Acceso mediante
+                        <div class="text-center p-4"><a aria-label="enlace" href="/certificate-access">Acceso mediante
                                 Certificado Digital</a></div>
                     @endif
 
@@ -180,7 +199,7 @@
                 src="{{ env('BACKEND_URL') . '/' . app('general_options')['poa_logo_1'] }}" />
         @endif
 
-        <div class="text-[28px] font-bold text-center mb-[15px]">Registrarme</div>
+        <div class="text-[28px] font-bold text-center mb-[15px]">Registro</div>
 
         <div class="mb-[25px]">
             <form id="registerFormMobile" action="/register/submit" method="POST">
@@ -209,13 +228,15 @@
 
                 <div class="flex flex-col mb-[20px]">
                     <label class="px-3 mb-[8px]">Contraseña</label>
-                    <input aria-label="contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3" name="password"
+                    <input aria-label="contraseña"
+                        class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3" name="password"
                         type="password" />
                 </div>
 
                 <div class="flex flex-col mb-[20px]">
                     <label class="px-3 mb-[8px]">Confirmar contraseña</label>
-                    <input aria-label="confirmar contraseña" class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
+                    <input aria-label="confirmar contraseña"
+                        class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
                         name="password_confirmation" type="password" />
                 </div>
 
@@ -230,7 +251,8 @@
                     </div>
                 @endif
 
-                <button title="registro" type="submit" class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Registrarme
+                <button title="registro" type="submit"
+                    class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Registrarme
                     {{ e_heroicon('arrow-up-right', 'outline') }}</button>
             </form>
         </div>
@@ -316,6 +338,15 @@
                 </a>
             @endif
 
+            @if (env('URL_LOGIN_CERT'))
+                <a aria-label="enlace" class="no-effect-hover" href='{{ env('URL_LOGIN_CERT') }}?origin="portal_web"'>
+                    <button title="rediris login" type="button"
+                        class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
+                        <img alt="registro" class="w-[32px] h-[32px]"
+                            src="data/images/login_icons/certificate_icon.svg" />
+                    </button>
+                </a>
+            @endif
         </div>
 
     </section>
