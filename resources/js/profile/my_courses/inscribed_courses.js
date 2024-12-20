@@ -166,15 +166,22 @@ function getInscribedCourses(page = 1, items_per_page = 3, search = null) {
     };
 
     apiFetch(params).then((response) => {
+        document.getElementById("number-total-results").innerHTML =
+            response.total;
+
         const containerInscribedCoursesPagination = document.getElementById(
             "pagination-inscribed-courses"
         );
 
-        updatePagination(
-            containerInscribedCoursesPagination,
-            response.current_page,
-            response.last_page
-        );
+        if (response.total <= items_per_page) {
+            containerInscribedCoursesPagination.classList.add("hidden");
+        } else {
+            updatePagination(
+                containerInscribedCoursesPagination,
+                response.current_page,
+                response.last_page
+            );
+        }
 
         const courses = response.data;
 

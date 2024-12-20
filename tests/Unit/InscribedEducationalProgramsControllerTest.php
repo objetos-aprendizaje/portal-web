@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use App\Models\UsersModel;
 use App\Models\ApiKeysModel;
+use App\Models\CoursesModel;
 use App\Models\HeaderPagesModel;
 use Illuminate\Http\UploadedFile;
 use App\Models\GeneralOptionsModel;
@@ -13,9 +14,11 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Storage;
 use App\Models\EducationalProgramsModel;
 use App\Models\EducationalProgramStatusesModel;
+use App\Models\EducationalProgramsPaymentsModel;
 use App\Models\EducationalProgramsStudentsModel;
 use App\Models\EducationalProgramsDocumentsModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\EducationalProgramsPaymentTermsModel;
 use App\Models\EducationalProgramsStudentsDocumentsModel;
 
 
@@ -82,6 +85,23 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         // Simular la autenticación del usuario si es necesario
         $this->actingAs(UsersModel::factory()->create());
 
+        $general_options  = [
+            'redsys_url' => 'http://midominio.com',
+            'color_1' => '#333333',
+            'color_2' => '#222',
+            'color_3' => '#111',
+            'color_4' => '#000',
+            'scripts' => '<script src="jquery.js"></script>',
+            'poa_logo_1' => 'image1.png',
+            'poa_logo_2' => 'image2.png',
+            'poa_logo_3' => 'image3.png',
+            'registration_active' => false,
+        ];
+
+        app()->instance('general_options', $general_options);
+
+        View::share('general_options', $general_options);
+
         // Realizar una solicitud GET a la ruta definida
         $response = $this->get(route('my-educational-programs-inscribed'));
 
@@ -106,10 +126,48 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         $user = UsersModel::factory()->create();
         $this->actingAs($user);
 
-        // Crear algunos programas formativos inscritos para el usuario
-        $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create()->first();
+        $status = EducationalProgramStatusesModel::where('code', 'INSCRIPTION')->first();
 
-        $user->educationalPrograms()->attach($educationalProgram, ['uid' => generate_uuid(), 'status' => 'INSCRIBED', 'acceptance_status' => 'ACCEPTED', 'educational_program_uid' => $educationalProgram->uid]);
+        // Crear algunos programas formativos inscritos para el usuario
+        $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create(
+            [
+                'educational_program_status_uid' => $status->uid,
+            ]
+        )->first();
+
+        EducationalProgramsPaymentTermsModel::factory()->create([
+            'educational_program_uid' => $educationalProgram->uid
+        ]);
+
+
+        $document = EducationalProgramsDocumentsModel::factory()->create(
+            [
+                'educational_program_uid' => $educationalProgram->uid
+            ]
+        );
+
+        EducationalProgramsStudentsDocumentsModel::factory()->create(
+            [
+                'educational_program_document_uid' => $document->uid,
+                'user_uid' => $user->uid,
+                'document_path' => 'file/file.pdf'
+            ]
+        );
+
+        CoursesModel::factory()->withCourseStatus()->withCourseType()->create(
+            [
+                'educational_program_uid' => $educationalProgram->uid
+            ]
+        );
+
+        $user->educationalPrograms()->attach(
+            $educationalProgram->uid,
+            [
+                'uid' => generate_uuid(),
+                'status' => 'INSCRIBED',
+                'acceptance_status' => 'ACCEPTED',
+            ]
+        );
 
         // Preparar los datos de la solicitud
         $data = [
@@ -321,11 +379,11 @@ class InscribedEducationalProgramsControllerTest extends TestCase
             'general_options',
             [
                 'payment_gateway' => true,
-                'redsys_commerce_code'=>true,
+                'redsys_commerce_code' => true,
                 'redsys_currency' => true,
-                'redsys_transaction_type'=> false,
+                'redsys_transaction_type' => false,
                 'redsys_terminal' => true,
-                'redsys_encryption_key'=>true,
+                'redsys_encryption_key' => true,
             ]
         );
 
@@ -334,6 +392,13 @@ class InscribedEducationalProgramsControllerTest extends TestCase
             'educational_program_status_uid' => $status->uid,
             'cost' => 100,
         ])->first();
+
+        EducationalProgramsPaymentsModel::factory()->create(
+            [
+                'educational_program_uid' => $educationalProgram->uid,
+                'user_uid' => $user->uid
+            ]
+        );
 
         // Agregar al usuario como estudiante pero no aprobado
         $educationalProgram->students()->attach($user->uid, ['acceptance_status' => 'ACCEPTED', 'uid' => generate_uuid()]);
@@ -358,6 +423,57 @@ class InscribedEducationalProgramsControllerTest extends TestCase
             // 'status' => 'ENROLLED',
         ]);
     }
+
+      /** @test */
+      public function testUserEnrollNotFreeProgramWihtoutPayment()
+      {
+          // Simular la autenticación del usuario
+          $user = UsersModel::factory()->create();
+          $this->actingAs($user);
+  
+          $status = EducationalProgramStatusesModel::where('code', 'ENROLLING')->first();
+  
+          app()->instance(
+              'general_options',
+              [
+                  'payment_gateway' => true,
+                  'redsys_commerce_code' => true,
+                  'redsys_currency' => true,
+                  'redsys_transaction_type' => false,
+                  'redsys_terminal' => true,
+                  'redsys_encryption_key' => true,
+              ]
+          );
+  
+          // Crear algunos programas formativos inscritos para el usuario
+          $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+              'educational_program_status_uid' => $status->uid,
+              'cost' => 100,
+          ])->first();
+  
+          // Agregar al usuario como estudiante pero no aprobado
+          $educationalProgram->students()->attach($user->uid, ['acceptance_status' => 'ACCEPTED', 'uid' => generate_uuid()]);
+  
+          // Preparar los datos de la solicitud
+          $data = [
+              'educationalProgramUid' => $educationalProgram->uid,
+              // 'payment_gateway' => 'gateway_test',
+          ];
+  
+          // Realizar una solicitud POST a la ruta definida
+          $response = $this->post(route('enroll-educational-program-inscribed'), $data);
+  
+          // Verificar que no se requiere pago y que el usuario está matriculado correctamente
+          $response->assertStatus(200);
+          // $response->assertJson(['requirePayment' => true, 'message' => 'Matriculado en el curso correctamente']);
+  
+          // Verificar que el usuario esté matriculado en el programa educativo
+          $this->assertDatabaseHas('educational_programs_students', [
+              'user_uid' => $user->uid,
+              'educational_program_uid' => $educationalProgram->uid,
+              // 'status' => 'ENROLLED',
+          ]);
+      }   
 
 
     /** @test download documento programa*/
@@ -476,21 +592,21 @@ class InscribedEducationalProgramsControllerTest extends TestCase
      */
     public function testSaveDocumentsEducationalProgram()
     {
-        
-         // Buscamos un usuario  
-         $user = UsersModel::where('email', 'admin@admin.com')->first();
-         // Si no existe el usuario lo creamos
-         if (!$user) {
-             $user = UsersModel::factory()->create([
-                 'email'=>'admin@admin.com'
-             ])->first();
-         }
-         // Lo autenticarlo         
-        $this->actingAs($user);      
+
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email' => 'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
+        $this->actingAs($user);
 
         // Crear un archivo simulado
         Storage::fake('documents');
-        $file = UploadedFile::fake()->create('document.pdf', 100);     
+        $file = UploadedFile::fake()->create('document.pdf', 100);
 
         // Mockear la respuesta del backend
         $filePath = 'documents/document.pdf';
@@ -506,7 +622,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         // Hacer la solicitud POST a la ruta
         $response = $this->postJson('/profile/my_educational_programs/save_documents_educational_program', $requestData);
 
-       
+
         // Verificar que la respuesta sea exitosa
         $response->assertStatus(200);
         $response->assertJson(['message' => 'Documentos guardados correctamente']);

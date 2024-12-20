@@ -16,22 +16,22 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class SuggestionsControllerTest extends TestCase
 {
     /**
- * @group configdesistema
- */
+     * @group configdesistema
+     */
     use RefreshDatabase;
 
-/**
- * @testdox Inicialización de inicio de sesión
- */
-    public function setUp(): void {
+    /**
+     * @testdox Inicialización de inicio de sesión
+     */
+    public function setUp(): void
+    {
         parent::setUp();
         $this->withoutMiddleware();
-
     }
 
-/**
-* @test function index
-*/
+    /**
+     * @test function index
+     */
     public function testIndexTheSuggestionsPageJsResources()
     {
 
@@ -44,8 +44,8 @@ class SuggestionsControllerTest extends TestCase
         ];
         View::share('footer_pages', $footer_pages);
 
-         // Define la variable $fonts con todas las claves necesarias
-         $fonts = [
+        // Define la variable $fonts con todas las claves necesarias
+        $fonts = [
             'truetype_regular_file_path' => asset('fonts/robot/roboto.ttf'), // Cambia esto a la ruta real
             'woff_regular_file_path' => asset('fonts/robot/roboto.woff'), // Cambia esto a la ruta real
             'woff2_regular_file_path' => asset('fonts/robot/roboto.woff2'), // Cambia esto a la ruta real
@@ -75,6 +75,9 @@ class SuggestionsControllerTest extends TestCase
         // Comparte la variable $header_pages para esta prueba
         View::share('header_pages', $headerPages);
 
+        app()->instance('existsEmailSuggestions', true);
+
+        view()->share('existsEmailSuggestions', true);
 
 
         // Realiza una solicitud GET a la ruta /suggestions
@@ -97,9 +100,17 @@ class SuggestionsControllerTest extends TestCase
         );
     }
 
-/**
- * @test Enviar Suggestion
- */
+    public function testIndexTheSuggestionsPageWithRedirect()
+    {
+        app()->instance('existsEmailSuggestions', false);
+        // Realiza una solicitud GET a la ruta /suggestions
+        $response = $this->get('/suggestions');
+        $response->assertStatus(302);
+    }
+
+    /**
+     * @test Enviar Suggestion
+     */
 
     public function testSendSuggestion()
     {
@@ -122,9 +133,24 @@ class SuggestionsControllerTest extends TestCase
         // Verify that the response is successful
         $response->assertStatus(200);
         $response->assertJson(['message' => 'Sugerencia enviada correctamente']);
-
     }
 
+    /**
+     * @test Enviar Suggestion con Error en la validación
+     */
 
+    public function testSendSuggestionWithErrorValidation()
+    {
+        // Simular datos válidos
+        $data = [
+            'message' => 'This is a test suggestion.',
+        ];
 
+        // Realizar una solicitud POST a la ruta
+        $response = $this->postJson('/suggestions/send_suggestion', $data);
+
+        // Verify that the response is 422
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'Algunos campos son incorrectos']);
+    }
 }

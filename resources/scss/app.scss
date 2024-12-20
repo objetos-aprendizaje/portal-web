@@ -207,6 +207,10 @@ input[type="checkbox"] {
     @apply cursor-pointer h-[32px] min-w-[32px] flex items-center justify-center text-[13px] p-[10px] rounded-[8px] border
 }
 
+.pagination-btn.pagination-btn-hidden {
+    @apply hidden;
+}
+
 
 .pagination-btn.selected {
     @apply bg-color_1 text-white;

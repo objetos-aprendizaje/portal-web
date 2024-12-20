@@ -63,15 +63,22 @@ function getHistoricCourses(page = 1, items_per_page = 3, search = null) {
     };
 
     apiFetch(params).then((response) => {
+        document.getElementById("number-total-results").innerHTML =
+            response.total;
+
         const containerHistoricCoursesPagination = document.getElementById(
             "pagination-historic-courses"
         );
 
-        updatePagination(
-            containerHistoricCoursesPagination,
-            response.current_page,
-            response.last_page
-        );
+        if (response.total <= items_per_page) {
+            containerHistoricCoursesPagination.classList.add("hidden");
+        } else {
+            updatePagination(
+                containerHistoricCoursesPagination,
+                response.current_page,
+                response.last_page
+            );
+        }
 
         const courses = response.data;
 

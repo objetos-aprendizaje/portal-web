@@ -181,11 +181,17 @@ class SearcherController extends Controller
         }
 
         if (isset($filters['inscription_start_date']) && isset($filters['inscription_finish_date'])) {
-            $educational_programs_query->whereBetween('inscription_start_date', [$filters['inscription_start_date'], $filters['inscription_finish_date']]);
+            $educational_programs_query->where(function ($query) use ($filters) {
+                $query->whereDate('inscription_start_date', '<=', $filters['inscription_finish_date'])
+                    ->whereDate('inscription_finish_date', '>=', $filters['inscription_start_date']);
+            });
         }
 
         if (isset($filters['realization_start_date']) && isset($filters['realization_finish_date'])) {
-            $educational_programs_query->whereBetween('realization_start_date', [$filters['realization_start_date'], $filters['realization_finish_date']]);
+            $educational_programs_query->where(function ($query) use ($filters) {
+                $query->whereDate('realization_start_date', '<=', $filters['realization_finish_date'])
+                    ->whereDate('realization_finish_date', '>=', $filters['realization_start_date']);
+            });
         }
 
         if (isset($filters['search'])) {
@@ -285,7 +291,7 @@ class SearcherController extends Controller
             ->leftJoinSub(
                 CoursesAssessmentsModel::select('course_uid', DB::raw('ROUND(AVG(calification)) as average_calification'))
                     ->groupBy('course_uid'),
-                'califications_avg', // Alias de la subconsulta
+                'califications_avg',
                 'califications_avg.course_uid',
                 '=',
                 'courses.uid'
@@ -318,11 +324,17 @@ class SearcherController extends Controller
         }
 
         if (isset($filters['inscription_start_date']) && isset($filters['inscription_finish_date'])) {
-            $courses_query->whereBetween('inscription_start_date', [$filters['inscription_start_date'], $filters['inscription_finish_date']]);
+            $courses_query->where(function ($query) use ($filters) {
+                $query->whereDate('inscription_start_date', '<=', $filters['inscription_finish_date'])
+                    ->whereDate('inscription_finish_date', '>=', $filters['inscription_start_date']);
+            });
         }
 
         if (isset($filters['realization_start_date']) && isset($filters['realization_finish_date'])) {
-            $courses_query->whereBetween('realization_start_date', [$filters['realization_start_date'], $filters['realization_finish_date']]);
+            $courses_query->where(function ($query) use ($filters) {
+                $query->whereDate('realization_start_date', '<=', $filters['realization_finish_date'])
+                    ->whereDate('realization_finish_date', '>=', $filters['realization_start_date']);
+            });
         }
 
         if (isset($filters['assessments'])) {

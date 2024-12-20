@@ -9,10 +9,6 @@ document.addEventListener("DOMContentLoaded", function () {
     applyPreventDefaultForms();
     controlSubmenus();
     controlSearch();
-
-    window.addEventListener("load", function() {
-        document.getElementById("preloader").classList.add("hidden");
-    });
 });
 
 /**
@@ -469,9 +465,12 @@ export function getFlatpickrDateRangeSql(flatpickrDate) {
     // Obtiene el rango de fechas seleccionado desde flatpickr
     let dateRange = flatpickrDate.selectedDates;
 
-    // Formatea las fechas a YYYY-MM-DD
+    // Formatea las fechas a YYYY-MM-DD ajustando a la zona horaria local
     let formattedDates = dateRange.map((date) => {
-        return date.toISOString().split("T")[0];
+        let localDate = new Date(
+            date.getTime() - date.getTimezoneOffset() * 60000
+        );
+        return localDate.toISOString().split("T")[0];
     });
 
     return formattedDates;
@@ -612,6 +611,7 @@ export function updatePagination(container, current_page, last_page) {
     const goNextPageBtn = container.querySelector(".go-next-page");
     const goPreviousPageBtn = container.querySelector(".go-previous-page");
     const goLastPageBtn = container.querySelector(".go-last-page");
+    const goFirstPageBtn = container.querySelector(".go-first-page-btn");
 
     const paginationButtons = [
         previousBtn,
@@ -625,6 +625,10 @@ export function updatePagination(container, current_page, last_page) {
 
     previousBtn.style.display = "flex";
     nextPageBtn.style.display = "flex";
+    goFirstPageBtn.classList.remove("pagination-btn-hidden");
+    goPreviousPageBtn.classList.remove("pagination-btn-hidden");
+    goLastPageBtn.classList.remove("pagination-btn-hidden");
+    goNextPageBtn.classList.remove("pagination-btn-hidden");
 
     let cssClassLastPage;
     if (last_page < 4 || last_page == current_page + 1) {
@@ -654,7 +658,9 @@ export function updatePagination(container, current_page, last_page) {
 
         goNextPageBtn.dataset.page =
             last_page > current_page ? current_page + 1 : last_page;
-        goPreviousPageBtn.dataset.page = 1;
+
+        goFirstPageBtn.classList.add("pagination-btn-hidden");
+        goPreviousPageBtn.classList.add("pagination-btn-hidden");
     }
     // If the current page is the last page, show the numbers of the last three pages
     else if (current_page === last_page) {
@@ -670,8 +676,10 @@ export function updatePagination(container, current_page, last_page) {
         nextPageBtn.textContent = last_page;
         nextPageBtn.dataset.page = last_page;
 
-        goNextPageBtn.dataset.page = last_page;
         goPreviousPageBtn.dataset.page = current_page - 1;
+
+        goLastPageBtn.classList.add("pagination-btn-hidden");
+        goNextPageBtn.classList.add("pagination-btn-hidden");
 
         // Hide the last page button if there are less than 4 pages
         separator.style.display = "none";
@@ -810,13 +818,16 @@ export function toggleVisibility(buttonId, targetId) {
     const target = document.getElementById(targetId);
 
     if (button && target) {
-        button.addEventListener("click", function(event) {
+        button.addEventListener("click", function (event) {
             event.stopPropagation();
             target.classList.toggle("hidden");
         });
 
-        document.addEventListener("click", function(event) {
-            if (!target.contains(event.target) && !target.classList.contains("hidden")) {
+        document.addEventListener("click", function (event) {
+            if (
+                !target.contains(event.target) &&
+                !target.classList.contains("hidden")
+            ) {
                 target.classList.add("hidden");
             }
         });

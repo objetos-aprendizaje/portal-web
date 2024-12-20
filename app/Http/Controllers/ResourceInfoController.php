@@ -44,7 +44,7 @@ class ResourceInfoController extends BaseController
 
     private function getResourceDatabase($resource_uid)
     {
-        $educational_resource = EducationalResourcesModel::with('status', 'contactEmails', 'educationalResourceType.redirection_queries_educational_program_types')->select('educational_resources.*', 'califications_avg.average_calification')->with('licenseType')->whereHas('status', function ($query) {
+        $educational_resource = EducationalResourcesModel::with('status', 'contactEmails', 'educationalResourceType.redirection_queries_educational_program_types', 'categories', 'learningResults')->select('educational_resources.*', 'califications_avg.average_calification')->with('licenseType')->whereHas('status', function ($query) {
             $query->where('code', 'PUBLISHED');
         })
             ->leftJoinSub(

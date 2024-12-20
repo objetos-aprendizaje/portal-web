@@ -148,9 +148,6 @@
 </head>
 
 <body>
-    <div id="preloader">
-        <div id="loader"></div>
-    </div>
 
     @include('partials.header')
 

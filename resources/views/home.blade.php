@@ -1,5 +1,10 @@
 @extends('layouts.app')
 @section('content')
+
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>
+
     <div id="main-slider">
         <div class="slideshow-container">
 

@@ -27,8 +27,12 @@
             <div id="educational-programs-inscribed-list">
             </div>
 
-            <div class="flex justify-center mt-[55px]" id="pagination-inscribed-educational-programs">
-                @include('partials.pagination')
+            <div class="flex md:flex-row flex-col gap-2 justify-between items-center mt-[55px]">
+                <div class="order-2 md:order-1 font-bold text-[18px]">Nº de resultados: <span
+                        id="number-total-results"></span></div>
+                <div class="order-1 md:order-2" id="pagination-inscribed-educational-programs">
+                    @include('partials.pagination')
+                </div>
             </div>
         </div>
 

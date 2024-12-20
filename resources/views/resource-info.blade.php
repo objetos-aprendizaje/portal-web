@@ -13,6 +13,19 @@
                     {{ $educational_resource->description }}
                 </p>
 
+                @if (!empty($educational_resource->learningResults))
+                    <h2 class="text-black">
+                        Resultados de aprendizaje
+                    </h2>
+                    <div class="mb-[40px]">
+                        <ul class="list-disc pl-5">
+                            @foreach ($educational_resource->learningResults as $learningResult)
+                                <li>{{ $learningResult->name }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 @switch($educational_resource->resource_way)
                     @case('IMAGE')
                         <img alt="{{ $educational_resource->title }}" class="mb-[30px]"
@@ -88,6 +101,19 @@
                                 </div>
                                 <div>
                                     <p>{{ $educational_resource->licenseType->name ?? 'Ninguna' }}</p>
+                                </div>
+                            </div>
+
+                            <hr class="border-dashed border-[#ACACAC] my-[12px]">
+                            <div class="grid grid-cols-2">
+                                <div class="flex gap-[10px] font-roboto-bold">
+                                    {{ e_heroicon('numbered-list', 'outline', null, 20, 20) }}
+                                    <h5>Categorías</h5>
+                                </div>
+                                <div>
+                                    @foreach ($educational_resource->categories as $category)
+                                        <p>{{ $category['name'] }}</p>
+                                    @endforeach
                                 </div>
                             </div>
 

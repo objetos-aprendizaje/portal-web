@@ -5,7 +5,7 @@ import {
     handlePagination,
     accordionControls,
     formatDate,
-    fillRedsysForm
+    fillRedsysForm,
 } from "../../app.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -32,12 +32,12 @@ function initHandlers() {
         const classClicked = event.target.classList;
         if (classClicked.contains("btn-blocked")) return;
 
-        if(classClicked.contains("btn-action-course")) {
+        if (classClicked.contains("btn-action-course")) {
             const courseUid = event.target.dataset.course_uid;
             accessCourse(courseUid);
         }
 
-        if(classClicked.contains("pay-term-btn")) {
+        if (classClicked.contains("pay-term-btn")) {
             const paymentTermUid = event.target.dataset.payment_term_uid;
             payTerm(paymentTermUid);
         }
@@ -73,14 +73,23 @@ function getEnrolledEducationalPrograms(
     };
 
     apiFetch(params).then((response) => {
+        document.getElementById("number-total-results").innerHTML =
+            response.total;
+
         const containerenrolledEducationalProgramsPagination =
             document.getElementById("pagination-enrolled-educational-programs");
 
-        updatePagination(
-            containerenrolledEducationalProgramsPagination,
-            response.current_page,
-            response.last_page
-        );
+        if (response.total <= items_per_page) {
+            containerenrolledEducationalProgramsPagination.classList.add(
+                "hidden"
+            );
+        } else {
+            updatePagination(
+                containerenrolledEducationalProgramsPagination,
+                response.current_page,
+                response.last_page
+            );
+        }
 
         const educationalPrograms = response.data;
 
@@ -186,7 +195,6 @@ function fillEducationalProgramTemplate(template, educationalProgram) {
 }
 
 function payTerm(paymentTermUid) {
-
     const params = {
         method: "POST",
         url: "/profile/my_educational_programs/enrolled/pay_term",
@@ -245,7 +253,10 @@ function fillEducationalProgramCourses(template, educationalProgram) {
         courseTemplateCloned.querySelector(".course-ects-workload").innerHTML =
             course.ects_workload;
 
-        if (educationalProgram.status_code === "DEVELOPMENT" && course.lms_url) {
+        if (
+            educationalProgram.status_code === "DEVELOPMENT" &&
+            course.lms_url
+        ) {
             courseTemplateCloned
                 .querySelector(".btn-action-container")
                 .classList.remove("hidden");
@@ -257,12 +268,13 @@ function fillEducationalProgramCourses(template, educationalProgram) {
 
         if (index === 0) {
             accordionBodyContainer.classList.add("accordion-uncollapsed");
-        }
-        else {
+        } else {
             accordionBodyContainer.classList.add("accordion-collapsed");
         }
 
-        courseTemplateCloned.querySelector(".btn-action-course").dataset.course_uid = course.uid;
+        courseTemplateCloned.querySelector(
+            ".btn-action-course"
+        ).dataset.course_uid = course.uid;
 
         coursesContainer.appendChild(
             document.importNode(courseTemplateCloned, true)

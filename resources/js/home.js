@@ -7,9 +7,13 @@ import {
 } from "./app";
 
 import { controlSlides } from "./slider";
+const premises = [];
+const preloader = document.getElementById("preloader");
+
 // Carril por defecto
 let currentLane = "courses-actived";
 document.addEventListener("DOMContentLoaded", function () {
+    preloader.classList.remove("hidden");
     handleLanes();
     if (window.userUid) {
         getActiveCourses();
@@ -23,6 +27,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     controlSlides("main-slider");
+});
+
+// Una vez que se carga la web y sus peticiones, se oculta el loader
+window.addEventListener("load", function () {
+    Promise.all(premises).then(() => {
+        preloader.classList.add("hidden");
+    });
 });
 
 function initHandlersCustomLanes() {
@@ -179,16 +190,17 @@ function getActiveCourses(page = 1, items_per_page = 3) {
             page,
             items_per_page,
         },
-        loader: true,
     };
 
-    apiFetch(params)
-        .then((response) => {
-            showLearningObjects(response, "courses");
-        })
-        .catch((error) => {
-            showNoLearningObjectsLanesUser("courses");
-        });
+    premises.push(
+        apiFetch(params)
+            .then((response) => {
+                showLearningObjects(response, "courses");
+            })
+            .catch((error) => {
+                showNoLearningObjectsLanesUser("courses");
+            })
+    );
 }
 
 function getRecommendedCourses(page = 1, items_per_page = 3) {
@@ -200,16 +212,17 @@ function getRecommendedCourses(page = 1, items_per_page = 3) {
             page,
             items_per_page,
         },
-        loader: true,
     };
 
-    apiFetch(params)
-        .then((response) => {
-            showLearningObjects(response, "courses");
-        })
-        .catch(() => {
-            showNoLearningObjectsLanesUser("courses");
-        });
+    premises.push(
+        apiFetch(params)
+            .then((response) => {
+                showLearningObjects(response, "courses");
+            })
+            .catch(() => {
+                showNoLearningObjectsLanesUser("courses");
+            })
+    );
 }
 
 function getRecommendedEducationalResources(page = 1, items_per_page = 3) {
@@ -221,16 +234,17 @@ function getRecommendedEducationalResources(page = 1, items_per_page = 3) {
             page,
             items_per_page,
         },
-        loader: true,
     };
 
-    apiFetch(params)
-        .then((response) => {
-            showLearningObjects(response, "educationalResources");
-        })
-        .catch((error) => {
-            showNoLearningObjectsLanesUser("educationalResources");
-        });
+    premises.push(
+        apiFetch(params)
+            .then((response) => {
+                showLearningObjects(response, "educationalResources");
+            })
+            .catch((error) => {
+                showNoLearningObjectsLanesUser("educationalResources");
+            })
+    );
 }
 
 function getInscribedCourses(page = 1, items_per_page = 3) {
@@ -242,16 +256,17 @@ function getInscribedCourses(page = 1, items_per_page = 3) {
             page,
             items_per_page,
         },
-        loader: true,
     };
 
-    apiFetch(params)
-        .then((response) => {
-            showLearningObjects(response, "courses");
-        })
-        .catch(() => {
-            showNoLearningObjectsLanesUser("courses");
-        });
+    premises.push(
+        apiFetch(params)
+            .then((response) => {
+                showLearningObjects(response, "courses");
+            })
+            .catch(() => {
+                showNoLearningObjectsLanesUser("courses");
+            })
+    );
 }
 
 function getMyEducationalResources(page = 1, items_per_page = 3) {
@@ -263,16 +278,17 @@ function getMyEducationalResources(page = 1, items_per_page = 3) {
             page,
             items_per_page,
         },
-        loader: true,
     };
 
-    apiFetch(params)
-        .then((response) => {
-            showLearningObjects(response, "educationalResources");
-        })
-        .catch((error) => {
-            showNoLearningObjectsLanesUser("educationalResources");
-        });
+    premises.push(
+        apiFetch(params)
+            .then((response) => {
+                showLearningObjects(response, "educationalResources");
+            })
+            .catch((error) => {
+                showNoLearningObjectsLanesUser("educationalResources");
+            })
+    );
 }
 
 function getRecommendedItinerary(page = 1, items_per_page = 3) {
@@ -284,16 +300,17 @@ function getRecommendedItinerary(page = 1, items_per_page = 3) {
             page,
             items_per_page,
         },
-        loader: true,
     };
 
-    apiFetch(params)
-        .then((response) => {
-            showLearningObjects(response, "courses");
-        })
-        .catch(() => {
-            showNoLearningObjectsLanesUser("courses");
-        });
+    premises.push(
+        apiFetch(params)
+            .then((response) => {
+                showLearningObjects(response, "courses");
+            })
+            .catch(() => {
+                showNoLearningObjectsLanesUser("courses");
+            })
+    );
 }
 
 function getTeacherCourses(page = 1, items_per_page = 3) {
@@ -305,12 +322,13 @@ function getTeacherCourses(page = 1, items_per_page = 3) {
             page,
             items_per_page,
         },
-        loader: true,
     };
 
-    apiFetch(params).then((response) => {
-        showLearningObjects(response, "courses");
-    });
+    premises.push(
+        apiFetch(params).then((response) => {
+            showLearningObjects(response, "courses");
+        })
+    );
 }
 
 function showLearningObjects(response, type) {
@@ -331,15 +349,22 @@ function showLearningObjects(response, type) {
 
     loadResources(coursesLanesContainer, response.data, type);
 
-    const containerPagination = document.getElementById(
-        "pagination-lane-courses"
-    );
+    // Si el total de elementos es menor o igual a los elementos por página, se oculta la paginación
+    if (response.total <= response.per_page) {
+        document
+            .getElementById("control-pagination-courses-lanes")
+            .classList.add("hidden");
+    } else {
+        const containerPagination = document.getElementById(
+            "pagination-lane-courses"
+        );
 
-    updatePagination(
-        containerPagination,
-        response.current_page,
-        response.last_page
-    );
+        updatePagination(
+            containerPagination,
+            response.current_page,
+            response.last_page
+        );
+    }
 }
 
 function showNoLearningObjectsLanesUser(type) {

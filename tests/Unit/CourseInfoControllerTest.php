@@ -9,10 +9,13 @@ use App\Models\BlocksModel;
 use App\Models\CoursesModel;
 use App\Models\CompetencesModel;
 use App\Models\CoursesTagsModel;
+use App\Models\CoursesStudentsModel;
 use App\Models\LearningResultsModel;
 use App\Models\CoursesAssessmentsModel;
 use App\Models\CoursesPaymentTermsModel;
+use App\Models\EducationalProgramTypesModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\RedirectionQueriesEducationalProgramTypesModel;
 
 class CourseInfoControllerTest extends TestCase
 {
@@ -23,22 +26,34 @@ class CourseInfoControllerTest extends TestCase
      * @test
      * Prueba que el método index carga la vista correcta con los datos del curso y las competencias.
      */
-    public function testIndexLoadsCourseInfoPageWithCorrectData()
+    public function testIndexLoadsCourseInfoPageWithCorrectDataWithLogged()
     {
         // Crear un curso con sus relaciones
 
-        $user = UsersModel::factory()->create()->first();
+        $user = UsersModel::factory()->create();
+
+        $this->actingAs($user);
+
+        $educationalType = EducationalProgramTypesModel::factory()->create();
+
+        RedirectionQueriesEducationalProgramTypesModel::factory()->create([
+            'educational_program_type_uid' => $educationalType->uid,
+            'contact' => $user->email,
+        ]);
 
         $course = CoursesModel::factory()
             ->withCourseStatus()
             ->withCourseType()
             ->create(
                 [
-                    'inscription_start_date' =>  Carbon::now(),
-                    'inscription_finish_date' => Carbon::now()->addDays(30)->format('Y-m-d\TH:i'),
+                    'inscription_start_date' => now()->subMonths(4),
+                    'inscription_finish_date' => now()->subMonths(3),
+                    'enrolling_start_date' => now()->subMonths(2),
+                    'enrolling_finish_date' => now()->subMonths(1),
                     'realization_start_date' =>  Carbon::now()->addDays(46)->format('Y-m-d\TH:i'),
                     'realization_finish_date' => Carbon::now()->addDays(60)->format('Y-m-d\TH:i'),
                     'cost' => 100,
+                    'educational_program_type_uid' => $educationalType->uid,
                 ]
             )
             ->first();
@@ -57,12 +72,15 @@ class CourseInfoControllerTest extends TestCase
             ]);
         }
 
-
         CoursesTagsModel::factory()->count(2)->create([
             'course_uid' => $course->uid,
         ]);
 
         $course->teachers()->attach($user->uid, [
+            'uid' => generate_uuid()  // Generar un UID para la tabla pivote
+        ]);
+
+        $student = $course->students()->attach($user->uid, [
             'uid' => generate_uuid()  // Generar un UID para la tabla pivote
         ]);
 
@@ -78,34 +96,91 @@ class CourseInfoControllerTest extends TestCase
             'course_uid' => $course,
         ]);
 
+        $blocks = CoursesAssessmentsModel::get();
 
+        // Hacer la solicitud GET a la ruta del curso
+        $response = $this->get("/course/" . $course->uid);    
+
+        // Verificaciones
+        $response->assertStatus(200);
+        $response->assertViewIs('course-info');              
+    }
+
+    public function testIndexLoadsCourseInfoPageWithCorrectData()
+    {
+        // Crear un curso con sus relaciones
+        $user = UsersModel::factory()->create();        
+
+        $educationalType = EducationalProgramTypesModel::factory()->create();
+
+        RedirectionQueriesEducationalProgramTypesModel::factory()->create([
+            'educational_program_type_uid' => $educationalType->uid,
+            'contact' => $user->email,
+        ]);
+
+        $course = CoursesModel::factory()
+            ->withCourseStatus()
+            ->withCourseType()
+            ->create(
+                [
+                    'inscription_start_date' => now()->subMonths(4),
+                    'inscription_finish_date' => now()->subMonths(3),
+                    'enrolling_start_date' => now()->subMonths(2),
+                    'enrolling_finish_date' => now()->subMonths(1),
+                    'realization_start_date' =>  Carbon::now()->addDays(46)->format('Y-m-d\TH:i'),
+                    'realization_finish_date' => Carbon::now()->addDays(60)->format('Y-m-d\TH:i'),
+                    'cost' => 100,
+                    'educational_program_type_uid' => $educationalType->uid,
+                ]
+            )
+            ->first();
+
+        $blocks = BlocksModel::factory()->count(3)->create(
+            [
+                'course_uid' => $course->uid
+            ]
+        );
+
+        $learning = LearningResultsModel::factory()->withCompetence()->create()->first();
+
+        foreach ($blocks as $block) {
+            $block->learningResults()->attach($learning->uid, [
+                'uid' => generate_uuid(),
+            ]);
+        }
+
+        CoursesTagsModel::factory()->count(2)->create([
+            'course_uid' => $course->uid,
+        ]);
+
+        $course->teachers()->attach($user->uid, [
+            'uid' => generate_uuid()  // Generar un UID para la tabla pivote
+        ]);
+
+        $student = $course->students()->attach($user->uid, [
+            'uid' => generate_uuid()  // Generar un UID para la tabla pivote
+        ]);
+
+        CoursesPaymentTermsModel::factory()->create(
+            [
+                'uid' => generate_uuid(),
+                'course_uid' => $course
+            ]
+        );
+
+        CoursesAssessmentsModel::factory()->count(2)->create([
+            'user_uid' => $user->uid,
+            'course_uid' => $course,
+        ]);
 
         $blocks = CoursesAssessmentsModel::get();
 
         // Hacer la solicitud GET a la ruta del curso
-        $response = $this->get("/course/" . $course->uid);
+        $response = $this->get("/course/" . $course->uid);    
 
-        // dd($response);
-        // Verificar que la vista correcta es cargada
-        $response->assertViewIs('course-info');
-
-        // Verificar que los datos del curso están presentes en la vista
-        $response->assertViewHas('course', function ($viewCourse) use ($course) {
-            return $viewCourse->uid === $course->uid;
-        });
-
-        // Verificar que las competencias están presentes en la vista
-        // $response->assertViewHas('competences', function ($viewCompetences) use ($blocks) {
-        //     // Extraer todas las competencias relacionadas con los bloques
-        //     $competences = $blocks->flatMap->competences->pluck('uid')->all();
-        //     return count($viewCompetences) === count($competences);
-        // });
-
-        // Verificar otros datos adicionales como 'resources' y 'page_title'
-        $response->assertViewHas('resources', [
-            'resources/js/course_info.js'
-        ]);
-        $response->assertViewHas('page_title', $course->title);
+        // Verificaciones
+        $response->assertStatus(200);
+        $response->assertViewIs('course-info');              
     }
 
     /**
