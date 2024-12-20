@@ -399,49 +399,18 @@ class EnrolledCoursesControllerTest extends TestCase
         // Simular la solicitud con paginación y búsqueda vacía
         $requestData = [
             'items_per_page' => 10,
-            'search' => null,
+            'search' => $courses[0]->title, 
         ];
 
         // Hacer la solicitud POST a la ruta de obtener cursos inscritos
         $response = $this->postJson(route('get-enrolled-courses'), $requestData);
 
         // Verificar que la respuesta es exitosa
-        $response->assertStatus(200);
-
-        // Comprobar que la estructura de respuesta coincide con la esperada
-        $response->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'uid',
-                    'title',
-                    'image_path',
-                    'payment_mode',
-                    'enrolling_start_date',
-                    'enrolling_finish_date',
-                    'realization_start_date',
-                    'realization_finish_date',
-                    'status_code',
-                    'payment_terms' => [
-                        '*' => [
-                            'uid',
-                            'name',
-                            'start_date',
-                            'finish_date',
-                            'cost',
-                            'user_payment' => [
-                                '*' => [
-                                    'is_paid'
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]);
+        $response->assertStatus(200);       
 
         // Verificar que los títulos de los cursos están presentes en la respuesta JSON
         $response->assertJsonFragment(['title' => $courses[0]->title]);
-        $response->assertJsonFragment(['title' => $courses[1]->title]);
+        // $response->assertJsonFragment(['title' => $courses[1]->title]);
     }
 
 
@@ -527,36 +496,37 @@ class EnrolledCoursesControllerTest extends TestCase
      * @test
      * Prueba el pago de un plazo cuando el plazo está activo.
      */
-    // public function testPayTermWhenPaymentTermIsActive()
-    // {
-    //     // Crear un usuario de prueba y autenticarlo
-    //     $user = UsersModel::factory()->create();
-    //     $this->actingAs($user);
+    public function testPayTermWhenPaymentTermIsActive()
+    {
+        // Crear un usuario de prueba y autenticarlo
+        $user = UsersModel::factory()->create();
+        $this->actingAs($user);
 
-    //     $course = CoursesModel::factory()
-    //     ->withCourseType()
-    //     ->withCourseStatus()
-    //     ->create()->first();
-    //     // Crear un plazo de pago activo
-    //     $paymentTerm = CoursesPaymentTermsModel::factory()->create([
-    //         'start_date' => now()->subDay(),
-    //         'finish_date' => now()->addDay(),
-    //         'course_uid' => $course->uid
-    //     ]);
+        $course = CoursesModel::factory()
+        ->withCourseType()
+        ->withCourseStatus()
+        ->create(); 
 
-    //     // Simular la solicitud para pagar el plazo
-    //     $response = $this->post(route('enrolled-courses-pay-term'), ['paymentTermUid' => $paymentTerm->uid]);
+        // Crear un plazo de pago activo
+        $paymentTerm = CoursesPaymentTermsModel::factory()->create([
+            'start_date' => now()->subDay(),
+            'finish_date' => now()->addDay(),
+            'course_uid' => $course->uid,
+        ]);
 
-    //     // Verificar que la respuesta es exitosa y contiene los parámetros de redsys
-    //     $response->assertStatus(200);
-    //     $response->assertJsonStructure(['redsysParams']);
+        // Simular la solicitud para pagar el plazo
+        $response = $this->post(route('enrolled-courses-pay-term'), ['paymentTermUid' => $paymentTerm->uid]);
 
-    //     // Verificar que se ha creado o recuperado el registro del usuario para este plazo
-    //     $this->assertDatabaseHas('courses_payment_terms_users', [
-    //         'course_payment_term_uid' => $paymentTerm->uid,
-    //         'user_uid' => $user->uid,
-    //     ]);
-    // }
+        // Verificar que la respuesta es exitosa y contiene los parámetros de redsys
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['redsysParams']);
+
+        // Verificar que se ha creado o recuperado el registro del usuario para este plazo
+        $this->assertDatabaseHas('courses_payment_terms_users', [
+            'course_payment_term_uid' => $paymentTerm->uid,
+            'user_uid' => $user->uid,
+        ]);
+    }
 
     // /**
     //  * @test

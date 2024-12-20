@@ -8,17 +8,17 @@
             <div class="flex gap-4 justify-between text-black">
 
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" class="rounded-[3px]" id="courses"/>
+                    <input type="checkbox" class="rounded-[3px]" id="courses" />
                     <label for="courses">Cursos</label>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" class="rounded-[3px]" id="programs"/>
+                    <input type="checkbox" class="rounded-[3px]" id="programs" />
                     <label for="programs">Programas</label>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" class="rounded-[3px]" id="resources"/>
+                    <input type="checkbox" class="rounded-[3px]" id="resources" />
                     <label for="resources">Recursos</label>
                 </div>
 
@@ -126,19 +126,26 @@
 
             <div class="col-span-full learning-results-filter">
                 <select id="learning-results-filter" name="learning_results[]" multiple
-                    placeholder="Introduce los resultados de aprendizaje..." aria-label="Introduce los resultados de aprendizaje...">
+                    placeholder="Introduce los resultados de aprendizaje..."
+                    aria-label="Introduce los resultados de aprendizaje...">
                 </select>
             </div>
         </section>
 
         <section class="flex justify-between mb-[54px]">
             <div id="filters-container" class="flex flex-wrap gap-[8px]">
+
+                <div class="gap-2 items-center hidden" id="wipe-filters-container">
+                    <div class="border-l border h-[16px] flex-none hidden lg:block"></div>
+                    <div class="text-[#FF2954]" id="delete-all-filters-btn">
+                        <a class="text-[14px]" aria-label="enlace" title="limpiar" href="javascript:void(0)">Limpiar</a>
+                    </div>
+                    <div class="border-l border h-[16px] flex-none hidden lg:block"></div>
+                </div>
+
                 <div id="filters-results" class="text-[14px] gap-[16px] text-center items-center hidden">
                     <div>Mostrando <span id="filter-results-showing"></span> de <span id="filter-results-total"></span>
                         resultados</div>
-                    <div class="border-l border h-[16px] flex-none hidden lg:block"></div>
-                    <div class="text-[#FF2954]" id="delete-all-filters-btn"><a aria-label="enlace" title="limpiar"
-                            href="javascript:void(0)">Limpiar</a></div>
                 </div>
             </div>
         </section>
@@ -180,7 +187,8 @@
 
                     <div class="block-container-title">
                         <div>
-                            <a aria-label="enlace" title="objeto de aprendizaje" class="learning-object-url" href="javascript:void(0)" target="_blank">
+                            <a aria-label="enlace" title="objeto de aprendizaje" class="learning-object-url"
+                                href="javascript:void(0)" target="_blank">
                                 <h2 class="block-title"></h2>
                             </a>
                         </div>
@@ -191,7 +199,8 @@
 
                     </div>
 
-                    <a aria-label="enlace" title="objeto de aprendizaje" class="learning-object-url" href="javascript:void(0)">
+                    <a aria-label="enlace" title="objeto de aprendizaje" class="learning-object-url"
+                        href="javascript:void(0)">
                         <div class="block-description"></div>
                     </a>
 

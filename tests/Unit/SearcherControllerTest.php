@@ -4,14 +4,19 @@ namespace Tests\Unit;
 
 use App\User;
 use Tests\TestCase;
+use App\Models\UsersModel;
+use App\Models\BlocksModel;
+use App\Models\CoursesModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Models\CategoriesModel;
 use App\Models\CompetencesModel;
 use App\Models\HeaderPagesModel;
+use App\Models\CourseStatusesModel;
 use App\Models\LearningResultsModel;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
+use App\Models\CoursesAssessmentsModel;
 use App\Exceptions\OperationFailedException;
 use App\Http\Controllers\SearcherController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -95,6 +100,7 @@ class SearcherControllerTest extends TestCase
         // Comparte la variable $header_pages para esta prueba
         View::share('header_pages', $headerPages);
 
+        view()->share('existsEmailSuggestions', true);
 
         // Realizar una solicitud GET a la ruta /searcher
         $response = $this->get('/searcher');
@@ -106,7 +112,9 @@ class SearcherControllerTest extends TestCase
         $response->assertViewIs('searcher');
 
         // Verificar que se pasen los datos correctos a la vista
+
         $response->assertViewHas('general_options');
+
         $response->assertViewHas('categories');
         $response->assertViewHas('variables_js');
 
@@ -116,6 +124,68 @@ class SearcherControllerTest extends TestCase
         // $this->assertEquals(collect([$competence1->toArray(), $competence2->toArray()]), collect($viewData['competences']));
         // $this->assertTrue($viewData['variables_js']['learning_objects_appraisals']);
     }
+
+    /**
+     * @test Retorna LearningObjects con tipo de recurso por defecto
+     */
+
+    public function testReturnsLearningObjectsResourceTypesCourses()
+    {
+
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        
+
+        $status = CourseStatusesModel::where('code', 'INSCRIPTION')->first();
+
+        // Se genera un curso de prueba
+        $courses = CoursesModel::factory()->count(3)->withCourseType()->create(
+            [
+                'course_status_uid' => $status->uid,
+            ]
+        );
+
+        $learning = LearningResultsModel::factory()->withCompetence()->create();
+
+
+        foreach ($courses as  $course) {
+
+            CoursesAssessmentsModel::factory()->create(
+                [
+                    'course_uid' => $course->uid,
+                    'user_uid' => $user->uid
+                ]
+            );
+
+            $block = BlocksModel::factory()->create(
+                [
+                    'course_uid' => $course->uid,
+                ]
+            );
+
+            $block->competences()->attach($learning->competence_uid, [
+                'uid' => generate_uuid(),
+            ]);
+
+            $block->learningResults()->attach($learning->uid, [
+                'uid' => generate_uuid(),
+            ]);
+        }
+
+        $data = [
+            'resourceTypes' => ['courses'],
+            'itemsPerPage' => 1,
+            'filters' => [
+                'learningObjectStatus' => 'INSCRIPTION',
+                'competences'          => [$learning->competence_uid],
+            ],
+        ];
+
+        // Realizar la solicitud GET con una consulta de búsqueda
+        $response = $this->post('/searcher/get_learning_objects', $data);
+
+        $response->assertStatus(200);
+    }
+
 
     /**
      * @test Retorna LearningObjects con tipo de recurso por defecto
@@ -241,7 +311,7 @@ class SearcherControllerTest extends TestCase
         $request = Request::create('/searcher/get_learning_objects', 'POST', [
             'resourceTypes' => ['courses'],
             'itemsPerPage' => 10,
-           
+
             'filters' => [
                 'modalityPayment'         => 'FREE',
                 'assessments'             => 5,
@@ -267,7 +337,7 @@ class SearcherControllerTest extends TestCase
         $request = Request::create('/searcher/get_learning_objects', 'POST', [
             'resourceTypes' => ['courses'],
             'itemsPerPage' => 10,
-           
+
             'filters' => [
                 'modalityPayment'         => 'PAID',
                 'assessments'             => 5,
@@ -294,15 +364,19 @@ class SearcherControllerTest extends TestCase
     {
         $request = Request::create('/searcher/get_learning_objects', 'POST', [
             'resourceTypes' => ['programs'],
-            'itemsPerPage' => 10,            
+            'itemsPerPage' => 10,
             'filters' => [
                 'assessments'             => 5,
                 'categories'              => [generate_uuid()],
                 'competences'             => [generate_uuid()],
                 'learningResults'         => [generate_uuid()],
                 'inscription_start_date'  => Carbon::now(),
-                'inscription_finish_date' => Carbon::now()->addDays(10),               
-                'search'                  => 'test'
+                'inscription_finish_date' => Carbon::now()->addDays(10),
+                'realization_start_date'  => Carbon::now()->addDays(15),
+                'realization_finish_date' => Carbon::now()->addDays(30),
+                'search'                  => 'test',
+                'modalityPayment'         => "FREE",
+
             ]
         ]);
 
@@ -310,6 +384,33 @@ class SearcherControllerTest extends TestCase
         $response = $controller->getLearningObjects($request);
 
         $this->assertEquals(200, $response->status());
+    }
+
+    /** @test */
+    public function testOrdersLearningObjectsWithFiltersInProgramsPaymentPaid()
+    {
+
+        $data = [
+            'resourceTypes' => ['programs'],
+            'itemsPerPage' => 10,
+            'filters' => [
+                'assessments'             => 5,
+                'categories'              => [generate_uuid()],
+                'competences'             => [generate_uuid()],
+                'learningResults'         => [generate_uuid()],
+                'inscription_start_date'  => Carbon::now(),
+                'inscription_finish_date' => Carbon::now()->addDays(10),
+                'realization_start_date'  => Carbon::now()->addDays(15),
+                'realization_finish_date' => Carbon::now()->addDays(30),
+                'search'                  => 'test',
+                'modalityPayment'         => "PAID",
+
+            ]
+        ];
+
+        $response = $this->post('/searcher/get_learning_objects', $data);
+
+        $response->assertStatus(200);
     }
 
     /** @test */

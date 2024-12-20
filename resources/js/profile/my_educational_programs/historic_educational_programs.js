@@ -66,14 +66,23 @@ function getHistoricEducationalPrograms(
     };
 
     apiFetch(params).then((response) => {
+        document.getElementById("number-total-results").innerHTML =
+            response.total;
+
         const containerHistoricEducationalProgramsPagination =
             document.getElementById("pagination-historic-educational-programs");
 
-        updatePagination(
-            containerHistoricEducationalProgramsPagination,
-            response.current_page,
-            response.last_page
-        );
+        if (response.total <= items_per_page) {
+            containerHistoricEducationalProgramsPagination.classList.add(
+                "hidden"
+            );
+        } else {
+            updatePagination(
+                containerHistoricEducationalProgramsPagination,
+                response.current_page,
+                response.last_page
+            );
+        }
 
         const educationalPrograms = response.data;
 
@@ -228,8 +237,7 @@ function fillEducationalProgramCourses(template, educationalProgram) {
 
         if (index === 0) {
             accordionBodyContainer.classList.add("accordion-uncollapsed");
-        }
-        else {
+        } else {
             accordionBodyContainer.classList.add("accordion-collapsed");
         }
 

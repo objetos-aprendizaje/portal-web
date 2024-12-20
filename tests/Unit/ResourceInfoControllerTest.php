@@ -25,6 +25,7 @@ use App\Models\EducationalResourceTypesModel;
 use App\Models\EducationalResourceStatusesModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\EducationalResourcesAssessmentsModel;
+use App\Models\EducationalResourceEmailsContactsModel;
 
 
 class ResourceInfoControllerTest extends TestCase
@@ -49,7 +50,19 @@ class ResourceInfoControllerTest extends TestCase
     public function testResourceInfoReturns404WhenResourceNotFound()
     {
         // Simular un UID inexistente
-        $response = $this->get('/resource/' . generate_uuid());
+
+        $educational  = EducationalResourcesModel::factory()
+        ->withStatus()
+        ->withEducationalResourceType()
+        ->withCreatorUser()
+        ->create(); 
+
+        EducationalResourceEmailsContactsModel::factory()->create([
+            'educational_resource_uid'=> $educational->uid,
+            'email' => 'info@miemail.com',
+        ]);
+        
+        $response = $this->get('/resource/' . $educational->uuid);
 
         // Asegurarse de que la respuesta sea un 404
         $response->assertStatus(404);
@@ -98,6 +111,8 @@ class ResourceInfoControllerTest extends TestCase
             ['slug' => 'page2', 'name' => 'Page 2'],
         ];
         View::share('footer_pages', $footer_pages);
+     
+        View::share('existsEmailSuggestions', true);
 
         // Define la variable $fonts con todas las claves necesarias
         $fonts = [
@@ -251,9 +266,62 @@ class ResourceInfoControllerTest extends TestCase
         ]);
     }
 
+    public function testCalificateResourceSuccessWithCalification()
+    {
+        // Estado del recurso educativo (asegurándonos que sea PUBLISHED)
+        $status = EducationalResourceStatusesModel::where("code", "PUBLISHED")->first();
 
+        // Crear el tipo de recurso educativo
+        $educationalResourceType = EducationalResourceTypesModel::factory()->create()->latest()->first();
 
+        // Crear el tipo de licencia
+        $licenseType = LicenseTypesModel::factory()->create()->latest()->first();
 
+        // Crear un usuario y autenticarlo
+        $user = UsersModel::factory()->create();
+        $this->actingAs($user);
+
+        // Crear un recurso educativo utilizando las relaciones
+        $educationalResource = EducationalResourcesModel::factory()->create([
+            'uid' => generate_uuid(),
+            'title' => 'Sample Resource',
+            'status_uid' => $status->uid,
+            'educational_resource_type_uid' => $educationalResourceType->uid,
+            'creator_user_uid' => $user->uid,
+            'license_type_uid' => $licenseType->uid,
+        ])->latest()->first();
+
+        EducationalResourcesAssessmentsModel::factory()->create(
+            [
+                'educational_resources_uid' =>$educationalResource->uid,
+                'user_uid'=> $user->uid
+            ]
+        );
+
+        // Verificar que el recurso educativo fue creado
+        $this->assertNotNull($educationalResource, 'El recurso educativo no fue creado correctamente.');
+
+        // Realizar la petición POST a la ruta, enviando la calificación y el UID del recurso
+        $response = $this->post('/resource/calificate', [
+            'calification' => 4,
+            'educational_resource_uid' => $educationalResource->uid
+        ]);
+
+        // Verificar que la respuesta es 200 (OK)
+        $response->assertStatus(200);
+
+        // Verificar que el mensaje de éxito está presente en la respuesta JSON
+        $response->assertJson([
+            'message' => 'Se ha registrado correctamente la calificación',
+        ]);
+
+        // Verificar que la calificación se ha guardado correctamente en la base de datos
+        $this->assertDatabaseHas('educational_resources_assessments', [
+            'user_uid' => $user->uid,
+            'educational_resources_uid' => $educationalResource->uid,
+            'calification' => 4,
+        ]);
+    }
 
 }
 

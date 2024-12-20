@@ -420,26 +420,19 @@ function searchLearningObjects(
         );
 
         updateFiltersSelectors(filters);
-        updateFiltersResults(filters, response.data.length, response.total);
+        updateFiltersResults(response.data.length, response.total);
 
         loadResources(response);
     });
 }
 
-function updateFiltersResults(filters, dataLength, total) {
-    const numberFilters = Object.keys(filters).length;
+function updateFiltersResults(dataLength, total) {
     const filterResults = document.getElementById("filters-results");
 
-    if (numberFilters) {
-        filterResults.classList.remove("hidden");
-        filterResults.classList.add("flex");
-        document.getElementById("filter-results-showing").innerHTML =
-            dataLength;
-        document.getElementById("filter-results-total").innerHTML = total;
-    } else {
-        filterResults.classList.add("hidden");
-        filterResults.classList.remove("flex");
-    }
+    filterResults.classList.remove("hidden");
+    filterResults.classList.add("flex");
+    document.getElementById("filter-results-showing").innerHTML = dataLength;
+    document.getElementById("filter-results-total").innerHTML = total;
 }
 
 function updateFiltersSelectors(filters) {
@@ -530,6 +523,13 @@ function updateFiltersSelectors(filters) {
             "learningResults"
         );
     }
+
+    // Botón de limpiar todos los filtros
+    const wipeFiltersContainer = document.getElementById("wipe-filters-container");
+    const hasFilters = Object.keys(filters).length > 0;
+
+    wipeFiltersContainer.classList.toggle("hidden", !hasFilters);
+    wipeFiltersContainer.classList.toggle("flex", hasFilters);
 }
 
 function fillLearningObjectsContainer(

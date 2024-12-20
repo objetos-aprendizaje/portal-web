@@ -29,7 +29,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -48,7 +48,9 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         $response->assertViewHas('resources', ['resources/js/profile/my_educational_programs/enrolled_educational_programs.js']);
         $response->assertViewHas('page_title', 'Mis programas formativos matriculados');
         $response->assertViewHas('currentPage', 'enrolledEducationalPrograms');
-    }
+    }    
+
+
 
     /**
      * @test
@@ -61,7 +63,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -70,7 +72,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();
 
         // Crear algunos programas formativos y matricular al usuario
-        EducationalProgramsModel::factory()
+        $educationalPrograms = EducationalProgramsModel::factory()
             ->withEducationalProgramType()
             ->count(3)->create(
                 [
@@ -78,7 +80,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 ]
             );
 
-        $educationalPrograms = EducationalProgramsModel::all();
+        // $educationalPrograms = EducationalProgramsModel::get();
 
         foreach ($educationalPrograms as $educationalProgram) {
 
@@ -96,18 +98,25 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 'educational_program_uid' => $educationalPrograms[0]->uid,
             ]);
 
-        $paymentTerm = EducationalProgramsPaymentTermsModel::factory()->create(
-            [
-                'educational_program_uid' => $educationalPrograms[0]->uid
-            ]
-        )->first();
 
-        EducationalProgramsPaymentTermsUsersModel::factory()->create(
-            [
-                'educational_program_payment_term_uid' => $paymentTerm->uid,
-                'user_uid' => $user->uid
-            ]
-        );
+        // Crear un término de pago
+        $paymentTerm = EducationalProgramsPaymentTermsModel::factory()->create([
+            'educational_program_uid' => $educationalPrograms[0]->uid,
+        ]);
+
+        // Crear un único registro de usuario asociado al término de pago
+        EducationalProgramsPaymentTermsUsersModel::factory()->create([
+            'educational_program_payment_term_uid' => $paymentTerm->uid,
+            'user_uid' => $user->uid,
+            'is_paid' => true,
+        ]);
+
+        // Simular que la relación userPayment sea una colección
+        $paymentTerm->setRelation('userPayment', collect([
+            EducationalProgramsPaymentTermsUsersModel::where('educational_program_payment_term_uid', $paymentTerm->uid)->first(),
+        ]));
+
+        // dd($paymentTermsUser);
 
         // Crear una solicitud simulada con paginación
         $requestData = [
@@ -138,7 +147,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -218,7 +227,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         
@@ -286,7 +295,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
         // Lo autenticarlo         

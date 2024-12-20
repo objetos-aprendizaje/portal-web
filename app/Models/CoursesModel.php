@@ -116,7 +116,7 @@ class CoursesModel extends Model
     {
         return $this->belongsToMany(
             CourseDocumentsModel::class,
-            'courseS_students_documents',
+            'courses_students_documents',
             'course_document_uid',
             'uid',
             'uid',

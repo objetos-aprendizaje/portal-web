@@ -5,7 +5,7 @@ import {
     handlePagination,
     formatDate,
     accordionControls,
-    fillRedsysForm
+    fillRedsysForm,
 } from "../../app.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -37,7 +37,7 @@ function initHandlers() {
             accessCourse(courseUid);
         }
 
-        if(classClicked.contains("pay-term-btn")) {
+        if (classClicked.contains("pay-term-btn")) {
             const paymentTermUid = event.target.dataset.payment_term_uid;
             payTerm(paymentTermUid);
         }
@@ -69,15 +69,22 @@ function getEnrolledCourses(page = 1, items_per_page = 3, search = null) {
     };
 
     apiFetch(params).then((response) => {
+        document.getElementById("number-total-results").innerHTML =
+            response.total;
+
         const containerenrolledCoursesPagination = document.getElementById(
             "pagination-enrolled-courses"
         );
 
-        updatePagination(
-            containerenrolledCoursesPagination,
-            response.current_page,
-            response.last_page
-        );
+        if (response.total <= items_per_page) {
+            containerenrolledCoursesPagination.classList.add("hidden");
+        } else {
+            updatePagination(
+                containerenrolledCoursesPagination,
+                response.current_page,
+                response.last_page
+            );
+        }
 
         const courses = response.data;
 
@@ -210,14 +217,12 @@ function setPaymentTerms(template, course) {
         const currentDate = new Date();
 
         if (paymentTerm.user_payment && paymentTerm.user_payment.is_paid) {
-            const paymentTermsLabels = paymentTermsCloned.querySelectorAll(
-                ".paid-term-label"
-            );
+            const paymentTermsLabels =
+                paymentTermsCloned.querySelectorAll(".paid-term-label");
             paymentTermsLabels.forEach((paymentTermLabel) => {
                 paymentTermLabel.classList.remove("hidden");
             });
-        }
-        else if (startDate < currentDate && finishDate > currentDate) {
+        } else if (startDate < currentDate && finishDate > currentDate) {
             const payTermsBtns =
                 paymentTermsCloned.querySelectorAll(".pay-term-btn");
 
@@ -235,7 +240,6 @@ function setPaymentTerms(template, course) {
 }
 
 function payTerm(paymentTermUid) {
-
     const params = {
         method: "POST",
         url: "/profile/my_courses/enrolled/pay_term",
@@ -250,7 +254,6 @@ function payTerm(paymentTermUid) {
     apiFetch(params).then((response) => {
         console.log(response);
         fillRedsysForm(response.redsysParams);
-
     });
 }
 
