@@ -48,12 +48,41 @@ class GeneralNotificationsControllerTest extends TestCase
             'general_notification_uid' => $generalNotification->uid,
             'view_date' => now()->format('Y-m-d H:i:s'),
         ]);
+        
+    }
 
-        // Verificar que la respuesta contiene la notificación con el campo 'is_read'
-        // $response->assertJsonFragment([
-        //     'uid' => $generalNotification->uid,
-        //     'is_read' => 1
-        // ]);
+    /**
+     * @test
+     * Prueba que devuelve correctamente la notificación general del usuario y la marca como leída
+     */
+    public function testGetGeneralNotificationNotExist()
+    {
+
+        // Buscamos un usuario  
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email'=>'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo         
+        $this->actingAs($user);
+
+        // Crear una notificación general en la base de datos
+        $generalNotification = GeneralNotificationsModel::factory()->create([
+            'uid' => generate_uuid(),
+        ])->first();
+
+        // Hacer una solicitud GET a la ruta de la notificación general del usuario
+        $response = $this->get('/notifications/general/get_general_notification_user/' . generate_uuid());
+
+        // Verificar que la respuesta es exitosa
+        $response->assertStatus(406);
+        $response->assertJson([
+            'message'=> 'La notificación general no existe',
+        ]);
+        
     }
     
 

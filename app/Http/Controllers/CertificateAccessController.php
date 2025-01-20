@@ -23,13 +23,17 @@ class CertificateAccessController extends BaseController
 
         $hashCheck = md5($data . $expiration . env('KEY_CHECK_CERTIFICATE_ACCESS'));
 
-        if ($expiration < time() || $hash != $hashCheck) return redirect('/login');
+        if ($expiration < time() || $hash != $hashCheck) {
+            return redirect('/login');
+        }
 
         $data = json_decode($data);
 
         $user = UsersModel::whereRaw('UPPER(nif) = ?', [strtoupper($data->nif)])->first();
 
-        if (!$user) $user = $this->createUser($data);
+        if (!$user) {
+            $user = $this->createUser($data);
+        }
 
         if (!$user->verified) {
             session(['dataCertificate' => $user]);

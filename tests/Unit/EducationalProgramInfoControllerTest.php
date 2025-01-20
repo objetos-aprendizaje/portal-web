@@ -70,6 +70,63 @@ class EducationalProgramInfoControllerTest extends TestCase
         $response->assertViewHas('resources', ['resources/js/educational_program_info.js']);
     }
 
+    public function testIndexLoadsViewWithProgramAndUserLogged()
+    {
+
+        // Crear un usuario y autenticarlo      
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        $this->actingAs($user);
+
+        // Crear un programa educativo en la base de datos
+        $program = EducationalProgramsModel::factory()
+            ->withEducationalProgramType()->create([
+                'uid' => generate_uuid(),
+                'name' => 'Programa educativo de prueba'
+            ])->first();
+
+        // Crear varios cursos asociados al programa educativo
+        $course = CoursesModel::factory()
+            ->withCourseStatus()
+            ->withCourseType()
+            ->create([
+                'educational_program_uid' => $program->uid
+            ])->first();
+
+        // Crear profesores y asociarlos a los cursos
+        $teachers = UsersModel::factory()->count(5)->create();
+
+        $teachersToAttach = $teachers->random(3)->pluck('uid')->toArray();
+
+        // dd($teachersToAttach);
+
+        foreach ($teachersToAttach as $teacherUid) {
+            $course->teachers()->attach($teacherUid, [
+                'uid' => (string) Str::uuid(),  // Generar un UID para la tabla pivote
+            ]);
+        }
+        // Hacer una solicitud GET a la ruta del programa educativo
+        $response = $this->get("/educational_program/{$program->uid}");
+
+        // Verificar que la respuesta es exitosa
+        $response->assertStatus(200);
+
+        // Verificar que la vista cargada es la correcta
+        $response->assertViewIs('educational-program-info');
+
+        // Verificar que el programa educativo y los profesores se pasan a la vista
+        $response->assertViewHas('educational_program', function ($viewProgram) use ($program) {
+            return $viewProgram->uid === $program->uid;
+        });
+
+        // Verificar que los profesores únicos se pasan a la vista
+        $response->assertViewHas('teachers', function ($viewTeachers) use ($teachers) {
+            return count($viewTeachers) <= 5; // Asegurar que los profesores únicos se pasan
+        });
+
+        // Verificar que los recursos se pasan correctamente
+        $response->assertViewHas('resources', ['resources/js/educational_program_info.js']);
+    }
+
     /**
      * @test
      * Prueba que se devuelve el programa educativo con cursos y profesores en formato JSON
@@ -158,8 +215,8 @@ class EducationalProgramInfoControllerTest extends TestCase
         $response->assertStatus(200);
 
         // Verificar que se ha registrado la calificación correctamente en la base de datos
-        $this->assertDatabaseHas('educational_programs_assessments', [    
-            'user_uid'=> $user->uid,     
+        $this->assertDatabaseHas('educational_programs_assessments', [
+            'user_uid' => $user->uid,
             'educational_program_uid' => $program->uid,
             'calification' => 4,
         ]);

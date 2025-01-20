@@ -21,9 +21,6 @@ class UsersModelFactory extends Factory
      */
     public function definition(): array
     {
-        $faker = FakerFactory::create();
-        // $faker->addProvider(new NifProvider($faker));
-
         return [
             'uid' => generate_uuid(),
             'first_name' => $this->faker->firstName,
@@ -32,7 +29,6 @@ class UsersModelFactory extends Factory
             'password' => password_hash('1234', PASSWORD_BCRYPT),
             'created_at' => Carbon::now()->format('Y-m-d\TH:i'),
             'updated_at' => Carbon::now()->format('Y-m-d\TH:i'),
-            // 'nif' => $faker->nif(),
             'verified' => 1
         ];
     }

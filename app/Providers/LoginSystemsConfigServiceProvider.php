@@ -22,12 +22,16 @@ class LoginSystemsConfigServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (env('DB_HOST') == 'image_build') return;
-        if (!Schema::hasTable('general_options')) return;
+        if (env('DB_HOST') == 'image_build') {
+            return;
+        }
+        if (!Schema::hasTable('general_options')) {
+            return;
+        }
 
         Cache::flush();
         if (!Cache::has('parameters_login_systems')) {
-            $parameters_login_systems = GeneralOptionsModel::whereIn('option_name', [
+            $parametersLoginSystems = GeneralOptionsModel::whereIn('option_name', [
                 'google_login_active',
                 'google_client_id',
                 'google_client_secret',
@@ -45,30 +49,30 @@ class LoginSystemsConfigServiceProvider extends ServiceProvider
 
             $config = [];
 
-            foreach ($parameters_login_systems as $parameter_login_system) {
-                $config[$parameter_login_system['option_name']] = $parameter_login_system['option_value'];
+            foreach ($parametersLoginSystems as $parameterLoginSystem) {
+                $config[$parameterLoginSystem['option_name']] = $parameterLoginSystem['option_value'];
             }
 
             Cache::put('parameters_login_systems', $config, 60 * 24); // Cache for 24 hours
         }
 
-        $parameters_login_systems = Cache::get('parameters_login_systems');
+        $parametersLoginSystems = Cache::get('parameters_login_systems');
 
         config([
-            'services.google.client_id' => $parameters_login_systems['google_client_id'],
-            'services.google.client_secret' => $parameters_login_systems['google_client_secret'],
+            'services.google.client_id' => $parametersLoginSystems['google_client_id'],
+            'services.google.client_secret' => $parametersLoginSystems['google_client_secret'],
             'services.google.redirect' => env('GOOGLE_REDIRECT_URL'),
 
-            'services.facebook.client_id' => $parameters_login_systems['facebook_client_id'],
-            'services.facebook.client_secret' => $parameters_login_systems['facebook_client_secret'],
+            'services.facebook.client_id' => $parametersLoginSystems['facebook_client_id'],
+            'services.facebook.client_secret' => $parametersLoginSystems['facebook_client_secret'],
             'services.facebook.redirect' => env('FACEBOOK_REDIRECT_URL'),
 
-            'services.twitter.client_id' => $parameters_login_systems['twitter_client_id'],
-            'services.twitter.client_secret' => $parameters_login_systems['twitter_client_secret'],
+            'services.twitter.client_id' => $parametersLoginSystems['twitter_client_id'],
+            'services.twitter.client_secret' => $parametersLoginSystems['twitter_client_secret'],
             'services.twitter.redirect' => env('TWITTER_REDIRECT_URL'),
 
-            'services.linkedin-openid.client_id' => $parameters_login_systems['linkedin_client_id'],
-            'services.linkedin-openid.client_secret' => $parameters_login_systems['linkedin_client_secret'],
+            'services.linkedin-openid.client_id' => $parametersLoginSystems['linkedin_client_id'],
+            'services.linkedin-openid.client_secret' => $parametersLoginSystems['linkedin_client_secret'],
             'services.linkedin-openid.redirect' => env('LINKEDIN_REDIRECT_URL'),
         ]);
     }

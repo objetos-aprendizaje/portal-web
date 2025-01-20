@@ -8,7 +8,7 @@
     <div class="block-container">
 
         <div class="min-h-[110px]">
-            <h4 class="block-title learning-object-title"></h4>
+            <h4 class="block-title learning-object-title">Objeto de aprendizaje</h4>
         </div>
 
         <div class="min-h-[24px]">

@@ -131,7 +131,7 @@ function updateSelectedCompetencesAndLearningResults(currentNode) {
 
 // Actualiza el set de resultados de aprendizaje seleccionados y el contador
 function updateSelectedLearningResults(learningResults, isSelected) {
-    if (!selectedLearningResults instanceof Set) {
+    if (!(selectedLearningResults instanceof Set)) {
         selectedLearningResults = new Set(selectedLearningResults);
     }
 

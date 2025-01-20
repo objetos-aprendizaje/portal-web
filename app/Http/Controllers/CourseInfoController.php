@@ -41,7 +41,7 @@ class CourseInfoController extends BaseController
             'access_date' => now()
         ]);
 
-        $showDoubtsButton = $course->contact_emails->count() || $course->educational_program_type->redirection_queries->count();
+        $showDoubtsButton = $course->contact_emails->count() || $course->course_type->redirection_queries->count();
         return view("course-info", [
             'course' => $course,
             'studentCourseInfo' => $studentCourseInfo,
@@ -56,21 +56,21 @@ class CourseInfoController extends BaseController
 
     public function getCourseCalification(Request $request)
     {
-        $course_uid = $request->input('course_uid');
-        $calification = CoursesAssessmentsModel::where('course_uid', $course_uid)
+        $courseUid = $request->input('course_uid');
+        $calification = CoursesAssessmentsModel::where('course_uid', $courseUid)
             ->where('user_uid', Auth::user()->uid)
             ->first();
 
-        $calification_number = $calification->calification = number_format($calification->calification, 1);
+        $calificationNumber = $calification->calification = number_format($calification->calification, 1);
 
         return response()->json([
-            'calification' => $calification_number
+            'calification' => $calificationNumber
         ]);
     }
 
     private function getCourse($uid) {
         $course = CoursesModel::select('courses.*', 'califications_avg.average_calification')->where('uid', $uid)->with([
-            'blocks.learningResults', 'status', 'tags', 'teachers', 'course_type', 'paymentTerms', 'contact_emails', 'educational_program_type.redirection_queries'
+            'blocks.learningResults', 'status', 'tags', 'teachers', 'course_type', 'paymentTerms', 'contact_emails', 'course_type.redirection_queries'
         ])
             ->leftJoinSub(
                 CoursesAssessmentsModel::select('course_uid', DB::raw('ROUND(AVG(calification), 1) as average_calification'))
@@ -83,7 +83,9 @@ class CourseInfoController extends BaseController
             ->with(["categories", "center", "status"])
             ->first();
 
-        if (!$course) abort(404);
+        if (!$course) {
+            abort(404);
+        }
 
         return $course;
     }

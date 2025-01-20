@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const classClicked = event.target.classList;
 
         if (classClicked.contains("documentation-btn")) {
-            var courseUid = event.target
+            const courseUid = event.target
                 .closest(".course-block")
                 .querySelector(".course-uid").value;
             loadUploadFilesModal(courseUid);
@@ -250,8 +250,6 @@ function loadCourses(courses, container, status) {
     let noCoursesFound = document.getElementById("no-courses-found");
 
     container.innerHTML = "";
-
-    //courseDocuments = [];
 
     if (courses.length) {
         noCoursesFound.classList.add("hidden");

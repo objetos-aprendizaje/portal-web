@@ -16,7 +16,6 @@ class AutomaticResourceAprovalUsersModelFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    // protected $model = AutomaticResourceAprovalUsersModel::class;  
 
     public function definition(): array
     {

@@ -37,9 +37,9 @@ class ProcessPaymentRedsys extends BaseController
 
         // Datos de pago. Si es de curso o programa formativo y si es plazo o pago único
         $paymentData = json_decode(urldecode($decodedData->Ds_MerchantData));
-        $order_number = $decodedData->Ds_Order;
+        $orderNumber = $decodedData->Ds_Order;
 
-        $this->processPayment($paymentData, $order_number, $decodedData);
+        $this->processPayment($paymentData, $orderNumber, $decodedData);
 
         return response()->json(["message" => "OK"]);
     }
@@ -54,24 +54,26 @@ class ProcessPaymentRedsys extends BaseController
     private function validatePayment($decodedData)
     {
         $dsResponse = intval($decodedData->Ds_Response);
-        if ($dsResponse > 99) throw new OperationFailedException("Error en el pago", 406);
+        if ($dsResponse > 99) {
+            throw new OperationFailedException("Error en el pago", 406);
+        }
     }
 
 
-    private function processPayment($paymentData, $order_number, $decodedData)
+    private function processPayment($paymentData, $orderNumber, $decodedData)
     {
-        DB::transaction(function () use ($paymentData, $order_number, $decodedData) {
+        DB::transaction(function () use ($paymentData, $orderNumber, $decodedData) {
             if ($paymentData->learningObjectType == "course") {
                 if ($paymentData->paymentType == "singlePayment") {
-                    $this->saveCourseEnrolled($order_number, $decodedData);
+                    $this->saveCourseEnrolled($orderNumber, $decodedData);
                 } else if ($paymentData->paymentType == "paymentTerm") {
-                    $this->savePaymentTerm($order_number, $decodedData, "course");
+                    $this->savePaymentTerm($orderNumber, $decodedData, "course");
                 }
             } else if ($paymentData->learningObjectType == "educationalProgram") {
                 if ($paymentData->paymentType == "singlePayment") {
-                    $this->saveEducationalProgramEnrolled($order_number, $decodedData);
+                    $this->saveEducationalProgramEnrolled($orderNumber, $decodedData);
                 } else if ($paymentData->paymentType == "paymentTerm") {
-                    $this->savePaymentTerm($order_number, $decodedData, "educationalProgram");
+                    $this->savePaymentTerm($orderNumber, $decodedData, "educationalProgram");
                 }
             }
         });
@@ -83,7 +85,9 @@ class ProcessPaymentRedsys extends BaseController
 
         $paymentTerm = $model::where('order_number', $orderNumber)->first();
 
-        if ($paymentTerm->is_paid) return;
+        if ($paymentTerm->is_paid) {
+            return;
+        }
         $paymentTerm->is_paid = true;
         $paymentTerm->info = json_encode($decodedData);
         $paymentTerm->payment_date = now();
@@ -130,6 +134,8 @@ class ProcessPaymentRedsys extends BaseController
         $kc = app('general_options')['redsys_encryption_key'];
         $firma = $this->redsysAPI->createMerchantSignatureNotif($kc, $data);
 
-        if ($firma != $signature) abort(401);
+        if ($firma != $signature) {
+            abort(401);
+        }
     }
 }

@@ -26,9 +26,4 @@ class EducationalResourceTypesModel extends Model
     {
         return $this->hasMany(EducationalResourcesModel::class, 'educational_resource_type_uid', 'uid');
     }
-
-    public function redirection_queries_educational_program_types()
-    {
-        return $this->hasMany(RedirectionQueriesEducationalProgramTypesModel::class, 'educational_program_type_uid', 'uid');
-    }
 }

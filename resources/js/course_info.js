@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Detecta el número de estrellas que se le da al curso
 function clickStars() {
-    var stars = document.querySelectorAll(".stars-califications svg");
+    const stars = document.querySelectorAll(".stars-califications svg");
     stars.forEach(function (star, index) {
         star.addEventListener("click", function () {
             const starsClicked = index + 1;
@@ -20,14 +20,14 @@ function clickStars() {
 // Califica el curso
 function calificateCourse(starsClicked) {
 
-    const course_uid = document.getElementById("course_uid").value;
+    const courseUid = document.getElementById("course_uid").value;
 
     const params = {
         url: "/course/calificate",
         method: "POST",
         body: {
             stars: starsClicked,
-            course_uid: course_uid
+            course_uid: courseUid
         },
         stringify: true,
         toast: true,
@@ -42,12 +42,12 @@ function calificateCourse(starsClicked) {
 
 // Obtiene la calificación general del curso
 function getCourseCalification() {
-    const course_uid = document.getElementById("course_uid").value;
+    const courseUid = document.getElementById("course_uid").value;
 
     const params = {
         url: "/course/get_course_calification",
         body: {
-            course_uid
+            courseUid
         },
         method: "POST",
         stringify: true,

@@ -45,7 +45,7 @@
                                 Your browser does not support the audio element.
                             @break;
                             @case('PDF')
-                                <iframe class="mb-[30px]"
+                                <iframe class="mb-[30px]" title="recurso educativo"
                                     src="{{ env('BACKEND_URL') . '/' . $educational_resource->resource_path }}" width="100%"
                                     height="500px"></iframe>
 

@@ -30,18 +30,18 @@ class HomeController extends BaseController
     }
     public function index()
     {
-        $general_options = GeneralOptionsModel::all()->pluck('option_value', 'option_name')->toArray();
+        $generalOptions = GeneralOptionsModel::all()->pluck('option_value', 'option_name')->toArray();
 
-        $featured_courses = $this->getFeaturedCourses();
+        $featuredCourses = $this->getFeaturedCourses();
 
         $featuredEducationalPrograms = $this->getFeaturedEducationalPrograms();
 
-        $educational_resources = $this->getEducationalResources();
+        $educationalResources = $this->getEducationalResources();
 
         $categories = $this->getCategories();
 
         // Cursos y programas a destacar en el slider
-        $featuredCoursesSlider = $featured_courses->filter(function ($course) {
+        $featuredCoursesSlider = $featuredCourses->filter(function ($course) {
             return $course->featured_big_carrousel && $course->featured_big_carrousel_approved;
         });
 
@@ -50,7 +50,7 @@ class HomeController extends BaseController
         });
 
         // Cursos y programas a destacar en el carrousel
-        $featuredCoursesCarrousel = $featured_courses->filter(function ($course) {
+        $featuredCoursesCarrousel = $featuredCourses->filter(function ($course) {
             return $course->featured_small_carrousel && $course->featured_small_carrousel_approved;
         });
 
@@ -61,7 +61,7 @@ class HomeController extends BaseController
         // Combina los cursos y programas destacados en el carrousel destacado
         $featuredLearningObjectsCarrousel = $featuredCoursesCarrousel->merge($featuredEducationalProgramsCarrousel);
 
-        $lanes_preferences = $this->getLanesPreferences();
+        $lanesPreferences = $this->getLanesPreferences();
 
         $sliderPrevisualization = $this->getPrevisualizationSlider();
 
@@ -72,16 +72,16 @@ class HomeController extends BaseController
                 "resources/js/carrousel.js",
                 "resources/js/slider.js"
             ],
-            'featured_courses' => $featured_courses,
-            'general_options' => $general_options,
-            'educational_resources' => $educational_resources,
+            'featured_courses' => $featuredCourses,
+            'general_options' => $generalOptions,
+            'educational_resources' => $educationalResources,
             "categories" => $categories,
             "featuredCoursesSlider" => $featuredCoursesSlider,
             "featuredCoursesCarrousel" => $featuredCoursesCarrousel,
             "featuredEducationalProgramsSlider" => $featuredEducationalProgramsSlider,
             "featuredEducationalProgramsCarrousel" => $featuredEducationalProgramsCarrousel,
             "featuredEducationalPrograms" => $featuredEducationalPrograms,
-            "lanes_preferences" => $lanes_preferences,
+            "lanes_preferences" => $lanesPreferences,
             "sliderPrevisualization" => $sliderPrevisualization,
             "featuredLearningObjectsCarrousel" => $featuredLearningObjectsCarrousel,
             "page_title" => "Inicio"
@@ -90,7 +90,7 @@ class HomeController extends BaseController
 
     public function getTeacherCourses(Request $request)
     {
-        $items_per_page = $request->items_per_page;
+        $itemsPerPage = $request->items_per_page;
 
         $courses = CoursesModel::with(['teachers', 'status', 'educationalProgram', 'educationalProgram.status'])
             ->whereHas('teachers', function ($query) {
@@ -109,7 +109,7 @@ class HomeController extends BaseController
                         });
                 });
             })
-            ->paginate($items_per_page);
+            ->paginate($itemsPerPage);
 
         $this->transformCollection($courses);
 
@@ -131,21 +131,21 @@ class HomeController extends BaseController
 
     public function getActiveCourses(Request $request)
     {
-        $items_per_page = $request->items_per_page;
+        $itemsPerPage = $request->items_per_page;
 
         $user = Auth::user();
 
-        $courses_students = $user->courses_students()->with('status')
+        $coursesStudents = $user->courses_students()->with('status')
             ->whereHas('status', function ($query) {
                 $query->where('code', 'DEVELOPMENT');
             })
             ->wherePivot('acceptance_status', 'ACCEPTED')
             ->wherePivot('status', 'ENROLLED')
-            ->paginate($items_per_page);
+            ->paginate($itemsPerPage);
 
-        $this->transformCollection($courses_students);
+        $this->transformCollection($coursesStudents);
 
-        return response()->json($courses_students);
+        return response()->json($coursesStudents);
     }
 
     public function getRecommendedCourses(Request $request)
@@ -154,7 +154,7 @@ class HomeController extends BaseController
             throw new OperationFailedException();
         }
 
-        $items_per_page = $request->items_per_page;
+        $itemsPerPage = $request->items_per_page;
         $page = $request->page;
 
         // Cursos en los que el usuario está inscrito
@@ -167,7 +167,7 @@ class HomeController extends BaseController
 
         $learningResultsUser = auth()->user()->learningResultsPreferences->pluck('uid')->toArray();
 
-        $similarCourses = $this->embeddingsService->getSimilarCoursesList($coursesUser, $categoriesUser, $learningResultsUser, $items_per_page, $page);
+        $similarCourses = $this->embeddingsService->getSimilarCoursesList($coursesUser, $categoriesUser, $learningResultsUser, $itemsPerPage, $page);
 
         $this->transformCollection($similarCourses);
 
@@ -180,7 +180,7 @@ class HomeController extends BaseController
             throw new OperationFailedException();
         }
 
-        $items_per_page = $request->items_per_page;
+        $itemsPerPage = $request->items_per_page;
         $page = $request->page;
 
         // Recursos educativos con los que el usuario ha interactuado
@@ -192,7 +192,7 @@ class HomeController extends BaseController
         $categoriesUser = auth()->user()->categories->pluck('uid')->toArray();
         $learningResultsUser = auth()->user()->learningResultsPreferences->pluck('uid')->toArray();
 
-        $similarEducationalResources = $this->embeddingsService->getSimilarEducationalResourcesList($educationalResourcesUser, $categoriesUser, $learningResultsUser, $items_per_page, $page);
+        $similarEducationalResources = $this->embeddingsService->getSimilarEducationalResourcesList($educationalResourcesUser, $categoriesUser, $learningResultsUser, $itemsPerPage, $page);
 
         $this->transformCollection($similarEducationalResources);
 
@@ -201,7 +201,7 @@ class HomeController extends BaseController
 
     public function getMyEducationalResources(Request $request)
     {
-        $items_per_page = $request->items_per_page;
+        $itemsPerPage = $request->items_per_page;
 
         $educationalResources = EducationalResourcesModel::select("educational_resources.*")
             ->distinct()
@@ -210,7 +210,7 @@ class HomeController extends BaseController
                     ->from('educational_resource_access')
                     ->where('user_uid', Auth::user()->uid);
             })
-            ->paginate($items_per_page);
+            ->paginate($itemsPerPage);
 
         $this->transformCollection($educationalResources);
 
@@ -251,7 +251,7 @@ class HomeController extends BaseController
 
     private function getCoveredLearningResults($userLearningResults)
     {
-        $userLearningResultsCovered = CoursesModel::whereHas('students', function ($query) {
+        return CoursesModel::whereHas('students', function ($query) {
             $query->where('user_uid', Auth::user()->uid);
         })
             ->whereHas('blocks.learningResults', function ($query) use ($userLearningResults) {
@@ -261,13 +261,11 @@ class HomeController extends BaseController
                 $query->whereIn('learning_results.uid', $userLearningResults);
             })
             ->get()->pluck('blocks')->flatten()->pluck('learningResults')->flatten()->pluck('uid')->unique()->toArray();
-
-        return $userLearningResultsCovered;
     }
 
     private function getCoursesLearningResultsStudent($userLearningResultsNotCovered, $itemsPerPage)
     {
-        $paginatedCourses = CoursesModel::with(['status', 'blocks.learningResults' => function ($query) use ($userLearningResultsNotCovered) {
+        return CoursesModel::with(['status', 'blocks.learningResults' => function ($query) use ($userLearningResultsNotCovered) {
             $query->whereIn('learning_results.uid', $userLearningResultsNotCovered);
         }])
             ->whereHas('blocks.learningResults', function ($query) use ($userLearningResultsNotCovered) {
@@ -289,8 +287,6 @@ class HomeController extends BaseController
             }, 'learning_results_count')
             ->addSelect('courses.*')
             ->orderBy('learning_results_count', 'desc')->paginate($itemsPerPage);
-
-        return $paginatedCourses;
     }
 
     private function filterCoursesLearningResults($paginatedCourses, $userLearningResultsNotCovered, $itemsPerPage)
@@ -318,20 +314,18 @@ class HomeController extends BaseController
         $filteredCoursesCollection = collect($filteredCourses);
 
         // Crear una nueva instancia de LengthAwarePaginator para los cursos filtrados
-        $paginatedFilteredCourses = new LengthAwarePaginator(
+        return new LengthAwarePaginator(
             $filteredCoursesCollection->forPage($paginatedCourses->currentPage(), $itemsPerPage),
             $filteredCoursesCollection->count(),
             $itemsPerPage,
             $paginatedCourses->currentPage(),
             ['path' => request()->url(), 'query' => request()->query()]
         );
-
-        return $paginatedFilteredCourses;
     }
 
     private function getFeaturedEducationalPrograms()
     {
-        $featuredEducationalPrograms = EducationalProgramsModel::select('educational_programs.*', 'califications_avg.average_calification')
+        return EducationalProgramsModel::select('educational_programs.*', 'califications_avg.average_calification')
             ->leftJoinSub(
                 EducationalProgramsAssessmentsModel::select('educational_program_uid', DB::raw('ROUND(AVG(calification), 1) as average_calification'))
                     ->groupBy('educational_program_uid'),
@@ -371,73 +365,69 @@ class HomeController extends BaseController
                 $program->type = 'educationalProgram';
                 return $program;
             });
-
-        return $featuredEducationalPrograms;
     }
 
     private function getLanesPreferences()
     {
-        $lanes_preferences = null;
+        $lanesPreferences = null;
         if (Auth::check()) {
-            $lanes_preferences = UserLanesModel::where('user_uid', Auth::user()->uid)->get()->pluck('active', 'code')->toArray();
+            $lanesPreferences = UserLanesModel::where('user_uid', Auth::user()->uid)->get()->pluck('active', 'code')->toArray();
 
-            if (!isset($lanes_preferences['courses'])) {
-                $lanes_preferences['courses'] = true;
+            if (!isset($lanesPreferences['courses'])) {
+                $lanesPreferences['courses'] = true;
             }
 
-            if (!isset($lanes_preferences['resources'])) {
-                $lanes_preferences['resources'] = true;
+            if (!isset($lanesPreferences['resources'])) {
+                $lanesPreferences['resources'] = true;
             }
 
-            if (!isset($lanes_preferences['programs'])) {
-                $lanes_preferences['programs'] = true;
+            if (!isset($lanesPreferences['programs'])) {
+                $lanesPreferences['programs'] = true;
             }
         }
 
-        if (!$lanes_preferences) {
-            $lanes_preferences = [
+        if (!$lanesPreferences) {
+            $lanesPreferences = [
                 "courses" => true,
                 "resources" => true,
                 "programs" => true
             ];
         }
 
-        return $lanes_preferences;
+        return $lanesPreferences;
     }
 
     private function getCategories()
     {
-        $categories = CategoriesModel::withCount(['courses' => function ($query) {
+        return CategoriesModel::withCount(['courses' => function ($query) {
             $query->whereHas('status', function ($query) {
                 $query->whereIn('code', ['INSCRIPTION', 'ACCEPTED_PUBLICATION']);
             });
         }])
-        ->orderBy('courses_count', 'desc')
-        ->limit(9)
-        ->get();
-
-        return $categories;
+            ->orderBy('courses_count', 'desc')
+            ->limit(9)
+            ->get();
     }
 
     public function getInscribedCourses(Request $request)
     {
-        $items_per_page = $request->items_per_page;
+        $itemsPerPage = $request->items_per_page;
 
         $user = Auth::user();
-        $courses_students = $user->courses_students()->with('status')
+        $coursesStudents = $user->courses_students()->with('status')
             ->whereHas('status', function ($query) {
                 $query->whereIn('code', ['INSCRIPTION', 'ENROLLING', 'DEVELOPMENT']);
             })
-            ->paginate($items_per_page);
+            ->paginate($itemsPerPage);
 
-        $this->transformCollection($courses_students);
+        $this->transformCollection($coursesStudents);
 
-        return response()->json($courses_students);
+        return response()->json($coursesStudents);
     }
 
     private function getFeaturedCourses()
     {
-        $featured_courses = CoursesModel::select('courses.*', 'califications_avg.average_calification')
+        return CoursesModel::select('courses.*', 'califications_avg.average_calification')
             ->leftJoinSub(
                 CoursesAssessmentsModel::select('course_uid', DB::raw('ROUND(AVG(calification), 1) as average_calification'))
                     ->groupBy('course_uid'),
@@ -455,13 +445,11 @@ class HomeController extends BaseController
                 $course->type = 'course';
                 return $course;
             });
-
-        return $featured_courses;
     }
 
     private function getEducationalResources()
     {
-        $educational_resources = EducationalResourcesModel::with('status')->select('educational_resources.*', 'califications_avg.average_calification')->whereHas('status', function ($query) {
+        return EducationalResourcesModel::with('status')->select('educational_resources.*', 'califications_avg.average_calification')->whereHas('status', function ($query) {
             $query->where('code', 'PUBLISHED');
         })
             ->leftJoinSub(
@@ -473,15 +461,13 @@ class HomeController extends BaseController
                 'educational_resources.uid' // Corregido aquí
             )
             ->get();
-
-        return $educational_resources;
     }
 
     public function saveLanesPreferences(Request $request)
     {
 
         if (!in_array($request->lane, ["courses", "resources", "programs"])) {
-            throw new \Exception("Invalid lane");
+            throw new OperationFailedException("Invalid lane");
         }
 
         $lane = $request->lane;

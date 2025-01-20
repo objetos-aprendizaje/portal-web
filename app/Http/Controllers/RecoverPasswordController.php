@@ -14,8 +14,6 @@ class RecoverPasswordController extends BaseController
 {
     protected $mailService;
 
-    public function __construct() {}
-
     public function index()
     {
         return view('non_authenticated.recover_password', [
@@ -33,7 +31,9 @@ class RecoverPasswordController extends BaseController
 
         $user = UsersModel::where('email', $email)->first();
 
-        if ($user) $this->sendEmailRecoverPassword($user);
+        if ($user) {
+            $this->sendEmailRecoverPassword($user);
+        }
 
         return redirect()->route('login')->with([
             'sent_email_recover_password' => true,
@@ -44,8 +44,8 @@ class RecoverPasswordController extends BaseController
     private function sendEmailRecoverPassword($user)
     {
         $token = md5(uniqid(rand(), true));
-        $minutes_expiration_token = env('PWRES_TOKEN_EXPIRATION_MIN', 60);
-        $expiration_date = date("Y-m-d H:i:s", strtotime("+$minutes_expiration_token minutes"));
+        $minutesExpirationToken = env('PWRES_TOKEN_EXPIRATION_MIN', 60);
+        $expirationDate = date("Y-m-d H:i:s", strtotime("+$minutesExpirationToken minutes"));
 
         // Insertar el token en la tabla password_reset_tokens
         $resetPasswordToken = new ResetPasswordTokensModel();
@@ -53,7 +53,7 @@ class RecoverPasswordController extends BaseController
         $resetPasswordToken->uid_user = $user->uid;
         $resetPasswordToken->email = $user->email;
         $resetPasswordToken->token = $token;
-        $resetPasswordToken->expiration_date = $expiration_date;
+        $resetPasswordToken->expiration_date = $expirationDate;
         $resetPasswordToken->save();
 
         $url = URL::temporarySignedRoute(

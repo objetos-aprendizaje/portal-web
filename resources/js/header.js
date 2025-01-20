@@ -8,19 +8,21 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleMobileMenu();
         });
 
-    document
-        .getElementById("notifications-btn")
-        .addEventListener("click", function () {
+    const notificationsBtn = document.getElementById("notifications-btn");
+    if (notificationsBtn) {
+        notificationsBtn.addEventListener("click", function () {
             hideMobileMenus();
             toogleNotificationsMenu();
         });
+    }
 
-    document
-        .getElementById("user-menu-mobile-btn")
-        .addEventListener("click", function () {
+    const userMenuMobileBtn = document.getElementById("user-menu-mobile-btn");
+    if (userMenuMobileBtn) {
+        userMenuMobileBtn.addEventListener("click", function () {
             hideMobileMenus();
             toogleUserMenuMobile();
         });
+    }
 
     document
         .getElementById("overlay-layer-menu")

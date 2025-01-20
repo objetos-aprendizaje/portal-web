@@ -13,7 +13,6 @@ export default (node, treeOptions) => {
         isMultiSelect,
         disabled = false,
         showCheckbox,
-        props,
         type = {},
         buttons = [],
     } = node;

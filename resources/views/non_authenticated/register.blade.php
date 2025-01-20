@@ -27,45 +27,45 @@
 
                             <div class="flex gap-[20px] mb-[20px]">
                                 <div class="flex flex-col w-1/2">
-                                    <label class="px-3 mb-[8px]">Nombre</label>
+                                    <label class="px-3 mb-[8px]" for="first_name">Nombre</label>
                                     <input aria-label="Nombre"
                                         class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[50px]"
-                                        type="text" name="first_name" value="{{ old('first_name') }}" />
+                                        type="text" name="first_name" value="{{ old('first_name') }}" id="first_name" />
                                 </div>
 
                                 <div class="flex flex-col w-1/2">
-                                    <label class="px-3 mb-[8px]">Apellidos</label>
+                                    <label class="px-3 mb-[8px]" for="last_name">Apellidos</label>
                                     <input aria-label="apellidos"
                                         class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[50px]"
-                                        type="text" name="last_name" value="{{ old('last_name') }}" />
+                                        type="text" name="last_name" value="{{ old('last_name') }}" id="last_name" />
                                 </div>
                             </div>
 
                             <div class="flex flex-col mb-[20px]">
-                                <label class="px-3 mb-[8px]">Correo</label>
+                                <label class="px-3 mb-[8px]" for="email">Correo</label>
                                 <input aria-label="email"
                                     class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[50px]"
-                                    type="text" name="email" value="{{ old('email') }}" />
+                                    type="text" name="email" value="{{ old('email') }}" id="email" />
                             </div>
 
                             <div class="flex flex-col mb-[20px]">
-                                <label class="px-3 mb-[8px]">Contraseña</label>
+                                <label class="px-3 mb-[8px]" for="password">Contraseña</label>
                                 <input aria-label="contraseña"
                                     class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
-                                    name="password" type="password" />
+                                    name="password" type="password" id="password" />
                             </div>
 
                             <div class="flex flex-col mb-[20px]">
-                                <label class="px-3 mb-[8px]">Confirma la contraseña</label>
+                                <label class="px-3 mb-[8px]" for="password_confirmation">Confirma la contraseña</label>
                                 <input aria-label="confirmar contraseña"
                                     class="border-[1.5px] border-solid border-color_1 rounded-full h-[50px] p-3"
-                                    name="password_confirmation" type="password" />
+                                    name="password_confirmation" type="password" id="password_confirmation" />
                             </div>
 
                             @if ($errors->any())
                                 <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px]">
                                     <p>Los siguientes campos son erróneos:</p>
-                                    <ul class="list-disc">
+                                    <ul class="list-disc ml-6 mr-6 mt-2">
                                         @foreach ($errors->all() as $error)
                                             <li>{{ $error }}</li>
                                         @endforeach
@@ -243,7 +243,7 @@
                 @if ($errors->any())
                     <div class="bg-[#ff605814] py-[12px] px-[27px] rounded-[8px] mb-[15px]">
                         <p>Los siguientes campos son erróneos:</p>
-                        <ul class="list-disc">
+                        <ul class="list-disc ml-6 mr-6 mt-2">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach

@@ -58,24 +58,31 @@
                 <button title="Buscar" type="button"
                     class="bg-color_1 absolute w-[32px] h-[32px] flex items-center justify-center rounded-[8px] ">
                     {{ e_heroicon('magnifying-glass', 'outline', 'white', 20, 20, null, '3') }}
-                    <!--<div tabindex="0"
-                    class="bg-color_1 p-2 cursor-pointer mx-1 rounded-[10px] input-search transition duration-300 hover:bg-color_2">
-                    {{ e_heroicon('magnifying-glass', 'outline', 'white') }}
-                </div>-->
             </div>
         </div>
     </div>
 
     <div class="container mx-auto mt-[51px] mb-[30px] flex justify-center">
-        <img alt="logotipo" class="max-w-[600px] w-full" src="images/logo-financed-ue.png" />
+        <img alt="logotipo" class="max-w-[600px] w-full" src="/images/logo-financed-ue.png" />
     </div>
 
     <hr>
 
     <div class="container mx-auto flex justify-between py-[38px] lg:flex-row gap-[20px] flex-col-reverse items-center">
-        <p class="text-sm text-color_3 text-center">
-            © {{ date('Y') }} {{ $general_options['company_name'] }}. Todos los derechos reservados.
-        </p>
+
+        <div class="flex flex-col text-sm text-color_3">
+            <p>
+                {{ $general_options['company_name'] }} {{ $general_options['cif'] }}
+            </p>
+
+            <p>
+                {{ $general_options['fiscal_domicile'] }}
+            </p>
+
+            <p>
+                {{ $general_options['phone_number'] }}
+            </p>
+        </div>
 
         @if (
             $general_options['facebook_url'] ||

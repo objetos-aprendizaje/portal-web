@@ -107,14 +107,36 @@
             </li>
         </a>
 
-        <a aria-label="enlace" class="no-effect-hover" href="{{ route('notifications') }}">
-            <li class="menu-element {{ $currentPage === 'notifications' ? 'menu-element-selected' : '' }}">
-                <div class="menu-content">
-                    <div class="icon">{{ e_heroicon('bell-alert', 'outline', '#C7C7C7', 24, 24) }}</div>
-                    <span>Notificaciones</span>
-                </div>
-            </li>
-        </a>
+        <li class="menu-element has-submenu">
+            <div class="toggle-submenu menu-content {{ $currentPage === 'profile-general-notifications' ? 'menu-element-selected' : '' }}">
+                <div class="icon">{{ e_heroicon('bell-alert', 'outline', '#C7C7C7', 24, 24) }}</div>
+                <div><span>Mis notificaciones</span></div>
+                <div class="icon-up">{{ e_heroicon('chevron-up', 'outline', '#000000', 12, 12) }}</div>
+                <div class="icon-down hidden">{{ e_heroicon('chevron-down', 'outline', '#000000', 12, 12) }}</div>
+            </div>
+
+            <ul class="sub-menu">
+                <a aria-label="enlace" class="no-effect-hover" href="{{ route('profile-general-notifications') }}">
+                    <li>
+                        <div
+                            class="menu-content sub-menu-content {{ $currentPage === 'profileGeneralNotifications' ? 'menu-element-selected' : '' }}">
+                            {{ e_heroicon('square-2-stack', 'outline', '#C7C7C7', 24, 24) }}
+                            <span>Generales</span>
+                        </div>
+                    </li>
+                </a>
+
+                <a aria-label="enlace" class="no-effect-hover" href="{{ route('profile-email-notifications') }}">
+                    <li>
+                        <div
+                            class="menu-content sub-menu-content {{ $currentPage === 'profileEmailNotifications' ? 'menu-element-selected' : '' }}">
+                            {{ e_heroicon('square-2-stack', 'outline', '#C7C7C7', 24, 24) }}
+                            <span>Por email</span>
+                        </div>
+                    </li>
+                </a>
+            </ul>
+        </li>
 
         <a aria-label="enlace" class="no-effect-hover" href="{{ route('categories') }}">
             <li class="menu-element {{ $currentPage === 'categories' ? 'menu-element-selected' : '' }}">

@@ -53,11 +53,11 @@
                 <div aria-label="enlace" class="flex justify-between gap-1">
                     <a aria-label="enlace" class="course-link" href="#">
                         <div class="hidden lg:block">
-                            <h2 class="title line-clamp line-clamp-2 mb-[12px] text-color_1"></h2>
+                            <h2 class="title line-clamp line-clamp-2 mb-[12px] text-color_1">Título curso</h2>
                         </div>
 
                         <div class="lg:hidden block">
-                            <h5 class="title line-clamp line-clamp-2 mb-[12px] text-color_1"></h5>
+                            <h5 class="title line-clamp line-clamp-2 mb-[12px] text-color_1">Título curso</h5>
                         </div>
                     </a>
 

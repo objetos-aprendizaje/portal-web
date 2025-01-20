@@ -30,6 +30,8 @@ use App\Http\Controllers\Profile\MyEducationalPrograms\HistoricEducationalProgra
 use App\Http\Controllers\Profile\MyEducationalPrograms\InscribedEducationalProgramsController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\GetEmailController;
+use App\Http\Controllers\Profile\Notifications\ProfileEmailNotificationsController;
+use App\Http\Controllers\Profile\Notifications\ProfileGeneralNotificationsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,8 +91,11 @@ Route::middleware('policies')->group(function () {
         Route::get('/profile/categories', [CategoriesController::class, 'index'])->name('categories');
         Route::post('/profile/categories/save_categories', [CategoriesController::class, 'saveCategories'])->name('save-categories');
 
-        Route::get('/profile/notifications', [NotificationsController::class, 'index'])->name('notifications');
-        Route::post('/profile/notifications/save_notifications', [NotificationsController::class, 'saveNotifications'])->name('save-notifications');
+        Route::get('/profile/notifications/general', [ProfileGeneralNotificationsController::class, 'index'])->name('profile-general-notifications');
+        Route::post('/profile/notifications/general/save', [ProfileGeneralNotificationsController::class, 'saveNotifications']);
+
+        Route::get('/profile/notifications/email', [ProfileEmailNotificationsController::class, 'index'])->name('profile-email-notifications');
+        Route::post('/profile/notifications/email/save', [ProfileEmailNotificationsController::class, 'saveNotifications']);
 
         Route::get('/profile/competences_learning_results', [CompetencesLearningResultsController::class, 'index'])->name("competences-learning-results");
         Route::post('/profile/competences_learning_results/save_learning_results', [CompetencesLearningResultsController::class, 'saveLearningResults']);

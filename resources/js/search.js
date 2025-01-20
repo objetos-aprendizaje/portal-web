@@ -125,7 +125,7 @@ function initHandlers() {
 }
 
 function applyOrder() {
-    var orderBy = this.getAttribute("data-order_by");
+    const orderBy = this.getAttribute("data-order_by");
 
     let orderByLabel = "";
     if (orderBy == "relevance") {
@@ -155,7 +155,9 @@ function wipeFilters() {
     treeSelectCategories.updateValue([]);
 
     selectedCompetences = [];
-    tomSelectLearningResultsFilter.clear();
+
+    tomSelectLearningResultsFilter.destroy();
+    initializeTomSelectCompetences();
 
     deleteParamFromUrl("category_uid");
     deleteParamFromUrl("text");
@@ -203,11 +205,11 @@ function getParamFromUrl(paramName) {
 }
 
 function getCategoryChecked() {
-    let category_uid = getParamFromUrl("category_uid");
+    let categoryUid = getParamFromUrl("category_uid");
 
-    if (category_uid) {
-        treeSelectCategories.updateValue([category_uid]);
-        selectedCategories = [category_uid];
+    if (categoryUid) {
+        treeSelectCategories.updateValue([categoryUid]);
+        selectedCategories = [categoryUid];
     }
 }
 
@@ -244,20 +246,24 @@ function handleChecksResourceTypes() {
                     }
                     searchLearningObjects();
                 } else {
-                    // Verificar si es la última casilla marcada
-                    if (resourceTypes.length > 1) {
-                        let index = resourceTypes.indexOf(this.id);
-                        if (index !== -1) {
-                            resourceTypes.splice(index, 1);
-                            searchLearningObjects();
-                        }
-                    } else {
-                        // Si es la última, volver a marcar la casilla y no llamar a searchLearningObjects
-                        this.checked = true;
-                    }
+                    handleUncheckedCheckbox(this);
                 }
             });
     });
+}
+
+function handleUncheckedCheckbox(checkbox) {
+    // Verificar si es la última casilla marcada
+    if (resourceTypes.length > 1) {
+        let index = resourceTypes.indexOf(checkbox.id);
+        if (index !== -1) {
+            resourceTypes.splice(index, 1);
+            searchLearningObjects();
+        }
+    } else {
+        // Si es la última, volver a marcar la casilla y no llamar a searchLearningObjects
+        checkbox.checked = true;
+    }
 }
 
 function initializeFlatpickr() {
@@ -453,14 +459,14 @@ function updateFiltersSelectors(filters) {
         filtersContainer.prepend(document.importNode(templateCloned, true));
     }
 
-    if (filters.categories && filters.categories.length) {
+    if (filters.categories?.length) {
         addFilter(
             filters.categories.length + " categorías seleccionadas",
             "categories"
         );
     }
 
-    if (filters.competences && filters.competences.length) {
+    if (filters.competences?.length) {
         addFilter(
             filters.competences.length + " competencias seleccionadas",
             "competences"
@@ -516,7 +522,7 @@ function updateFiltersSelectors(filters) {
         addFilter("Búsqueda: " + filters.search, "search");
     }
 
-    if (filters.learningResults && filters.learningResults.length) {
+    if (filters.learningResults?.length) {
         addFilter(
             filters.learningResults.length +
                 " resultados de aprendizaje seleccionados",

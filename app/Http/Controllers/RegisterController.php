@@ -22,17 +22,23 @@ class RegisterController extends BaseController
     {
         // Comprobación si el registro está activo
         $registrationActive = app('general_options')['registration_active'];
-        if (!$registrationActive) return redirect('/login');
+        if (!$registrationActive) {
+            return redirect('/login');
+        }
 
-        $logo_bd = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
+        $logoBd = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
 
-        if ($logo_bd != null) $logo = $logo_bd['option_value'];
-        else $logo = null;
+        if ($logoBd != null) {
+            $logo = $logoBd['option_value'];
+        }
+        else {
+            $logo = null;
+        }
 
         $urlCas = $this->getCasUrl();
         $urlRediris = $this->getRedirisUrl();
 
-        $parameters_login_systems = Cache::get('parameters_login_systems');
+        $parametersLoginSystems = Cache::get('parameters_login_systems');
 
         return view('non_authenticated.register', [
             "page_name" => "Regístrate",
@@ -44,7 +50,7 @@ class RegisterController extends BaseController
             "cert_login" => env('DOMINIO_CERTIFICADO'),
             "urlCas" => $urlCas,
             "urlRediris" => $urlRediris,
-            "parameters_login_systems" => $parameters_login_systems
+            "parameters_login_systems" => $parametersLoginSystems
         ]);
     }
 
@@ -55,7 +61,9 @@ class RegisterController extends BaseController
         if ($loginCas) {
             $loginCasUrl = Saml2TenantsModel::where('key', 'cas')->first();
             $urlCas = url('saml2/' . $loginCasUrl->uuid . '/login');
-        } else $urlCas = false;
+        } else {
+            $urlCas = false;
+        }
 
         return $urlCas;
     }
@@ -67,7 +75,9 @@ class RegisterController extends BaseController
         if ($loginRediris) {
             $loginRedirisUrl = Saml2TenantsModel::where('key', 'rediris')->first();
             $urlRediris = url('saml2/' . $loginRedirisUrl->uuid . '/login');
-        } else $urlRediris = false;
+        } else {
+            $urlRediris = false;
+        }
 
         return $urlRediris;
     }
@@ -134,26 +144,28 @@ class RegisterController extends BaseController
     {
         $verify = EmailVerifyModel::where('token', $request->token)->first();
 
-        if (!$verify) return redirect('/error/002');
+        if (!$verify) {
+            return redirect('/error/002');
+        }
 
-        $user_bd = UsersModel::where('uid', $verify->user_uid)->with('roles')->first();
+        $userBd = UsersModel::where('uid', $verify->user_uid)->with('roles')->first();
 
         if ($verify->expires_at <=  now()) {
             return redirect('/login')->with([
                 'verify_link_expired' => true,
-                'email' => $user_bd->email
+                'email' => $userBd->email
             ]);
         }
 
-        $user_bd->verified = true;
+        $userBd->verified = true;
 
-        DB::transaction(function () use ($verify, $user_bd, $request) {
-            $user_bd->save();
+        DB::transaction(function () use ($userBd, $request) {
+            $userBd->save();
             EmailVerifyModel::where('token', $request->token)->delete();
         });
 
         return redirect('/login')->with([
-            'email_verified' => $user_bd->email
+            'email_verified' => $userBd->email
         ]);
     }
 

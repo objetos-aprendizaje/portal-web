@@ -4,18 +4,13 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 document.addEventListener("DOMContentLoaded", function () {
-    var swiper = new Swiper(".swiper-container", {
+    new Swiper(".swiper-container", {
         navigation: {
             nextEl: ".swiper-button-next",
             prevEl: ".swiper-button-prev",
         },
-        pagination: {
-            el: ".swiper-pagination",
-            dynamicBullets: true,
-        },
         slidesPerView: 1,
         spaceBetween: 50,
-        // init: false,
         pagination: {
             el: ".swiper-pagination",
             clickable: true,

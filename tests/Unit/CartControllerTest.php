@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use App\Models\CoursesPaymentTermsModel;
 use App\Models\EducationalProgramsModel;
+use App\Exceptions\OperationFailedException;
 use App\Models\EducationalProgramTypesModel;
 use App\Models\EducationalProgramStatusesModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -463,7 +464,7 @@ class CartControllerTest extends TestCase
         // Crea un programa educativo disponible para inscripción
         $program = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
             'educational_program_status_uid' => $status->uid,
-            'validate_student_registrations' => false,            
+            'validate_student_registrations' => false,
         ])->first();
 
         $data = [
@@ -489,13 +490,13 @@ class CartControllerTest extends TestCase
         // Crea un programa educativo disponible para inscripción
         $program = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
             'educational_program_status_uid' => $status->uid,
-            'validate_student_registrations' => false,   
-            'cost'=> 100,         
+            'validate_student_registrations' => false,
+            'cost' => 100,
         ])->first();
 
         $data = [
             'learningObjectType' => 'educational_program',
-            'learningObjectUid' => $program->uid,            
+            'learningObjectUid' => $program->uid,
         ];
 
         // Realiza la solicitud POST a la ruta
@@ -506,7 +507,10 @@ class CartControllerTest extends TestCase
         $response->assertJson(['message' => 'Inscripción realizada con éxito']);
     }
 
-    /** @test*/
+
+
+    // Todo: estas pruebas estan presentando error, se comenta para su revisión luego, fecha creación :17-01-25
+    /** @test*/    
     public function testInscriptionAlreadyExists()
     {
         $user = UsersModel::factory()->create()->first();
@@ -525,15 +529,17 @@ class CartControllerTest extends TestCase
             'course_uid' => $course->uid,
         ]);
 
+        // Datos para la solicitud
         $data = [
             'learningObjectType' => 'course',
             'learningObjectUid' => $course->uid,
-        ];
+        ];     
 
-        // Realiza la solicitud POST a la ruta y espera un error 422 (ya inscrito)
-        $response = $this->postJson('/cart/inscribe', $data);
-
-        $response->assertJson(['message' => "Ya estás inscrito"]);
+        // Realiza la solicitud POST a la ruta
+        $response= $this->postJson('/cart/inscribe', $data);
+        $response->assertStatus(406);
+        $response->assertJson(['message' => 'Ya estás inscrito']);
+                
     }
 
     /** @test*/
@@ -593,41 +599,6 @@ class CartControllerTest extends TestCase
 
         $response->assertJson(['message' => "El curso no está disponible para inscripción"]);
     }
-
-
-    /** @test*/
-    // Todo: hacer ajustes para llegar a la linea 142 a la 144
-    // public function testInscriptionWithoutValidateCheckIfUserIsAlreadyInscribed()
-    // {
-    //     $user = UsersModel::factory()->create()->first();
-    //     $this->actingAs($user);
-
-    //     $status = CourseStatusesModel::where('code', 'INSCRIPTION')->first();
-    //     // Crea un curso disponible para inscripción
-    //     $course = CoursesModel::factory()->withCourseType()->create([
-    //         'course_status_uid'  => $status->uid,
-    //         'validate_student_registrations' => false,
-    //         'cost' => null
-    //     ])->first();
-
-    //     $course->students()->attach(
-    //         $user->uid,
-    //         [
-    //             'uid'=> generate_uuid(),
-    //         ]
-    //     );
-
-    //     $data = [
-    //         'learningObjectType' => 'course',
-    //         'learningObjectUid' => $course->uid,
-    //     ];
-
-    //     $response = $this->postJson('/cart/inscribe', $data);
-
-    //     $response->assertStatus(406);
-
-    //     $response->assertJson(['message' => "El curso no está disponible para inscripción"]);
-    // }
 
 
 }

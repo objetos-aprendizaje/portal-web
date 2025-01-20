@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SendEmailJob;
-use App\Mail\SendDoubt;
 use App\Models\CoursesModel;
 use App\Models\EducationalProgramsModel;
 use App\Models\EducationalResourcesModel;
@@ -12,10 +11,10 @@ use Illuminate\Support\Facades\Validator;
 
 class DoubtsController extends Controller
 {
-    public function index($learning_object_type, $uid)
+    public function index($learningObjectType, $uid)
     {
 
-        if (!in_array($learning_object_type, ['course', 'educational_program', 'educational_resource'])) {
+        if (!in_array($learningObjectType, ['course', 'educational_program', 'educational_resource'])) {
             abort(404);
         }
 
@@ -23,7 +22,7 @@ class DoubtsController extends Controller
             "resources" => [
                 "resources/js/doubts.js"
             ],
-            "learning_object_type" => $learning_object_type,
+            "learning_object_type" => $learningObjectType,
             "uid" => $uid,
             "page_title" => "Dudas"
         ]);
@@ -61,7 +60,7 @@ class DoubtsController extends Controller
             return response()->json(['message' => 'Algunos campos son incorrectos', 'errors' => $errorsValidator], 422);
         }
 
-        $learning_object_type = $request->input('learning_object_type');
+        $learningObjectType = $request->input('learning_object_type');
         $uid = $request->input('uid');
 
         $name = trim($request->input('name'));
@@ -74,11 +73,11 @@ class DoubtsController extends Controller
             'userMessage' => $message
         ];
 
-        if ($learning_object_type == 'course') {
+        if ($learningObjectType == 'course') {
             $this->handleCourse($uid, $parameters);
-        } else if ($learning_object_type == 'educational_program') {
+        } else if ($learningObjectType == 'educational_program') {
             $this->handleEducationalProgram($uid, $parameters);
-        } else if ($learning_object_type == 'educational_resource') {
+        } else if ($learningObjectType == 'educational_resource') {
             $this->handleEducationalResource($uid, $parameters);
         }
 
@@ -87,78 +86,76 @@ class DoubtsController extends Controller
 
     private function handleCourse($uid, $parameters)
     {
-        $learning_object = CoursesModel::where('uid', $uid)->with([
-            'educational_program_type',
-            'educational_program_type.redirection_queries' => function ($query) {
+        $learningObject = CoursesModel::where('uid', $uid)->with([
+            'course_type',
+            'course_type.redirection_queries' => function ($query) {
                 $query->where('type', 'email');
             },
             'contact_emails'
         ])->first();
 
-        if (!$learning_object) {
+        if (!$learningObject) {
             return response()->json(['message' => 'El curso no existe'], 404);
         }
 
-        $emails_to_send = $this->extractEmails($learning_object);
+        $emailsToSend = [];
+        if ($learningObject->contact_emails->count()) {
+            $emailsToSend = $learningObject->contact_emails->pluck('email')->toArray();
+        } else if ($learningObject->course_type->redirection_queries->count()) {
+            $emailsToSend = $learningObject->course_type->redirection_queries->pluck('contact')->toArray();
+        }
 
-        $parameters['learningObjectName'] = $learning_object->title;
-
-        $this->sendEmails($emails_to_send, $parameters);
+        $parameters['learningObjectName'] = $learningObject->title;
+        $this->sendEmails($emailsToSend, $parameters);
     }
 
     private function handleEducationalProgram($uid, $parameters)
     {
-        $educational_program = EducationalProgramsModel::where('uid', $uid)->with([
+        $educationalProgram = EducationalProgramsModel::where('uid', $uid)->with([
             'educational_program_type',
             'educational_program_type.redirection_queries' => function ($query) {
                 $query->where('type', 'email');
             }
         ])->first();
 
-        if (!$educational_program) {
+        if (!$educationalProgram) {
             return response()->json(['message' => 'El programa formativo no existe'], 404);
         }
 
-        $emails_to_send = $this->extractEmails($educational_program);
+        $emailsToSend = [];
+        if ($educationalProgram->contact_emails->count()) {
+            $emailsToSend = $educationalProgram->contact_emails->pluck('email')->toArray();
+        } else if ($educationalProgram->educational_program_type->redirection_queries->count()) {
+            $emailsToSend = $educationalProgram->educational_program_type->redirection_queries->pluck('contact')->toArray();
+        }
 
-        $parameters['learningObjectName'] = $educational_program->name;
-        $this->sendEmails($emails_to_send, $parameters);
+        $parameters['learningObjectName'] = $educationalProgram->name;
+        $this->sendEmails($emailsToSend, $parameters);
     }
 
     private function handleEducationalResource($uid, $parameters)
     {
-        $educational_resource = EducationalResourcesModel::where('uid', $uid)
+        $educationalResource = EducationalResourcesModel::where('uid', $uid)
             ->with([
                 'contactEmails',
                 'educationalResourceType'
             ])
             ->first();
 
-        if (!$educational_resource) {
+        if (!$educationalResource) {
             return response()->json(['message' => 'El recurso educativo no existe'], 404);
         }
 
-        $emailsToSend = $educational_resource->contactEmails->pluck('email')->toArray();
+        $emailsToSend = $educationalResource->contactEmails->pluck('email')->toArray();
 
-        $parameters['learningObjectName'] = $educational_resource->title;
+        $parameters['learningObjectName'] = $educationalResource->title;
         $this->sendEmails($emailsToSend, $parameters);
-    }
-
-    private function extractEmails($learning_object)
-    {
-        if (!empty($learning_object->contact_emails->toArray())) {
-            return $learning_object->contact_emails->pluck('email')->toArray();
-        } else if (!empty($learning_object->educational_program_type->redirection_queries->toArray())) {
-            return $learning_object->educational_program_type->redirection_queries->pluck('contact')->toArray();
-        }
-
-        return [];
     }
 
     private function sendEmails($emails, $parameters)
     {
-        foreach ($emails as $destination_email) {
-            dispatch(new SendEmailJob($destination_email, 'Has recibido una nueva consulta', $parameters, 'emails.doubt_learning_result'));
+        foreach ($emails as $destinationEmail) {
+            dispatch(new SendEmailJob($destinationEmail, 'Has recibido una nueva consulta', $parameters, 'emails.doubt_learning_result'));
         }
     }
 }

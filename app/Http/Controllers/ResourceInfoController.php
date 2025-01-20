@@ -15,36 +15,40 @@ class ResourceInfoController extends BaseController
 
     public function index($uid)
     {
-        $educational_resource = $this->getResourceDatabase($uid);
+        $educationalResource = $this->getResourceDatabase($uid);
 
-        $showDoubtsButton = $educational_resource->contactEmails->count() ? true : false;
-        if (!$educational_resource) abort(404);
+        $showDoubtsButton = $educationalResource->contactEmails->count() ? true : false;
+        if (!$educationalResource) {
+            abort(404);
+        }
 
         // Grabar acceso
         $this->storeResourceAccess($uid);
 
         return view("resource-info", [
             'showDoubtsButton' => $showDoubtsButton,
-            'educational_resource' => $educational_resource,
+            'educational_resource' => $educationalResource,
             "resources" => [
                 'resources/js/educational_resource_info.js'
             ],
-            'page_title' => $educational_resource->title,
+            'page_title' => $educationalResource->title,
         ]);
     }
 
-    public function getResource($resource_uid)
+    public function getResource($resourceUid)
     {
-        $educational_resource = $this->getResourceDatabase($resource_uid);
+        $educationalResource = $this->getResourceDatabase($resourceUid);
 
-        if (!$educational_resource) abort(404);
+        if (!$educationalResource) {
+            abort(404);
+        }
 
-        return response()->json($educational_resource);
+        return response()->json($educationalResource);
     }
 
-    private function getResourceDatabase($resource_uid)
+    private function getResourceDatabase($resourceUid)
     {
-        $educational_resource = EducationalResourcesModel::with('status', 'contactEmails', 'educationalResourceType.redirection_queries_educational_program_types', 'categories', 'learningResults')->select('educational_resources.*', 'califications_avg.average_calification')->with('licenseType')->whereHas('status', function ($query) {
+        return EducationalResourcesModel::with('status', 'contactEmails', 'educationalResourceType', 'categories', 'learningResults')->select('educational_resources.*', 'califications_avg.average_calification')->with('licenseType')->whereHas('status', function ($query) {
             $query->where('code', 'PUBLISHED');
         })
             ->leftJoinSub(
@@ -55,10 +59,8 @@ class ResourceInfoController extends BaseController
                 '=',
                 'educational_resources.uid'
             )
-            ->where('uid', $resource_uid)
+            ->where('uid', $resourceUid)
             ->first();
-
-        return $educational_resource;
     }
 
     public function calificate(Request $request)
@@ -69,13 +71,12 @@ class ResourceInfoController extends BaseController
             'educational_resource_uid' => 'required|exists:educational_resources,uid'
         ]);
 
-        $educational_resource_uid = $request->input('educational_resource_uid');
-        $calification = $request->input('calification');
+        $educationalResourceUid = $request->input('educational_resource_uid');
 
         $calificationValue = $request->input('calification');
 
         $calification = EducationalResourcesAssessmentsModel::where('user_uid', auth()->user()->uid)
-            ->where('educational_resources_uid', $educational_resource_uid)
+            ->where('educational_resources_uid', $educationalResourceUid)
             ->first();
 
         if ($calification) {
@@ -85,7 +86,7 @@ class ResourceInfoController extends BaseController
             $calification = new EducationalResourcesAssessmentsModel();
             $calification->uid = generate_uuid();
             $calification->user_uid = auth()->user()->uid;
-            $calification->educational_resources_uid = $educational_resource_uid;
+            $calification->educational_resources_uid = $educationalResourceUid;
             $calification->calification = $calificationValue;
             $calification->save();
         }
@@ -97,7 +98,9 @@ class ResourceInfoController extends BaseController
     {
         $educationalResourceAccess = new EducationalResourceAccessModel();
         $educationalResourceAccess->uid = generate_uuid();
-        if (auth()->user()) $educationalResourceAccess->user_uid = auth()->user()->uid;
+        if (auth()->user()) {
+            $educationalResourceAccess->user_uid = auth()->user()->uid;
+        }
         $educationalResourceAccess->educational_resource_uid = $resourceUid;
         $educationalResourceAccess->date = now();
         $educationalResourceAccess->save();

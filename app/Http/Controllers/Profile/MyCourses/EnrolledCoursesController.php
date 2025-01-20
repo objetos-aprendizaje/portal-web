@@ -26,7 +26,7 @@ class EnrolledCoursesController extends BaseController
     public function getEnrolledCourses(Request $request)
     {
         $user = auth()->user();
-        $items_per_page = $request->items_per_page;
+        $itemsPerPage = $request->items_per_page;
         $search = $request->search;
 
         $coursesStudentQuery = $user->courses_students()
@@ -49,7 +49,7 @@ class EnrolledCoursesController extends BaseController
             });
         }
 
-        $coursesStudent = $coursesStudentQuery->paginate($items_per_page);
+        $coursesStudent = $coursesStudentQuery->paginate($itemsPerPage);
 
         $coursesStudent->getCollection()->transform(function ($courseStudent) {
             return [

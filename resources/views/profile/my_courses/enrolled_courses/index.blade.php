@@ -59,7 +59,7 @@
 
                     <div class="w-full flex-grow">
                         <a aria-label="enlace" class="course-link" href="#">
-                            <h2 class="title line-clamp line-clamp-2 mb-[12px]"></h2>
+                            <h2 class="title line-clamp line-clamp-2 mb-[12px]">Título curso</h2>
                         </a>
 
                         <div class="mb-[12px]">

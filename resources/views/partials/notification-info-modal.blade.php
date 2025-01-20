@@ -2,6 +2,7 @@
     <div class="modal-body w-full md:w-[600px]">
         <div class="text-center mb-4">
             <h2 class="modal-title" id="notification-title">
+                Información de notificación
             </h2>
             <p id="notification-description">
             </p>

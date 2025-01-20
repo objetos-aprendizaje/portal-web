@@ -26,7 +26,7 @@ class EnrolledEducationalProgramsController extends BaseController
     public function getEnrolledEducationalPrograms(Request $request)
     {
         $user = auth()->user();
-        $items_per_page = $request->items_per_page;
+        $itemsPerPage = $request->items_per_page;
         $search = $request->search;
 
         $educationalProgramsStudentQuery = $user->educationalPrograms()
@@ -50,7 +50,7 @@ class EnrolledEducationalProgramsController extends BaseController
             });
         }
 
-        $educationalProgramsStudent = $educationalProgramsStudentQuery->paginate($items_per_page);
+        $educationalProgramsStudent = $educationalProgramsStudentQuery->paginate($itemsPerPage);
 
         $educationalProgramsStudent->getCollection()->transform(function ($educationalProgram) {
             return [

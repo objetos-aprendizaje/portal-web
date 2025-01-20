@@ -13,4 +13,7 @@ class CourseTypesModel extends Model
 
     protected $keyType = 'string';
 
+    public function redirection_queries() {
+        return $this->hasMany(RedirectionQueriesLearningObjectsModel::class, 'course_type_uid', 'uid');
+    }
 }

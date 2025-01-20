@@ -20,17 +20,17 @@
                             @csrf
                             <div class="mb-[25px]">
                                 <div class="flex flex-col mb-[20px]">
-                                    <label class="px-3 mb-[8px]">Correo</label>
+                                    <label class="px-3 mb-[8px]" for="email" for="email">Correo</label>
                                     <input
                                         class="border-[1.5px] border-solid border-primary rounded-full p-3 focus:border-primary h-[60px]"
-                                        type="text" name="email" value="" />
+                                        type="text" name="email" value="" id="email" />
                                 </div>
 
                                 <div class="flex flex-col mb-[20px]">
-                                    <label class="px-3 mb-[8px]">Vuelva a escribir el Correo</label>
+                                    <label class="px-3 mb-[8px]" for="email_verification">Vuelva a escribir el Correo</label>
                                     <input
                                         class="border-[1.5px] border-solid border-primary rounded-full p-3 focus:border-primary h-[60px]"
-                                        type="text" name="email_verification" value="" />
+                                        type="text" name="email_verification" value="" id="email_verification"/>
                                 </div>
 
                                 @if ($errors->any())
@@ -82,10 +82,10 @@
                         </div>
 
                         <div class="flex flex-col mb-[20px]">
-                            <label class="px-3 mb-[8px]">Vuelva a escribir el Correo</label>
+                            <label class="px-3 mb-[8px]" id="email_verification">Vuelva a escribir el Correo</label>
                             <input
                                 class="border-[1.5px] border-solid border-primary rounded-full p-3 focus:border-primary h-[60px]"
-                                type="text" name="email_verification" value="" />
+                                type="text" name="email_verification" id="email_verification" value="" />
                         </div>
 
                         <button title="acceder" type="submit"

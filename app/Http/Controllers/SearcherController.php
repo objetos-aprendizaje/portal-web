@@ -22,12 +22,12 @@ class SearcherController extends Controller
     public function index()
     {
 
-        $general_options = GeneralOptionsModel::all()->pluck('option_value', 'option_name')->toArray();
+        $generalOptions = GeneralOptionsModel::all()->pluck('option_value', 'option_name')->toArray();
 
         $categories = CategoriesModel::whereNull('parent_category_uid')->with('subcategories')->get()->toArray();
 
         return view("searcher", [
-            "general_options" => $general_options,
+            "general_options" => $generalOptions,
             "page_title" => "Búsqueda de objetos de aprendizaje",
             "categories" => $categories,
             "flatpickr" => true,
@@ -45,13 +45,13 @@ class SearcherController extends Controller
 
     public function getLearningObjects(Request $request)
     {
-        $resource_types = $request->get("resourceTypes");
+        $resourceTypes = $request->get("resourceTypes");
 
-        if (empty($resource_types)) {
-            $resource_types = ["courses", "programs", "resources"];
+        if (empty($resourceTypes)) {
+            $resourceTypes = ["courses", "programs", "resources"];
         }
 
-        $learning_objects = [];
+        $learningObjects = [];
 
         $queries = [];
 
@@ -60,39 +60,39 @@ class SearcherController extends Controller
 
         $this->validateFilters($filters);
 
-        if (in_array("courses", $resource_types)) {
+        if (in_array("courses", $resourceTypes)) {
             $queries[] = $this->buildCoursesQuery($filters);
         }
 
-        if (in_array("programs", $resource_types)) {
+        if (in_array("programs", $resourceTypes)) {
             $queries[] = $this->buildEducationalProgramsQuery($filters);
         }
 
-        if (in_array("resources", $resource_types)) {
+        if (in_array("resources", $resourceTypes)) {
             $queries[] = $this->buildEducationalResourcesQuery($filters);
         }
 
-        $learning_objects_query = array_shift($queries);
+        $learningObjectsQuery = array_shift($queries);
 
         foreach ($queries as $query) {
-            $learning_objects_query->unionAll($query);
+            $learningObjectsQuery->unionAll($query);
         }
 
         $orderBy = $request->get("orderBy");
 
         // Envolver la consulta UNION en una subconsulta
-        $learning_objects_query = DB::table(DB::raw("({$learning_objects_query->toSql()}) as temp_table"))
-            ->mergeBindings($learning_objects_query->getQuery());
+        $learningObjectsQuery = DB::table(DB::raw("({$learningObjectsQuery->toSql()}) as temp_table"))
+            ->mergeBindings($learningObjectsQuery->getQuery());
 
         if ($orderBy == "closer") {
-            $learning_objects_query->orderByRaw('COALESCE(temp_table.inscription_start_date, \'9999-12-31\') ASC');
+            $learningObjectsQuery->orderByRaw('COALESCE(temp_table.inscription_start_date, \'9999-12-31\') ASC');
         } else if ($orderBy == "puntuation") {
-            $learning_objects_query->orderByRaw('temp_table.average_calification IS NULL, temp_table.average_calification DESC');
+            $learningObjectsQuery->orderByRaw('temp_table.average_calification IS NULL, temp_table.average_calification DESC');
         }
 
-        $learning_objects = $learning_objects_query->orderBy('inscription_start_date')->paginate($itemsPerPage);
+        $learningObjects = $learningObjectsQuery->orderBy('inscription_start_date')->paginate($itemsPerPage);
 
-        $learning_objects->transform(function ($learningObject) {
+        $learningObjects->transform(function ($learningObject) {
             return [
                 "uid" => $learningObject->uid,
                 "title" => $learningObject->title,
@@ -109,7 +109,7 @@ class SearcherController extends Controller
             ];
         });
 
-        return response()->json($learning_objects);
+        return response()->json($learningObjects);
     }
 
     public function searchLearningResults($query)
@@ -128,7 +128,7 @@ class SearcherController extends Controller
 
     private function buildEducationalProgramsQuery($filters = [])
     {
-        $educational_programs_query = EducationalProgramsModel::select([
+        $educationalProgramsQuery = EducationalProgramsModel::select([
             'educational_programs.uid',
             'educational_programs.name as title',
             'educational_programs.description',
@@ -158,13 +158,13 @@ class SearcherController extends Controller
             ->with('courses', 'courses.average_calification', 'courses.blocks.learningResults');
 
         if (isset($filters['learningObjectStatus'])) {
-            $educational_programs_query->where('educational_program_statuses.code', $filters['learningObjectStatus']);
+            $educationalProgramsQuery->where('educational_program_statuses.code', $filters['learningObjectStatus']);
         } else {
-            $educational_programs_query->whereIn('educational_program_statuses.code', ['INSCRIPTION', 'DEVELOPMENT', 'ENROLLING', 'FINISHED']);
+            $educationalProgramsQuery->whereIn('educational_program_statuses.code', ['INSCRIPTION', 'DEVELOPMENT', 'ENROLLING', 'FINISHED']);
         }
 
         if (isset($filters['categories'])) {
-            $educational_programs_query->with(['courses.categories'])->whereHas('courses.categories', function ($query) use ($filters) {
+            $educationalProgramsQuery->with(['courses.categories'])->whereHas('courses.categories', function ($query) use ($filters) {
                 $query->whereIn('category_uid', $filters['categories']);
             });
         }
@@ -172,7 +172,7 @@ class SearcherController extends Controller
         if (isset($filters['competences'])) {
             $competences = $filters['competences'];
 
-            $educational_programs_query->with([
+            $educationalProgramsQuery->with([
                 'courses.blocks',
                 'courses.blocks.competences'
             ])->whereHas('courses.blocks.competences', function ($query) use ($competences) {
@@ -181,49 +181,49 @@ class SearcherController extends Controller
         }
 
         if (isset($filters['inscription_start_date']) && isset($filters['inscription_finish_date'])) {
-            $educational_programs_query->where(function ($query) use ($filters) {
+            $educationalProgramsQuery->where(function ($query) use ($filters) {
                 $query->whereDate('inscription_start_date', '<=', $filters['inscription_finish_date'])
                     ->whereDate('inscription_finish_date', '>=', $filters['inscription_start_date']);
             });
         }
 
         if (isset($filters['realization_start_date']) && isset($filters['realization_finish_date'])) {
-            $educational_programs_query->where(function ($query) use ($filters) {
+            $educationalProgramsQuery->where(function ($query) use ($filters) {
                 $query->whereDate('realization_start_date', '<=', $filters['realization_finish_date'])
                     ->whereDate('realization_finish_date', '>=', $filters['realization_start_date']);
             });
         }
 
         if (isset($filters['search'])) {
-            $educational_programs_query->where('educational_programs.name', 'ilike', '%' . $filters['search'] . '%')->orWhere('description', 'ilike', '%' . $filters['search'] . '%');
+            $educationalProgramsQuery->where('educational_programs.name', 'ilike', '%' . $filters['search'] . '%')->orWhere('description', 'ilike', '%' . $filters['search'] . '%');
         }
 
         if (isset($filters["learningResults"])) {
             $learningResults = $filters["learningResults"];
-            $educational_programs_query->whereHas('courses.blocks.learningResults', function ($query) use ($learningResults) {
+            $educationalProgramsQuery->whereHas('courses.blocks.learningResults', function ($query) use ($learningResults) {
                 $query->whereIn('learning_results.uid', $learningResults);
             });
         }
 
         if (isset($filters['modalityPayment'])) {
             if ($filters['modalityPayment'] == "FREE") {
-                $educational_programs_query->where(function ($query) {
+                $educationalProgramsQuery->where(function ($query) {
                     $query->where('cost', 0)->where('payment_mode', 'SINGLE_PAYMENT');
                 });
             } else if ($filters['modalityPayment'] == "PAID") {
-                $educational_programs_query->where(function ($query) {
+                $educationalProgramsQuery->where(function ($query) {
                     $query->where('cost', '>', 0)->orWhere('payment_mode', 'INSTALLMENT_PAYMENT');
                 });
             }
         }
 
-        return $educational_programs_query;
+        return $educationalProgramsQuery;
     }
 
     private function buildEducationalResourcesQuery($filters = [])
     {
 
-        $educational_resources_query = EducationalResourcesModel::select([
+        $educationalResourcesQuery = EducationalResourcesModel::select([
             'educational_resources.uid',
             'educational_resources.title',
             'educational_resources.description',
@@ -252,28 +252,28 @@ class SearcherController extends Controller
 
         if (isset($filters['categories'])) {
             $categories = $filters['categories'];
-            $educational_resources_query->with('categories')->whereHas('categories', function ($query) use ($categories) {
+            $educationalResourcesQuery->with('categories')->whereHas('categories', function ($query) use ($categories) {
                 $query->whereIn('category_uid', $categories);
             });
         }
 
         if (isset($filters['assessments'])) {
-            $educational_resources_query->where('califications_avg.average_calification', $filters['assessments']);
+            $educationalResourcesQuery->where('califications_avg.average_calification', $filters['assessments']);
         }
 
         if (isset($filters['search'])) {
-            $educational_resources_query->where('title', 'ilike', '%' . $filters['search'] . '%')->orWhere('description', 'ilike', '%' . $filters['search'] . '%');
+            $educationalResourcesQuery->where('title', 'ilike', '%' . $filters['search'] . '%')->orWhere('description', 'ilike', '%' . $filters['search'] . '%');
             if (isset($filters['add_uuids_to_search'])) {
-                $educational_resources_query->orWhereIn('educational_resources.uid', $filters['add_uuids_to_search']);
+                $educationalResourcesQuery->orWhereIn('educational_resources.uid', $filters['add_uuids_to_search']);
             }
         }
 
-        return $educational_resources_query;
+        return $educationalResourcesQuery;
     }
 
     private function buildCoursesQuery($filters = [])
     {
-        $courses_query = CoursesModel::select([
+        $coursesQuery = CoursesModel::select([
             'courses.uid',
             'courses.title',
             'courses.description',
@@ -300,20 +300,20 @@ class SearcherController extends Controller
             ->whereNull('educational_program_uid');
 
         if (isset($filters['learningObjectStatus'])) {
-            $courses_query->where('course_statuses.code', $filters['learningObjectStatus']);
+            $coursesQuery->where('course_statuses.code', $filters['learningObjectStatus']);
         } else {
-            $courses_query->whereIn('course_statuses.code', ['INSCRIPTION', 'DEVELOPMENT', 'ENROLLING', 'FINISHED']);
+            $coursesQuery->whereIn('course_statuses.code', ['INSCRIPTION', 'DEVELOPMENT', 'ENROLLING', 'FINISHED']);
         }
 
         if (isset($filters['categories'])) {
-            $courses_query->with('categories')->whereHas('categories', function ($query) use ($filters) {
+            $coursesQuery->with('categories')->whereHas('categories', function ($query) use ($filters) {
                 $query->whereIn('category_uid', $filters['categories']);
             });
         }
 
         if (isset($filters['competences'])) {
             $competences = $filters['competences'];
-            $courses_query->with([
+            $coursesQuery->with([
                 'blocks' => function ($query) {
                     $query->orderBy('order', 'asc');
                 },
@@ -324,25 +324,25 @@ class SearcherController extends Controller
         }
 
         if (isset($filters['inscription_start_date']) && isset($filters['inscription_finish_date'])) {
-            $courses_query->where(function ($query) use ($filters) {
+            $coursesQuery->where(function ($query) use ($filters) {
                 $query->whereDate('inscription_start_date', '<=', $filters['inscription_finish_date'])
                     ->whereDate('inscription_finish_date', '>=', $filters['inscription_start_date']);
             });
         }
 
         if (isset($filters['realization_start_date']) && isset($filters['realization_finish_date'])) {
-            $courses_query->where(function ($query) use ($filters) {
+            $coursesQuery->where(function ($query) use ($filters) {
                 $query->whereDate('realization_start_date', '<=', $filters['realization_finish_date'])
                     ->whereDate('realization_finish_date', '>=', $filters['realization_start_date']);
             });
         }
 
         if (isset($filters['assessments'])) {
-            $courses_query->where('califications_avg.average_calification', $filters['assessments']);
+            $coursesQuery->where('califications_avg.average_calification', $filters['assessments']);
         }
 
         if (isset($filters['search'])) {
-            $courses_query->where(function ($query) use ($filters) {
+            $coursesQuery->where(function ($query) use ($filters) {
                 $query->where('title', 'ILIKE', '%' . $filters['search'] . '%')
                     ->orWhere('description', 'ILIKE', '%' . $filters['search'] . '%');
 
@@ -354,23 +354,23 @@ class SearcherController extends Controller
 
         if (isset($filters["learningResults"])) {
             $learningResults = $filters["learningResults"];
-            $courses_query->whereHas('blocks.learningResults', function ($query) use ($learningResults) {
+            $coursesQuery->whereHas('blocks.learningResults', function ($query) use ($learningResults) {
                 $query->whereIn('learning_results.uid', $learningResults);
             });
         }
 
         if (isset($filters['modalityPayment'])) {
             if ($filters['modalityPayment'] == "FREE") {
-                $courses_query->where(function ($query) {
+                $coursesQuery->where(function ($query) {
                     $query->where('cost', 0)->where('payment_mode', 'SINGLE_PAYMENT');
                 });
             } else if ($filters['modalityPayment'] == "PAID") {
-                $courses_query->where(function ($query) {
+                $coursesQuery->where(function ($query) {
                     $query->where('cost', '>', 0)->orWhere('payment_mode', 'INSTALLMENT_PAYMENT');
                 });
             }
         }
 
-        return $courses_query;
+        return $coursesQuery;
     }
 }
