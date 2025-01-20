@@ -42,13 +42,13 @@ class MyProfileController extends BaseController
 
         // Guardar la imagen en el backend
         if ($request->file('photo_path')) {
-            $photo_path = $this->updateImageBackend($request->file('photo_path'));
+            $photoPath = $this->updateImageBackend($request->file('photo_path'));
 
-            if (!$photo_path) {
+            if (!$photoPath) {
                 return response()->json(['message' => 'Ha ocurrido un error al subir la imagen'], 500);
             }
 
-            $user->photo_path = $photo_path;
+            $user->photo_path = $photoPath;
         }
 
         $user->save();

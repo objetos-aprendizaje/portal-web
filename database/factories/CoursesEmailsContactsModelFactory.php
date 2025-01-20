@@ -19,6 +19,7 @@ class CoursesEmailsContactsModelFactory extends Factory
     {
         return [
             'uid' => Str::uuid(),
+            'email' => fake()->unique()->safeEmail(),
         ];
     }
 }

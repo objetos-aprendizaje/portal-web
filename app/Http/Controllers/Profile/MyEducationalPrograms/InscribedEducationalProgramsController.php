@@ -30,7 +30,7 @@ class InscribedEducationalProgramsController extends BaseController
     {
         $user = auth()->user();
 
-        $items_per_page = $request->items_per_page;
+        $itemsPerPage = $request->items_per_page;
 
         $search = $request->search;
 
@@ -56,7 +56,7 @@ class InscribedEducationalProgramsController extends BaseController
             });
         }
 
-        $educationalProgramsStudents = $educationalProgramsStudentQuery->paginate($items_per_page);
+        $educationalProgramsStudents = $educationalProgramsStudentQuery->paginate($itemsPerPage);
 
         $educationalProgramsStudents->getCollection()->transform(function ($educationalProgram) {
             return [

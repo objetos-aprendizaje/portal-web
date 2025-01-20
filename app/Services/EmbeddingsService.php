@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\OperationFailedException;
 use App\Models\CoursesEmbeddingsModel;
 use App\Models\CoursesModel;
 use App\Models\EducationalResourcesModel;
@@ -16,14 +17,14 @@ class EmbeddingsService
 
     public function __construct()
     {
-        $openai_key = GeneralOptionsModel::where('option_name', 'openai_key')->first();
-        $this->openAiApiKey = $openai_key ? $openai_key['option_value'] : null;
+        $openaiKey = GeneralOptionsModel::where('option_name', 'openai_key')->first();
+        $this->openAiApiKey = $openaiKey ? $openaiKey['option_value'] : null;
     }
 
     public function getEmbedding($text)
     {
         if (!$this->openAiApiKey) {
-            throw new \Exception('OpenAI API key not found.');
+            throw new OperationFailedException('OpenAI API key not found.');
         }
 
         $response = Http::withHeaders([
@@ -135,8 +136,12 @@ class EmbeddingsService
         $uids = $educationalResources->map(fn($educationalResource) => $educationalResource->uid)->toArray();
         $embeddings = $educationalResources->pluck('embeddings')->map(function ($embedding) {
             // Convert the string of embeddings into an array
-            if (isset($embedding->embeddings)) return $embedding->embeddings;
-            else return null;
+            if (isset($embedding->embeddings)) {
+                return $embedding->embeddings;
+            }
+            else {
+                return null;
+            }
         })->toArray();
 
         // Calculate the average embedding by averaging the values for each dimension

@@ -1,6 +1,6 @@
 <!-- Header desktop -->
 <header
-    class="px-[30px] h-[110px] bg-white items-center justify-between hidden lg:flex border-b top-0 fixed w-full z-50">
+    class="px-[30px] h-[110px] bg-white items-center justify-between hidden lgx:flex border-b top-0 fixed w-full z-50">
     <div class="flex items-center gap-[25px]">
         @if (!$general_options['poa_logo_1'] && !$general_options['poa_logo_2'] && !$general_options['poa_logo_3'])
             <a aria-label="enlace" class="no-effect-hover" href="/" class="no-effect-hover">
@@ -146,7 +146,7 @@
 <header class="mobile-navbar">
     <div>
         <button data-collapse-toggle="mobile-menu" type="button" id="mobile-menu-btn"
-            class="inline-flex items-center p-1 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg lg:hidden focus:outline-none">
+            class="inline-flex items-center p-1 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg lgx:hidden focus:outline-none">
             <span class="sr-only">Open main menu</span>
             <span id="menu-icon1" class="icon-bars">{{ e_heroicon('bars-3', 'outline', 'grey') }}</span>
             <span id="menu-icon2" class="icon-bars"
@@ -160,7 +160,7 @@
                 class="h-[50px]" alt="Logo header">
         </a>
         <div
-            class="bg-white items-center h-3/4 justify-between p-1 border rounded-xl w-2/4 my-auto ml-[25px]  lg:flex hidden searcher">
+            class="bg-white items-center h-3/4 justify-between p-1 border rounded-xl w-2/4 my-auto ml-[25px]  lgx:flex hidden searcher">
 
             <input
                 class=" w-full px-3 border-none bg-transparent text-black py-1 rounded-none ring-0 focus:ring-0 focus:outline-none focus:ring-opacity-0"
@@ -383,11 +383,31 @@
             </li>
         </a>
 
-        <a aria-label="enlace" href="{{ route('notifications') }}">
-            <li class="option-label option">
-                Configuración de Notificaciones
-            </li>
-        </a>
+        <li class="option-submenu">
+            <div class="option-label flex justify-between items-center hover:opacity-75">
+                <div>Configuración de notificaciones</div>
+                <div class="icon-closed">
+                    {{ e_heroicon('chevron-right', 'outline', null, 16, 16) }}
+                </div>
+                <div class="icon-openned hidden">
+                    {{ e_heroicon('chevron-down', 'outline', null, 16, 16) }}
+                </div>
+            </div>
+
+            <ul class="submenu hidden">
+                <a aria-label="enlace" href="{{ route('profile-general-notifications') }}">
+                    <li>
+                        <div class="option-label">Notificaciones generales</div>
+                    </li>
+                </a>
+
+                <a aria-label="enlace" href="{{ route('profile-email-notifications') }}">
+                    <li>
+                        <div class="option-label">Notificaciones por email</div>
+                    </li>
+                </a>
+            </ul>
+        </li>
 
         <a aria-label="enlace" href="{{ route('categories') }}">
             <li class="option-label option">

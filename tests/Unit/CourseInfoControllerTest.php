@@ -35,11 +35,7 @@ class CourseInfoControllerTest extends TestCase
         $this->actingAs($user);
 
         $educationalType = EducationalProgramTypesModel::factory()->create();
-
-        RedirectionQueriesEducationalProgramTypesModel::factory()->create([
-            'educational_program_type_uid' => $educationalType->uid,
-            'contact' => $user->email,
-        ]);
+       
 
         $course = CoursesModel::factory()
             ->withCourseStatus()
@@ -53,7 +49,7 @@ class CourseInfoControllerTest extends TestCase
                     'realization_start_date' =>  Carbon::now()->addDays(46)->format('Y-m-d\TH:i'),
                     'realization_finish_date' => Carbon::now()->addDays(60)->format('Y-m-d\TH:i'),
                     'cost' => 100,
-                    'educational_program_type_uid' => $educationalType->uid,
+                    
                 ]
             )
             ->first();
@@ -112,11 +108,7 @@ class CourseInfoControllerTest extends TestCase
         $user = UsersModel::factory()->create();        
 
         $educationalType = EducationalProgramTypesModel::factory()->create();
-
-        RedirectionQueriesEducationalProgramTypesModel::factory()->create([
-            'educational_program_type_uid' => $educationalType->uid,
-            'contact' => $user->email,
-        ]);
+       
 
         $course = CoursesModel::factory()
             ->withCourseStatus()
@@ -129,8 +121,7 @@ class CourseInfoControllerTest extends TestCase
                     'enrolling_finish_date' => now()->subMonths(1),
                     'realization_start_date' =>  Carbon::now()->addDays(46)->format('Y-m-d\TH:i'),
                     'realization_finish_date' => Carbon::now()->addDays(60)->format('Y-m-d\TH:i'),
-                    'cost' => 100,
-                    'educational_program_type_uid' => $educationalType->uid,
+                    'cost' => 100,                    
                 ]
             )
             ->first();

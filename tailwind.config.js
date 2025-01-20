@@ -22,6 +22,9 @@ export default {
                 "regular": ["font-regular", "sans-serif"],
                 "bold": ["font-bold", "sans-serif"],
             },
+            screens: {
+                'lgx': '1200px',
+              },
         },
     },
     darkMode: "class",

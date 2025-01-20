@@ -51,19 +51,25 @@ class AppServiceProvider extends ServiceProvider
 
             $dataLogin = $this->getDataLogin($userDataSaml);
 
-            if (!$dataLogin["email"]) Redirect::to('/')->send();
+            if (!$dataLogin["email"]) {
+                Redirect::to('/')->send();
+            }
 
             $user = UsersModel::where('email', strtolower($dataLogin["email"]))->first();
 
             DB::transaction(function () use ($dataLogin, &$user) {
-                if (!$user) $user = $this->registerCasRediris($dataLogin);
-                if (!$user->hasAnyRole(['STUDENT'])) $this->addRoleStudent($user);
+                if (!$user) {
+                    $user = $this->registerCasRediris($dataLogin);
+                }
+                if (!$user->hasAnyRole(['STUDENT'])) {
+                    $this->addRoleStudent($user);
+                }
             });
 
             Auth::login($user);
         });
 
-        Event::listen('Slides\Saml2\Events\SignedOut', function (SignedOut $event) {
+        Event::listen('Slides\Saml2\Events\SignedOut', function () {
             Auth::logout();
         });
     }
@@ -76,7 +82,9 @@ class AppServiceProvider extends ServiceProvider
         $newUser->email = $dataLogin["email"];
         $newUser->identity_verified = true;
 
-        if(isset($dataLogin["nif"])) $newUser->nif = $dataLogin["nif"];
+        if(isset($dataLogin["nif"])) {
+            $newUser->nif = $dataLogin["nif"];
+        }
 
         $newUser->save();
         return $newUser;
@@ -85,11 +93,11 @@ class AppServiceProvider extends ServiceProvider
     private function addRoleStudent($user)
     {
         $rol = UserRolesModel::where("code", "STUDENT")->first();
-        $rol_relation = new UserRoleRelationshipsModel();
-        $rol_relation->uid = generate_uuid();
-        $rol_relation->user_uid = $user->uid;
-        $rol_relation->user_role_uid = $rol->uid;
-        $rol_relation->save();
+        $rolRelation = new UserRoleRelationshipsModel();
+        $rolRelation->uid = generate_uuid();
+        $rolRelation->user_uid = $user->uid;
+        $rolRelation->user_role_uid = $rol->uid;
+        $rolRelation->save();
     }
 
     private function getDataLogin($userDataSaml)

@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\OperationFailedException;
 use Illuminate\Support\Str;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Client;
@@ -135,9 +136,9 @@ function guzzle_call($url, $data = null, $headers = null, $method = 'GET')
             $statusCode = $response->getStatusCode();
             $body = (string) $response->getBody();
 
-            throw new \Exception('Error en la petición Guzzle: ' . $statusCode . ' - ' . $body);
+            throw new OperationFailedException('Error en la petición Guzzle: ' . $statusCode . ' - ' . $body);
         } else {
-            throw new \Exception('Error en la petición Guzzle: ' . $e->getMessage());
+            throw new OperationFailedException('Error en la petición Guzzle: ' . $e->getMessage());
         }
     }
 }
@@ -258,7 +259,7 @@ function sendFileToBackend($file, $url, $header = [], $decode_response = true)
 
     // Verificar si ocurrió algún error durante la petición
     if (curl_errno($curl)) {
-        throw new Exception(curl_error($curl));
+        throw new OperationFailedException(curl_error($curl));
     }
 
     // Obtener el código de estado HTTP de la respuesta
@@ -266,7 +267,7 @@ function sendFileToBackend($file, $url, $header = [], $decode_response = true)
 
     // Verificar el código de estado HTTP
     if ($httpCode != 200 && $httpCode != 201) {
-        throw new Exception("Unexpected response status: $httpCode. Response: $response");
+        throw new OperationFailedException("Unexpected response status: $httpCode. Response: $response");
     }
 
     // Cerrar la sesión cURL
@@ -297,7 +298,7 @@ function downloadFileFromBackend($url, $params, $pathDownload, $header = [])
 
     // Verifica si ocurrió algún error durante la solicitud
     if (curl_errno($ch)) {
-        throw new Exception(curl_error($ch));
+        throw new OperationFailedException(curl_error($ch));
     }
 
     // Obtener el código de estado HTTP de la respuesta
@@ -305,7 +306,7 @@ function downloadFileFromBackend($url, $params, $pathDownload, $header = [])
 
     // Verificar el código de estado HTTP
     if ($httpCode != 200 && $httpCode != 201) {
-        throw new Exception("Unexpected response status: $httpCode. Response: $response");
+        throw new OperationFailedException("Unexpected response status: $httpCode. Response: $response");
     }
 
     // Cierra la sesión cURL

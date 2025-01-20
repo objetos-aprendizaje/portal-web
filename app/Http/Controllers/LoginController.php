@@ -21,15 +21,19 @@ class LoginController extends BaseController
     public function index()
     {
 
-        $logo_bd = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
+        $logoBd = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
 
-        if ($logo_bd != null) $logo = $logo_bd['option_value'];
-        else $logo = null;
+        if ($logoBd != null) {
+            $logo = $logoBd['option_value'];
+        }
+        else {
+            $logo = null;
+        }
 
         $urlCas = $this->getCasUrl();
         $urlRediris = $this->getRedirisUrl();
 
-        $parameters_login_systems = Cache::get('parameters_login_systems');
+        $parametersLoginSystems = Cache::get('parameters_login_systems');
 
         return view('non_authenticated.login', [
             "page_name" => "Inicia sesión",
@@ -41,7 +45,7 @@ class LoginController extends BaseController
             "cert_login" => env('DOMINIO_CERTIFICADO'),
             "urlCas" => $urlCas,
             "urlRediris" => $urlRediris,
-            "parameters_login_systems" => $parameters_login_systems
+            "parameters_login_systems" => $parametersLoginSystems
         ]);
     }
 
@@ -52,7 +56,9 @@ class LoginController extends BaseController
         if ($loginCas) {
             $loginCasUrl = Saml2TenantsModel::where('key', 'cas')->first();
             $urlCas = url('saml2/' . $loginCasUrl->uuid . '/login');
-        } else $urlCas = false;
+        } else {
+            $urlCas = false;
+        }
 
         return $urlCas;
     }
@@ -64,8 +70,9 @@ class LoginController extends BaseController
         if ($loginRediris) {
             $loginRedirisUrl = Saml2TenantsModel::where('key', 'rediris')->first();
             $urlRediris = url('saml2/' . $loginRedirisUrl->uuid . '/login');
-        } else $urlRediris = false;
-
+        } else {
+            $urlRediris = false;
+        }
         return $urlRediris;
     }
 
@@ -92,27 +99,31 @@ class LoginController extends BaseController
     private function loginUser($user)
     {
 
-        $user_bd = UsersModel::where('email', $user->email)->with('roles')->first();
+        $userBd = UsersModel::where('email', $user->email)->with('roles')->first();
 
-        if (!$user_bd) {
-            $user_bd = new UsersModel();
-            $user_bd->uid = generate_uuid();
-            $user_bd->first_name = $user->first_name;
-            if (isset($user->last_name)) $user_bd->last_name = $user->last_name;
-            $user_bd->email = $user->email;
-            $user_bd->save();
+        if (!$userBd) {
+            $userBd = new UsersModel();
+            $userBd->uid = generate_uuid();
+            $userBd->first_name = $user->first_name;
+            if (isset($user->last_name)) {
+                $userBd->last_name = $user->last_name;
+            }
+            $userBd->email = $user->email;
+            $userBd->save();
 
-            $student_role = UserRolesModel::where('code', 'STUDENT')->first();
+            $studentRole = UserRolesModel::where('code', 'STUDENT')->first();
 
-            $user_bd->roles()->attach($student_role->uid, ['uid' => generate_uuid()]);
+            $userBd->roles()->attach($studentRole->uid, ['uid' => generate_uuid()]);
         } else {
-            $role_codes = array_column($user_bd->toArray()['roles'], 'code');
+            $roleCodes = array_column($userBd->toArray()['roles'], 'code');
 
-            if (!in_array('STUDENT', $role_codes)) abort(404);
+            if (!in_array('STUDENT', $roleCodes)) {
+                abort(404);
+            }
         }
 
-        $this->saveUserAccess($user_bd);
-        Auth::login($user_bd);
+        $this->saveUserAccess($userBd);
+        Auth::login($userBd);
     }
 
     public function logout()
@@ -174,7 +185,9 @@ class LoginController extends BaseController
         if ($urlCurrent) {
             $request->session()->forget('url.current');
             return $urlCurrent;
-        } else return '/';
+        } else {
+            return '/';
+        }
     }
 
     private function saveUserAccess($user)

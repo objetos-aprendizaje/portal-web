@@ -136,7 +136,7 @@ input[type="checkbox"] {
         }
 
         .error-label {
-            @apply text-[#DB371F]
+            @apply text-[#DB371F] text-[14px];
         }
 
         @apply sm:w-9/12 w-auto
@@ -239,7 +239,7 @@ input[type="checkbox"] {
 
 .modal-close-modal-btn {
     svg {
-        @apply fill-white w-5 h-5
+        @apply fill-white w-5 h-5 text-white;
     }
     @apply bg-color_1 w-7 h-7 rounded-full flex items-center justify-center p-0
 }
@@ -306,11 +306,11 @@ body.modal-open {
         @apply p-0;
     }
 
-    @apply w-full z-50 lg:hidden top-[60px] lg:top-[110px] fixed;
+    @apply w-full z-50 lgx:hidden top-[60px] lgx:top-[110px] fixed;
 }
 
 .mobile-navbar {
-    @apply lg:hidden bg-white border-b fixed w-full z-50 top-0 flex justify-between items-center;
+    @apply lgx:hidden bg-white border-b fixed w-full z-50 top-0 flex justify-between items-center;
     height: $header-mobile-height;
 }
 
@@ -541,10 +541,6 @@ body.modal-open {
 .ts-wrapper {
   @apply mb-0
 }
-
-/* input {
-  @apply border-color_1 focus:border-color_1 focus:ring-color_1 focus:shadow-none;
-} */
 
 .container {
     @apply px-[20px]
@@ -787,15 +783,11 @@ body.modal-open {
 
 .learning-objects-container.vertical {
     .block-container-title {
-        @apply min-h-[134px] gap-[14px];
+        @apply min-h-[134px] gap-[14px] mb-[14px];
     }
 
     .block-title {
         @apply line-clamp-3;
-    }
-
-    .block-container-title {
-        @apply mb-[14px];
     }
 
     .dates-container {
@@ -892,7 +884,7 @@ body.modal-open {
         }
     }
 
-    @apply select-none text-black pb-6 top-0 overflow-y-auto mt-[110px] h-[calc(100%-110px)] w-[270px] bg-white fixed left-0  lg:block hidden;
+    @apply select-none text-black pb-6 top-0 overflow-y-auto mt-[110px] h-[calc(100%-110px)] w-[270px] bg-white fixed left-0  lgx:block hidden;
 }
 
 
@@ -903,29 +895,19 @@ body.modal-open {
 .custom-treeselect .treeselect-list__item.treeselect-list__item--focused {
     @apply text-white;
 }
-.custom-treeselect .treeselect-list__item--checked .treeselect-list__item-checkbox-container, .treeselect-list__item--partial-checked .treeselect-list__item-checkbox-container {
-    @apply bg-color_1;
-}
 
 .custom-treeselect .treeselect-list__item-label {
-    @apply text-[16px]
+    @apply text-[16px] pl-[8px];
 }
 
 .custom-treeselect .treeselect-list__item {
     @apply py-[10px] h-auto
 }
 
-/* .custom-treeselect .treeselect-list__item[level="0"] {
-    @apply text-color_1 font-medium;
-} */
-
 .custom-treeselect .treeselect-list__item {
     @apply hover:text-white;
 }
 
-.custom-treeselect .treeselect-list__item-label {
-    @apply pl-[8px]
-}
 .custom-treeselect .treeselect-input--value-not-selected .treeselect-input__edit, .treeselect-input--value-not-selected.treeselect-input--unsearchable .treeselect-input__edit {
   @apply focus:outline-none focus:ring-0;
 }
@@ -1013,18 +995,12 @@ body.modal-open {
 .flatpickr-day:hover {
     background-color: var(--color_1) !important;
     border: none !important;
+    color: white !important;
 }
 
 .flatpickr-day.endRange {
     -webkit-box-shadow: -10px 0 0 var(--color_2) !important;
     box-shadow: -10px 0 0 var(--color_2) !important;
-}
-
-.flatpickr-day:hover {
-    color: white !important;
-}
-
-.flatpickr-day.endRange {
     background-color: var(--color_1) !important;
     border: none !important;
 }
@@ -1105,7 +1081,7 @@ body.modal-open {
 }
 
 /******************************* FORMS ********************/
-.poa-form{
+.poa-form {
     & .field.no-visible {
         @apply hidden
     }
@@ -1138,7 +1114,7 @@ body.modal-open {
         }
 
         .error-label {
-            @apply text-[#DB371F]
+            @apply text-[#DB371F] text-[14px];
         }
 
         @apply sm:w-9/12 w-auto
@@ -1146,12 +1122,6 @@ body.modal-open {
 
     & .field textarea {
         @apply h-auto resize-y
-    }
-
-    & .field .content-container {
-        .error-label {
-            @apply text-red-500 text-[14px]
-        }
     }
 }
 

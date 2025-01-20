@@ -15,16 +15,16 @@ use Illuminate\Http\Request;
 
 class CartController extends BaseController
 {
-    public function index($learning_object_type, $uid)
+    public function index($learningObjectType, $uid)
     {
 
-        if (!in_array($learning_object_type, ["course", "educational_program"])) {
+        if (!in_array($learningObjectType, ["course", "educational_program"])) {
             return abort(405);
         }
 
-        if ($learning_object_type == "course") {
+        if ($learningObjectType == "course") {
             $learningObjectData = $this->getCourseData($uid);
-        } else if ($learning_object_type == "educational_program") {
+        } else if ($learningObjectType == "educational_program") {
             $learningObjectData = $this->getEducationalProgramData($uid);
         }
 
@@ -36,7 +36,7 @@ class CartController extends BaseController
             "resources" => [
                 "resources/js/cart.js"
             ],
-            "learning_object_type" => $learning_object_type,
+            "learning_object_type" => $learningObjectType,
             "learning_object_uid" => $uid,
             "learningObjectData" => $learningObjectData,
             "page_title" => "Gestión de pago"
@@ -68,29 +68,29 @@ class CartController extends BaseController
 
     protected function getEducationalProgramData($uid)
     {
-        $educational_program = EducationalProgramsModel::where('uid', $uid)->with(['courses', 'paymentTerms'])->first();
+        $educationalProgram = EducationalProgramsModel::where('uid', $uid)->with(['courses', 'paymentTerms'])->first();
 
         $totalCost = 0;
-        if($educational_program->payment_mode == "INSTALLMENT_PAYMENT") {
-            foreach ($educational_program->paymentTerms as $paymentTerm) {
+        if($educationalProgram->payment_mode == "INSTALLMENT_PAYMENT") {
+            foreach ($educationalProgram->paymentTerms as $paymentTerm) {
                 $totalCost += $paymentTerm->cost;
             }
         } else {
-            $totalCost = $educational_program->cost;
+            $totalCost = $educationalProgram->cost;
         }
 
         $ectsWorkload = 0;
-        foreach ($educational_program->courses as $course) {
+        foreach ($educationalProgram->courses as $course) {
             $ectsWorkload += $course->ects_workload;
         }
 
         $data = [
-            "uid" => $educational_program->uid,
-            "title" => $educational_program->name,
-            "description" => $educational_program->description,
+            "uid" => $educationalProgram->uid,
+            "title" => $educationalProgram->name,
+            "description" => $educationalProgram->description,
             "cost" => $totalCost,
             "ects_workload" => $ectsWorkload,
-            "image_path" => $educational_program->image_path,
+            "image_path" => $educationalProgram->image_path,
         ];
 
         return $data;
@@ -106,13 +106,17 @@ class CartController extends BaseController
         if ($learningObjectType == "course") {
             // Comprobamos primero que no esté inscrito
             $isInscribed = CoursesStudentsModel::where('user_uid', auth()->user()->uid)->where('course_uid', $learningObjectUid)->exists();
-            if($isInscribed) throw new OperationFailedException("Ya estás inscrito");
+            if($isInscribed) {
+                throw new OperationFailedException("Ya estás inscrito");
+            }
 
             $learningObject = CoursesModel::where('uid', $learningObjectUid)->with(['status', 'students'])->first();
             $statusWithLearningObject = $this->inscribeUserInCourse($learningObject);
         } else if ($learningObjectType == "educational_program") {
             $isInscribed = EducationalProgramsStudentsModel::where('user_uid', auth()->user()->uid)->where('educational_program_uid', $learningObjectUid)->exists();
-            if($isInscribed) throw new OperationFailedException("Ya estás inscrito");
+            if($isInscribed) {
+                throw new OperationFailedException("Ya estás inscrito");
+            }
 
             $learningObject = EducationalProgramsModel::where('uid', $learningObjectUid)->with(['status', 'students'])->first();
             $statusWithLearningObject = $this->inscribeUserInEducationalProgram($learningObject);
@@ -164,9 +168,9 @@ class CartController extends BaseController
         return $statusInscription;
     }
 
-    private function inscribeUserInEducationalProgram($educational_program)
+    private function inscribeUserInEducationalProgram($educationalProgram)
     {
-        if (!$educational_program->cost && !$educational_program->validate_student_registrations) {
+        if (!$educationalProgram->cost && !$educationalProgram->validate_student_registrations) {
             $statusInscription = "ENROLLED";
         } else {
             $statusInscription = "INSCRIBED";
@@ -175,8 +179,8 @@ class CartController extends BaseController
         EducationalProgramsStudentsModel::insert([
             'uid' => generate_uuid(),
             'user_uid' => auth()->user()->uid,
-            'educational_program_uid' => $educational_program->uid,
-            'acceptance_status' => $educational_program->validate_student_registrations ? "PENDING" : "ACCEPTED",
+            'educational_program_uid' => $educationalProgram->uid,
+            'acceptance_status' => $educationalProgram->validate_student_registrations ? "PENDING" : "ACCEPTED",
             'status' => $statusInscription
         ]);
 
@@ -185,66 +189,70 @@ class CartController extends BaseController
 
     public function makePayment(Request $request)
     {
-        $learning_object_type = $request->input('learning_object_type');
-        $learning_object_uid = $request->input('learning_object_uid');
+        $learningObjectType = $request->input('learning_object_type');
+        $learningObjectUid = $request->input('learning_object_uid');
 
         // Puede ser curso o programa formativo
-        $this->validateRequest($learning_object_type);
+        $this->validateRequest($learningObjectType);
 
-        if ($learning_object_type == "course") {
-            $redsys_params = $this->processCoursePayment($learning_object_uid);
-        } else if ($learning_object_type == "educational_program") {
+        if ($learningObjectType == "course") {
+            $redsysParams = $this->processCoursePayment($learningObjectUid);
+        } else if ($learningObjectType == "educational_program") {
             // TODO
         }
 
-        return response()->json($redsys_params, 200);
+        return response()->json($redsysParams, 200);
     }
 
-    private function processCoursePayment($learning_object_uid)
+    private function processCoursePayment($learningObjectUid)
     {
-        $course = CoursesModel::where('uid', $learning_object_uid)->with('status')->first();
+        $course = CoursesModel::where('uid', $learningObjectUid)->with('status')->first();
 
         $this->validateCourse($course);
 
         $totalCost = $course->cost;
         $amount = (string)round($totalCost * 100);
-        $order_number = generateRandomNumber(12);
+        $orderNumber = generateRandomNumber(12);
 
-        $this->createCoursePayment($course, $order_number);
+        $this->createCoursePayment($course, $orderNumber);
 
-        return $this->generateRedsysObject($amount, "course", $order_number);
+        return $this->generateRedsysObject($amount, "course", $orderNumber);
     }
 
-    private function createCoursePayment($course, $order_number)
+    private function createCoursePayment($course, $orderNumber)
     {
-        $course_payment = new CoursesPaymentsModel();
-        $course_payment->uid = generate_uuid();
-        $course_payment->user_uid = auth()->user()->uid;
-        $course_payment->course_uid = $course->uid;
-        $course_payment->order_number = $order_number;
-        $course_payment->is_paid = 0;
+        $coursePayment = new CoursesPaymentsModel();
+        $coursePayment->uid = generate_uuid();
+        $coursePayment->user_uid = auth()->user()->uid;
+        $coursePayment->course_uid = $course->uid;
+        $coursePayment->order_number = $orderNumber;
+        $coursePayment->is_paid = 0;
 
-        $course_payment->save();
+        $coursePayment->save();
     }
 
 
-    private function generateRedsysObject($amount, $learning_object_type, $order_number)
+    private function generateRedsysObject($amount, $learningObjectType, $orderNumber)
     {
         // Preparamos el objeto de la API de Redsys
         $miObj = new RedsysAPI;
         $miObj->setParameter("DS_MERCHANT_AMOUNT", $amount);
 
-        $miObj->setParameter("DS_MERCHANT_ORDER", $order_number);
+        $miObj->setParameter("DS_MERCHANT_ORDER", $orderNumber);
         $miObj->setParameter("DS_MERCHANT_MERCHANTCODE", app('general_options')['redsys_commerce_code']);
         $miObj->setParameter("DS_MERCHANT_CURRENCY", app('general_options')['redsys_currency']);
         $miObj->setParameter("DS_MERCHANT_TRANSACTIONTYPE", app('general_options')['redsys_transaction_type']);
         $miObj->setParameter("DS_MERCHANT_TERMINAL", app('general_options')['redsys_terminal']);
-        $miObj->setParameter("DS_MERCHANT_MERCHANTDATA", $learning_object_type);
+        $miObj->setParameter("DS_MERCHANT_MERCHANTDATA", $learningObjectType);
 
         $miObj->setParameter("DS_MERCHANT_MERCHANTURL", route('webhook_process_payment_redsys'));
 
-        if ($learning_object_type == "course") $description = "COMPRA DE CURSO";
-        else if ($learning_object_type == "educational_program") $description = "COMPRA DE PROGRAMA FORMATIVO";
+        if ($learningObjectType == "course") {
+            $description = "COMPRA DE CURSO";
+        }
+        else if ($learningObjectType == "educational_program") {
+            $description = "COMPRA DE PROGRAMA FORMATIVO";
+        }
 
         $miObj->setParameter("DS_MERCHANT_PRODUCTDESCRIPTION", $description);
 
@@ -266,9 +274,9 @@ class CartController extends BaseController
         ];
     }
 
-    private function validateRequest($learning_object_type)
+    private function validateRequest($learningObjectType)
     {
-        if (!in_array($learning_object_type, ["course", "educational_program"])) {
+        if (!in_array($learningObjectType, ["course", "educational_program"])) {
             abort(405);
         }
     }

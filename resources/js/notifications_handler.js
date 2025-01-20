@@ -82,11 +82,6 @@ function getUrlAndTextButtonRedirectNotificationAutomatic(entity, entityUid) {
             url: "/profile/my_courses/enrolled",
             text: "Ir al curso",
         };
-    } else if (entity === "course_status_change_finished") {
-        return {
-            url: "/profile/my_courses/historic",
-            text: "Ir al curso",
-        };
     } else if (entity === "course_status_change_inscription") {
         return {
             url: "/course/" + entityUid,
@@ -133,7 +128,7 @@ function markReadNotification(notificationUid) {
         `.notification[data-notification_uid="${notificationUid}"]`
     );
 
-    notificationDivs.forEach(notificationDiv => {
+    notificationDivs.forEach((notificationDiv) => {
         const notReadDiv = notificationDiv.querySelector(".not-read");
         if (notReadDiv) notReadDiv.remove();
     });

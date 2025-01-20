@@ -56,7 +56,7 @@
 
                 <div class="flex-grow w-full ">
                     <a aria-label="enlace" class="educational-program-link" href="#">
-                        <h2 class="title line-clamp line-clamp-2 mb-[12px]"></h2>
+                        <h2 class="title line-clamp line-clamp-2 mb-[12px]">Título programa educativo</h2>
                     </a>
 
                     <div class="mb-[12px]">

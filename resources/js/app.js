@@ -30,15 +30,19 @@ function controlSearch() {
         }
     }
 
-    searchButton.addEventListener("click", function () {
-        redirectToSearcher();
-    });
-
-    searchInput.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
+    if(searchButton) {
+        searchButton.addEventListener("click", function () {
             redirectToSearcher();
-        }
-    });
+        });
+    }
+
+    if(searchInput) {
+        searchInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                redirectToSearcher();
+            }
+        });
+    }
 
     if (searchButtonFooter) {
         searchButtonFooter.addEventListener("click", function () {
@@ -114,16 +118,16 @@ function applyPreventDefaultForms() {
 }
 
 export function handleTabs() {
-    var tabs = Array.from(document.querySelectorAll(".tab"));
-    var tabContents = Array.from(document.querySelectorAll(".tab-content"));
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const tabContents = Array.from(document.querySelectorAll(".tab-content"));
 
     function showTabContent(tab) {
         tabContents.forEach((tabContent) => {
             tabContent.style.display = "none";
             tabContent.classList.remove("fade-tab");
         });
-        var tabContentId = tab.getAttribute("tab-content");
-        var tabContent = document.getElementById(tabContentId);
+        const tabContentId = tab.getAttribute("tab-content");
+        const tabContent = document.getElementById(tabContentId);
         tabContent.style.display = "block";
         tabContent.style.opacity = 0;
         tabContent.classList.add("fade-tab");
@@ -132,7 +136,7 @@ export function handleTabs() {
         tab.classList.add("tab-selected");
     }
 
-    var selectedTab = tabs.find((tab) =>
+    const selectedTab = tabs.find((tab) =>
         tab.classList.contains("tab-selected")
     );
     if (selectedTab) {
@@ -248,7 +252,7 @@ export function updateInputFile() {
             const previewDiv = target.closest(`.${classDiv}`);
             const span = previewDiv.querySelector(".file-name");
 
-            if (target.files && target.files[0]) {
+            if (target.files?.[0]) {
                 const fileName = target.files[0].name;
                 span.textContent = fileName;
             } else {
@@ -374,16 +378,16 @@ export function apiFetch(params) {
 
                 if (params.download) {
                     return response.blob().then((blob) => {
-                        var url = window.URL.createObjectURL(blob);
-                        var a = document.createElement("a");
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement("a");
                         a.href = url;
                         a.download = params.filename || "download";
                         a.style.display = "none";
                         document.body.appendChild(a);
-                        var contentDisposition = response.headers.get(
+                        const contentDisposition = response.headers.get(
                             "Content-Disposition"
                         );
-                        var filename = contentDisposition
+                        const filename = contentDisposition
                             ? contentDisposition.split("=")[1]
                             : "download";
                         a.download = filename;
@@ -496,11 +500,11 @@ export function getFlatpickrDateRange(flatpickrDate) {
 }
 
 export function accordionControls() {
-    var accordionHeaders = document.querySelectorAll(".accordion-header");
+    const accordionHeaders = document.querySelectorAll(".accordion-header");
 
     accordionHeaders.forEach(function (header) {
         header.addEventListener("click", function () {
-            var content = this.nextElementSibling;
+            const content = this.nextElementSibling;
 
             // Toggle accordion classes
             content.classList.toggle("accordion-collapsed");
@@ -517,7 +521,7 @@ export function accordionControls() {
  * Función que se encarga de rellenar las estrellas de la calificación al hacer hover sobre ellas.
  */
 export function fillStarsHover() {
-    var stars = Array.from(
+    const stars = Array.from(
         document.querySelectorAll(".stars-califications svg")
     );
 
@@ -539,16 +543,16 @@ export function fillStarsHover() {
  * @param {*} number Número de estrellas a rellenar
  */
 export function fillStars(number) {
-    var stars = document.querySelectorAll(".stars-califications svg");
+    const stars = document.querySelectorAll(".stars-califications svg");
 
     // Resalta las estrellas correspondientes
-    for (var i = 0; i < number; i++) {
+    for (let i = 0; i < number; i++) {
         stars[i].style.fill = "#EABA0F";
         stars[i].style.stroke = "#EABA0F";
     }
 
     // Pone grises las estrellas restantes
-    for (var i = number; i < stars.length; i++) {
+    for (let i = number; i < stars.length; i++) {
         stars[i].style.fill = "#E4E4E4";
         stars[i].style.stroke = "#E4E4E4";
     }
@@ -568,7 +572,7 @@ export function updateInputImage() {
             const img = previewDiv.querySelector("img");
             const span = previewDiv.querySelector(".image-name");
 
-            if (target.files && target.files[0]) {
+            if (target.files?.[0]) {
                 const fileType = target.files[0].type;
 
                 if (!fileType.startsWith("image/")) return;
@@ -642,19 +646,19 @@ export function updatePagination(container, current_page, last_page) {
 
     // Si la primera página es la actual, mostrar los números de las tres páginas siguientes
     if (current_page === 1) {
-        let previous_page = current_page;
-        previousBtn.textContent = previous_page;
-        previousBtn.dataset.page = previous_page;
+        let previousPage = current_page;
+        previousBtn.textContent = previousPage;
+        previousBtn.dataset.page = previousPage;
 
         if (last_page < 3) nextPageBtn.style.display = "none";
 
-        let current_btn_value = current_page + 1;
-        currentPageBtn.textContent = current_btn_value;
-        currentPageBtn.dataset.page = current_btn_value;
+        let currentBtnValue = current_page + 1;
+        currentPageBtn.textContent = currentBtnValue;
+        currentPageBtn.dataset.page = currentBtnValue;
 
-        let next_page_value = current_page + 2;
-        nextPageBtn.textContent = next_page_value;
-        nextPageBtn.dataset.page = next_page_value;
+        let nextPageValue = current_page + 2;
+        nextPageBtn.textContent = nextPageValue;
+        nextPageBtn.dataset.page = nextPageValue;
 
         goNextPageBtn.dataset.page =
             last_page > current_page ? current_page + 1 : last_page;
@@ -664,9 +668,9 @@ export function updatePagination(container, current_page, last_page) {
     }
     // If the current page is the last page, show the numbers of the last three pages
     else if (current_page === last_page) {
-        let previous_page = Math.max(1, current_page - 2);
-        previousBtn.textContent = previous_page;
-        previousBtn.dataset.page = previous_page;
+        let previousPage = Math.max(1, current_page - 2);
+        previousBtn.textContent = previousPage;
+        previousBtn.dataset.page = previousPage;
 
         if (last_page < 3) previousBtn.style.display = "none";
 
@@ -686,16 +690,16 @@ export function updatePagination(container, current_page, last_page) {
         lastPageBtn.style.display = "none";
     } else {
         // Otherwise, show the current page number and the next two page numbers
-        let previous_page_value = Math.max(1, current_page - 1);
-        previousBtn.textContent = previous_page_value;
-        previousBtn.dataset.page = previous_page_value;
+        let previousPageValue = Math.max(1, current_page - 1);
+        previousBtn.textContent = previousPageValue;
+        previousBtn.dataset.page = previousPageValue;
 
         currentPageBtn.textContent = current_page;
         currentPageBtn.dataset.page = current_page;
 
-        let next_page_value = Math.min(last_page, current_page + 1);
-        nextPageBtn.textContent = next_page_value;
-        nextPageBtn.dataset.page = next_page_value;
+        let nextPageValue = Math.min(last_page, current_page + 1);
+        nextPageBtn.textContent = nextPageValue;
+        nextPageBtn.dataset.page = nextPageValue;
 
         goNextPageBtn.dataset.page = current_page + 1;
         goPreviousPageBtn.dataset.page = current_page - 1;

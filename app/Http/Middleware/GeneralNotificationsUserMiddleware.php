@@ -23,11 +23,11 @@ class GeneralNotificationsUserMiddleware
         if (Auth::check()) {
             $generalNotifications = $this->getCombinedGeneralNotifications();
 
-            $is_read_values = array_column($generalNotifications, 'is_read');
-            $unread_general_notifications = in_array(0, $is_read_values);
+            $isReadValues = array_column($generalNotifications, 'is_read');
+            $unreadGeneralNotifications = in_array(0, $isReadValues);
 
             View::share('general_notifications', $generalNotifications);
-            View::share('unread_general_notifications', $unread_general_notifications);
+            View::share('unread_general_notifications', $unreadGeneralNotifications);
         }
 
         return $next($request);
@@ -111,22 +111,22 @@ class GeneralNotificationsUserMiddleware
         return $user->roles->pluck('uid')->toArray();
     }
 
-    private function applyUserFilter($query, $user_uid)
+    private function applyUserFilter($query, $userUid)
     {
-        return $query->where(function ($q) use ($user_uid) {
+        return $query->where(function ($q) use ($userUid) {
             $q->where('type', 'USERS')
-                ->whereHas('users', function ($query) use ($user_uid) {
-                    $query->where('user_uid', $user_uid);
+                ->whereHas('users', function ($query) use ($userUid) {
+                    $query->where('user_uid', $userUid);
                 });
         });
     }
 
-    private function applyRoleFilter($query, $uids_roles)
+    private function applyRoleFilter($query, $uidsRoles)
     {
-        return $query->where(function ($q) use ($uids_roles) {
+        return $query->where(function ($q) use ($uidsRoles) {
             $q->where('type', 'ROLES')
-                ->whereHas('roles', function ($query) use ($uids_roles) {
-                    $query->whereIn('rol_uid', $uids_roles);
+                ->whereHas('roles', function ($query) use ($uidsRoles) {
+                    $query->whereIn('rol_uid', $uidsRoles);
                 });
         });
     }

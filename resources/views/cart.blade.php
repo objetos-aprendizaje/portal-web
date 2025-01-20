@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
     <div class="container mx-auto">
-        <h1 class="text-color_1 mt-[43px]">Carrito</h1>
+        <h1 class="text-color_1 mt-[43px]">Selección</h1>
 
         <table class="mt-[35px] w-full">
             <thead>

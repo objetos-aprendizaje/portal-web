@@ -85,46 +85,6 @@ class CompetencesLearningResultsControllerTest extends TestCase
 
     /**
      * @test
-     * Prueba que el mapeo de competencias se realiza correctamente
-     */
-    public function testMapCompetencesTransformsDataCorrectly()
-    {
-        // Crear un framework de competencias con subcompetencias y resultados de aprendizaje
-        $competenceFramework = CompetenceFrameworksModel::factory()->create()->first();
-
-        CompetencesModel::factory()->count(3)->create([
-            'competence_framework_uid' => $competenceFramework->uid
-        ]);
-
-        $subCompetences =  CompetencesModel::get();
-
-        // Crear resultados de aprendizaje asociados a las subcompetencias
-        foreach ($subCompetences as $subCompetence) {
-            $learningResults = LearningResultsModel::factory()->count(2)->create(
-                [
-                    'competence_uid' => $subCompetence->uid
-                ]
-            );
-        }
-
-        // Obtener los datos mapeados
-        $competencesLearningResults = $competenceFramework->with([
-            'allSubcompetences.learningResults',
-        ])->get()->toArray();
-
-        $controller = new CompetencesLearningResultsController();
-        $mappedCompetences = $controller->mapCompetences($competencesLearningResults);
-
-        // Verificar que el mapeo de las competencias se ha hecho correctamente
-        $this->assertIsArray($mappedCompetences);
-        $this->assertNotEmpty($mappedCompetences);
-        $this->assertArrayHasKey('children', $mappedCompetences[0]);
-        $this->assertArrayHasKey('id', $mappedCompetences[0]);
-        $this->assertEquals('competence', $mappedCompetences[0]['type']);
-    }
-
-    /**
-     * @test
      * Prueba que los resultados de aprendizaje se guarden correctamente para el usuario autenticado
      */
     public function testSaveLearningResultsSavesCorrectly()

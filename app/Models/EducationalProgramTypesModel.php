@@ -18,6 +18,6 @@ class EducationalProgramTypesModel extends Model
     ];
 
     public function redirection_queries() {
-        return $this->hasMany(RedirectionQueriesEducationalProgramTypesModel::class, 'educational_program_type_uid', 'uid');
+        return $this->hasMany(RedirectionQueriesLearningObjectsModel::class, 'educational_program_type_uid', 'uid');
     }
 }

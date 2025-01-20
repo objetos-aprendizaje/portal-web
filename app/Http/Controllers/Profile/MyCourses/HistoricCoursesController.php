@@ -23,7 +23,7 @@ class HistoricCoursesController extends BaseController
     public function getHistoricCourses(Request $request)
     {
         $user = auth()->user();
-        $items_per_page = $request->items_per_page;
+        $itemsPerPage = $request->items_per_page;
         $search = $request->search;
 
         $coursesStudentQuery = $user->courses_students()
@@ -42,7 +42,7 @@ class HistoricCoursesController extends BaseController
             });
         }
 
-        $coursesStudent = $coursesStudentQuery->paginate($items_per_page);
+        $coursesStudent = $coursesStudentQuery->paginate($itemsPerPage);
 
         $coursesStudent->getCollection()->transform(function ($courseStudent) {
             return [

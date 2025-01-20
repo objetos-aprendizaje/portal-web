@@ -20,14 +20,13 @@ class EducationalProgramsAssessmentsModelFactory extends Factory
     {
         return [
             'uid' =>  generate_uuid(),
-            // 'calification'=> 6
             'calification' => $this->faker->randomNumber(2)
         ];
     }
 
     public function withEducationalProgram(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn() => [
             'course_status_uid' => EducationalProgramsModel::factory()
                 ->withEducationalProgramType()
                 ->create()->first(),
@@ -36,7 +35,7 @@ class EducationalProgramsAssessmentsModelFactory extends Factory
 
     public function withUser(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'user_uid' => UsersModel::factory()->create()->first(),
             ];

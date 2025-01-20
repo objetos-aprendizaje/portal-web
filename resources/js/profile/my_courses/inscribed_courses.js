@@ -42,7 +42,7 @@ function initHandlers() {
         if (classClicked.contains("btn-blocked")) return;
 
         if (classClicked.contains("documentation-btn")) {
-            var courseUid = event.target
+            const courseUid = event.target
                 .closest(".course-block")
                 .querySelector(".course-uid").value;
             loadUploadFilesModal(courseUid);

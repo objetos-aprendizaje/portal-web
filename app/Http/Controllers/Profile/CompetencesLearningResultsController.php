@@ -42,7 +42,7 @@ class CompetencesLearningResultsController extends BaseController
     }
 
 
-    function mapCompetences($competences)
+    private function mapCompetences($competences)
     {
         $mapped = array_map(function ($competence) {
             $mappedCompetence = [

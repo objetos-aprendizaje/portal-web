@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\OperationFailedException;
 use Exception;
 
 class KafkaService
@@ -9,13 +10,15 @@ class KafkaService
 
     public function sendMessage($key, $message, $topic)
     {
-        if(!env('KAFKA_BROKERS')) return;
+        if(!env('KAFKA_BROKERS')) {
+            return;
+        }
 
         $producer = new \RdKafka\Producer();
         $producer->setLogLevel(LOG_DEBUG);
 
         if ($producer->addBrokers(env('KAFKA_BROKERS')) < 1) {
-            throw new Exception("No se pudo añadir brokers");
+            throw new OperationFailedException("No se pudo añadir brokers");
         }
 
         $topic = $producer->newTopic($topic);
@@ -30,9 +33,11 @@ class KafkaService
                 }
             }
 
-            if ($flushRetries > 10) throw new Exception("No se pudo enviar el mensaje");
-        } catch (Exception $e) {
-            throw new Exception("No se pudo enviar el mensaje");
+            if ($flushRetries > 10) {
+                throw new OperationFailedException("No se pudo enviar el mensaje");
+            }
+        } catch (Exception) {
+            throw new OperationFailedException("No se pudo enviar el mensaje");
         }
     }
 }

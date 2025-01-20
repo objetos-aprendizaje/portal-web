@@ -83,17 +83,17 @@
                         @csrf
                         <div class="mb-[25px]">
                             <div class="flex flex-col mb-[20px]">
-                                <label class="px-3 mb-[8px]">Correo</label>
+                                <label class="px-3 mb-[8px]" for="email">Correo</label>
                                 <input aria-label="email"
                                     class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[60px]"
-                                    type="text" name="email" />
+                                    type="text" name="email" id="email" />
                             </div>
 
                             <div class="flex flex-col mb-[8px]">
-                                <label class="px-3 mb-[8px]">Contraseña</label>
+                                <label class="px-3 mb-[8px]" for="password">Contraseña</label>
                                 <input aria-label="contraseña"
                                     class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3"
-                                    name="password" type="password" />
+                                    name="password" type="password" id="password"/>
                             </div>
 
                             <div class="block px-3 mb-[20px]">
@@ -280,19 +280,20 @@
         @endif
 
         <div class="mb-[25px]">
-            <form id="loginFormMobile" action="/login/authenticate" method="POST" prevent-default>
+            <form id="loginFormMobile" action="/login/authenticate" method="POST">
                 @csrf
                 <div class="flex flex-col mb-[20px]">
                     <label class="px-3 mb-[8px]">Correo</label>
                     <input aria-label="email"
                         class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3 focus:border-color_1 "
-                        type="text" />
+                        type="text" name="email" />
                 </div>
 
                 <div class="flex flex-col mb-[8px]">
                     <label class="px-3 mb-[8px]">Contraseña</label>
                     <input aria-label="contraseña"
-                        class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3" type="password" />
+                        class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3" name="password"
+                        type="password" />
                 </div>
 
                 <div class="block px-3 mb-[20px]">
@@ -302,7 +303,8 @@
                         contraseña?</a>
                 </div>
 
-                <button title="iniciar sesión" class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]">Iniciar
+                <button title="iniciar sesión" class="btn bg-color_1 text-white hover:bg-color_2 w-full h-[60px]"
+                    type="submit">Iniciar
                     sesión
                     {{ e_heroicon('arrow-up-right', 'outline') }}</button>
 
@@ -394,7 +396,8 @@
                 <a aria-label="enlace" class="no-effect-hover" href='{{ env('URL_LOGIN_CERT') }}?origin="portal_web"'>
                     <button title="certificado login" type="button"
                         class="border hover:border-color_1 flex items-center justify-center rounded-full w-[64px] h-[64px]">
-                        <img alt="login" class="w-[32px] h-[32px]" src="data/images/login_icons/certificate_icon.svg" />
+                        <img alt="login" class="w-[32px] h-[32px]"
+                            src="data/images/login_icons/certificate_icon.svg" />
                     </button>
                 </a>
             @endif

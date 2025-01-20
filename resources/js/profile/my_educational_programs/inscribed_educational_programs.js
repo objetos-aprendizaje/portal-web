@@ -68,8 +68,6 @@ function initHandlers() {
             const documentUid = event.target.dataset.document_uid;
             downloadDocumentEducationalProgram(documentUid);
         } else if (classClicked.contains("upload-files")) {
-            const educationalProgramUid =
-                event.target.dataset.educational_program_uid;
             loadUploadFilesModal(courseUid);
         } else if (classClicked.contains("btn-action-educational-program")) {
             const educationalProgramUid =

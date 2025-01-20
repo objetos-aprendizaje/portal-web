@@ -2,10 +2,14 @@
 
 namespace Tests\Unit;
 
+use Carbon\Carbon;
 use Tests\TestCase;
 use App\Models\UsersModel;
 use App\Models\CoursesModel;
+use App\Models\HeaderPagesModel;
+use App\Models\GeneralOptionsModel;
 use App\Models\CoursesAccessesModel;
+use Illuminate\Support\Facades\View;
 use App\Models\EducationalProgramsModel;
 use App\Exceptions\OperationFailedException;
 use App\Models\EducationalProgramStatusesModel;
@@ -16,6 +20,50 @@ use App\Models\EducationalProgramsPaymentTermsUsersModel;
 class EnrolledEducationalProgramsControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware();
+        $general_options = GeneralOptionsModel::all()->pluck('option_value', 'option_name')->toArray();
+        app()->instance('general_options', $general_options);
+        View::share('general_options', $general_options);
+
+        $footer_pages = [
+            ['slug' => 'page1', 'name' => 'Page 1'],
+            ['slug' => 'page2', 'name' => 'Page 2'],
+        ];
+        View::share('footer_pages', $footer_pages);
+
+        // Define la variable $fonts con todas las claves necesarias
+        $fonts = [
+            'truetype_regular_file_path' => asset('fonts/robot/roboto.ttf'), // Cambia esto a la ruta real
+            'woff_regular_file_path' => asset('fonts/robot/roboto.woff'), // Cambia esto a la ruta real
+            'woff2_regular_file_path' => asset('fonts/robot/roboto.woff2'), // Cambia esto a la ruta real
+            'embedded_opentype_regular_file_path' => asset('fonts/robot/roboto.eot'), // Cambia esto a la ruta real
+            'opentype_regular_input_file' => asset('fonts/robot/roboto.otf'), // Cambia esto a la ruta real
+            'svg_regular_file_path' => asset('fonts/robot/roboto.svg'), // Asegúrate de incluir esta clave
+            'truetype_medium_file_path' => asset('fonts/robot/roboto-medium.ttf'), // Replace with the actual path
+            'woff_medium_file_path' => asset('fonts/robot/roboto-medium.woff'),
+            'woff2_medium_file_path' => asset('fonts/robot/roboto-medium.woff2'),
+            'embedded_opentype_medium_file_path' => asset('fonts/robot/roboto.eot'),
+            'opentype_medium_file_path' => asset('fonts/robot/roboto.otf'),
+            'svg_medium_file_path' => asset('fonts/robot/roboto.svg'),
+            'truetype_bold_file_path' =>  asset('fonts/robot/roboto-bold.ttf'),
+            'woff_bold_file_path' => asset('fonts/robot/roboto-bold.woff'),
+            'woff2_bold_file_path' => asset('fonts/robot/roboto-bold.woff2'),
+            'embedded_opentype_bold_file_path' => asset('fonts/robot/roboto.eot'),
+            'opentype_bold_file_path' => asset('fonts/robot/roboto.otf'),
+            'svg_bold_file_path' => asset('fonts/robot/roboto.svg'),
+        ];
+        // Comparte la variable $fonts para esta prueba
+        View::share('fonts', $fonts);
+
+        $headerPages = HeaderPagesModel::whereNull('header_page_uid')->with('headerPagesChildren')->orderBy('order', 'asc')->get();
+
+        // Comparte la variable $header_pages para esta prueba
+        View::share('header_pages', $headerPages);
+    }
 
     /**
      * @test
@@ -35,6 +83,25 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         // Lo autenticarlo         
         $this->actingAs($user);
 
+        $general_options  = [
+            'redsys_url' => 'http://midominio.com',
+            'color_1' => '#333333',
+            'color_2' => '#222',
+            'color_3' => '#111',
+            'color_4' => '#000',
+            'scripts' => '<script src="jquery.js"></script>',
+            'poa_logo_1' => 'image1.png',
+            'poa_logo_2' => 'image2.png',
+            'poa_logo_3' => 'image3.png',
+            'registration_active' => false,
+        ];
+
+        app()->instance('general_options', $general_options);
+
+        View::share('general_options', $general_options);
+
+        View::share('unread_general_notifications', true);
+
         // Hacer una solicitud GET a la ruta de programas formativos matriculados
         $response = $this->get(route('my-educational-programs-enrolled'));
 
@@ -48,7 +115,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         $response->assertViewHas('resources', ['resources/js/profile/my_educational_programs/enrolled_educational_programs.js']);
         $response->assertViewHas('page_title', 'Mis programas formativos matriculados');
         $response->assertViewHas('currentPage', 'enrolledEducationalPrograms');
-    }    
+    }
 
 
 
@@ -156,35 +223,50 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();
 
         // Crear algunos programas formativos y matricular al usuario
-        EducationalProgramsModel::factory()
+        // EducationalProgramsModel::factory()
+        //     ->withEducationalProgramType()
+        //     ->count(3)->create(
+        //         [
+        //             'educational_program_status_uid' => $status->uid
+        //         ]
+        //     );
+
+        // $educationalPrograms = EducationalProgramsModel::all();
+
+        // foreach ($educationalPrograms as $educationalProgram) {
+
+        //     $user->educationalPrograms()->attach($educationalProgram->uid, [
+        //         'uid' => generate_uuid(),
+        //         'status' => 'ENROLLED',
+        //         'acceptance_status' => 'ACCEPTED'
+        //     ]);            
+        // }
+
+
+        $educationalProgram = EducationalProgramsModel::factory()
             ->withEducationalProgramType()
-            ->count(3)->create(
+            ->create(
                 [
                     'educational_program_status_uid' => $status->uid
                 ]
             );
 
-        $educationalPrograms = EducationalProgramsModel::all();
+        CoursesModel::factory()->withCourseStatus()->withCourseType()->create(
+            [
+                'educational_program_uid' =>  $educationalProgram->uid
+            ]
+        );
 
-        foreach ($educationalPrograms as $educationalProgram) {
+        $user->educationalPrograms()->attach($educationalProgram->uid, [
+            'uid' => generate_uuid(),
+            'status' => 'ENROLLED',
+            'acceptance_status' => 'ACCEPTED'
+        ]);
 
-            $user->educationalPrograms()->attach($educationalProgram->uid, [
-                'uid' => generate_uuid(),
-                'status' => 'ENROLLED',
-                'acceptance_status' => 'ACCEPTED'
-            ]);
-        }
-
-        CoursesModel::factory()
-            ->withCourseStatus()
-            ->withCourseType()
-            ->create([
-                'educational_program_uid' => $educationalPrograms[0]->uid,
-            ]);
 
         $paymentTerm = EducationalProgramsPaymentTermsModel::factory()->create(
             [
-                'educational_program_uid' => $educationalPrograms[0]->uid
+                'educational_program_uid' => $educationalProgram->uid
             ]
         )->first();
 
@@ -197,7 +279,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         // Crear una solicitud simulada con búsqueda
         $requestData = [
             'items_per_page' => 2,
-            'search' => $educationalPrograms[0]->name // Buscar por nombre del primer programa
+            'search' => $educationalProgram->name // Buscar por nombre del primer programa
         ];
         // Hacer la solicitud POST a la ruta de obtener programas formativos matriculados
         $response = $this->post(route('my-educational-programs-enrolled-get'), $requestData);
@@ -207,12 +289,12 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
 
         // Verificar que solo el programa que coincide con la búsqueda se devuelve
         $response->assertJsonFragment([
-            'uid' => $educationalPrograms[0]->uid,
+            'uid' => $educationalProgram->uid,
         ]);
 
         // Asegurarse de que no se devuelven otros programas
         $response->assertJsonMissing([
-            'uid' => $educationalPrograms[1]->uid,
+            'uid' => $educationalProgram->uid,
         ]);
     }
 
@@ -331,5 +413,132 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
 
         // Hacer la solicitud POST a la ruta de acceso al curso
         $this->post(route('my-educational-programs-enrolled-access-course'), $requestData);
+    }
+
+    /**
+     * @test
+     * Prueba que se lanza una excepción si el programa no está en desarrollo
+     */
+    public function testPayTermWithPaymentTermUser()
+    {
+        // Buscamos un usuario  
+        $user = UsersModel::factory()->create();
+        // Lo autenticarlo         
+        $this->actingAs($user);
+
+        $educational = EducationalProgramsModel::factory()->withEducationalProgramType()->create();
+
+        $paymentTerm = EducationalProgramsPaymentTermsModel::factory()->create(
+            [
+                'cost' => 100,
+                'educational_program_uid' => $educational->uid
+            ]
+        );
+
+        EducationalProgramsPaymentTermsUsersModel::factory()->create(
+            [
+                'educational_program_payment_term_uid' => $paymentTerm->uid,
+                'user_uid' => $user->uid,
+            ]
+        );
+
+        $general_options = [
+            'payment_gateway' => true,
+            'redsys_commerce_code' => true,
+            'redsys_currency' => true,
+            'redsys_transaction_type' => false,
+            'redsys_terminal' => true,
+            'redsys_encryption_key' => true,
+        ];
+
+        app()->instance('general_options', $general_options);
+
+
+        $data = [
+            'paymentTermUid' => $paymentTerm->uid
+        ];
+
+        // Hacer la solicitud POST a la ruta de acceso al curso
+        $response = $this->post(route('my-educational-programs-enrolled-pay-term'), $data);
+
+        // Verificar que la respuesta es exitosa
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     * 
+     */
+    public function testPayTermWithEducationalProgramsPaymentTerms()
+    {
+        // Buscamos un usuario  
+        $user = UsersModel::factory()->create();
+        // Lo autenticarlo         
+        $this->actingAs($user);
+
+        $educational = EducationalProgramsModel::factory()->withEducationalProgramType()->create();
+
+        $paymentTerm = EducationalProgramsPaymentTermsModel::factory()->create(
+            [
+                'cost' => 100,
+                'educational_program_uid' => $educational->uid
+            ]
+        );
+
+        $general_options = [
+            'payment_gateway' => true,
+            'redsys_commerce_code' => true,
+            'redsys_currency' => true,
+            'redsys_transaction_type' => false,
+            'redsys_terminal' => true,
+            'redsys_encryption_key' => true,
+        ];
+
+        app()->instance('general_options', $general_options);
+
+
+        $data = [
+            'paymentTermUid' => $paymentTerm->uid
+        ];
+
+        // Hacer la solicitud POST a la ruta de acceso al curso
+        $response = $this->post(route('my-educational-programs-enrolled-pay-term'), $data);
+
+        // Verificar que la respuesta es exitosa
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     * 
+     */
+    public function testPayTermWithEFail406()
+    {
+        // Buscamos un usuario  
+        $user = UsersModel::factory()->create();
+        // Lo autenticarlo         
+        $this->actingAs($user);
+
+        $educational = EducationalProgramsModel::factory()->withEducationalProgramType()->create();
+
+        $paymentTerm = EducationalProgramsPaymentTermsModel::factory()->create(
+            [
+                'start_date' => Carbon::now()->addDays(10),
+                'finish_date' => Carbon::yesterday(),
+                'educational_program_uid' => $educational->uid
+            ]
+        );
+
+        $data = [
+            'paymentTermUid' => $paymentTerm->uid
+        ];
+
+        $response = $this->post(route('my-educational-programs-enrolled-pay-term'), $data);
+
+        // Verificar que la respuesta es exitosa
+        $response->assertStatus(406);
+
+        $response->assertJson(['message' => 'El plazo de pago no está activo']);
+        
     }
 }

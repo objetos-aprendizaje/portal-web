@@ -145,21 +145,21 @@
 
     <!-- BOTONES DE CONTROL -->
     <section
-        class="container mx-auto items-end  mb-[48px] lg:mb-[110px] flex gap-[26px] flex-row flex-wrap justify-center ">
+        class="container mx-auto items-end  mb-[48px] lgx:mb-[110px] flex gap-[26px] flex-row flex-wrap justify-center ">
         @if ($general_options['lane_featured_courses'])
-            <label id="cursoButton" class="btn-lane-home text-white">
+            <label id="cursoButton" class="btn-lane-home text-white" for="courses-lane-checkbox">
                 <x-checkbox id="courses-lane-checkbox" label="Cursos" :classLabel="'text-white'" :checked="$lanes_preferences['courses']" />
             </label>
         @endif
 
         @if ($general_options['lane_featured_educationals_programs'])
-            <label id="programaButton" class="btn-lane-home">
+            <label id="programaButton" class="btn-lane-home" for="programs-lane-checkbox">
                 <x-checkbox id="programs-lane-checkbox" label="Programas" :classLabel="'text-white'" :checked="$lanes_preferences['programs']" />
             </label>
         @endif
 
         @if ($general_options['lane_recents_educational_resources'])
-            <label id="recursoButton" class="btn-lane-home">
+            <label id="recursoButton" class="btn-lane-home" for="resources-lane-checkbox">
                 <x-checkbox id="resources-lane-checkbox" label="Recursos" :classLabel="'text-white'" :checked="$lanes_preferences['resources']" />
             </label>
         @endif
@@ -285,7 +285,7 @@
                 <div class="block-container-title">
                     <a aria-label="enlace" title="objeto de aprendizaje" class="no-effect-hover block-url"
                         href="#">
-                        <h2 class="block-title"></h2>
+                        <h2 class="block-title">Objeto de aprendizaje</h2>
                     </a>
                 </div>
                 <p class="block-description block-description-small"></p>

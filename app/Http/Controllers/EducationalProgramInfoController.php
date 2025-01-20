@@ -18,37 +18,37 @@ class EducationalProgramInfoController extends BaseController
     public function index($uid)
     {
 
-        $educational_program = $this->getEducationalProgram($uid);
+        $educationalProgram = $this->getEducationalProgram($uid);
 
         if(Auth::check()) {
-            $studentEducationalProgramInfo = EducationalProgramsStudentsModel::where('educational_program_uid', $educational_program->uid)->where('user_uid', Auth::user()->uid)->first();
+            $studentEducationalProgramInfo = EducationalProgramsStudentsModel::where('educational_program_uid', $educationalProgram->uid)->where('user_uid', Auth::user()->uid)->first();
         } else {
             $studentEducationalProgramInfo = null;
         }
 
-        adaptDatesCourseEducationalProgram($educational_program);
+        adaptDatesCourseEducationalProgram($educationalProgram);
 
         // Hacemos un array único con los profesores de cada curso
-        $teachers = $this->getTeachersUnique($educational_program);
+        $teachers = $this->getTeachersUnique($educationalProgram);
 
-        $showDoubtsButton = $educational_program->contact_emails->count() || $educational_program->educational_program_type->redirection_queries->count();
+        $showDoubtsButton = $educationalProgram->contact_emails->count() || $educationalProgram->educational_program_type->redirection_queries->count();
 
         return view("educational-program-info", [
             "resources" => [
                 'resources/js/educational_program_info.js'
             ],
             'showDoubtsButton' => $showDoubtsButton,
-            "educational_program" => $educational_program,
+            "educational_program" => $educationalProgram,
             "teachers" => $teachers,
-            'page_title' => $educational_program->name,
+            'page_title' => $educationalProgram->name,
             'studentEducationalProgramInfo' => $studentEducationalProgramInfo
         ]);
     }
 
-    private function getTeachersUnique($educational_program) {
+    private function getTeachersUnique($educationalProgram) {
         $teachers = [];
         $temp = [];
-        foreach ($educational_program->courses as $course) {
+        foreach ($educationalProgram->courses as $course) {
             foreach ($course->teachers as $teacher) {
                 // Utiliza el uid del teacher como clave en el array temporal.
                 $temp[$teacher->uid] = $teacher;
@@ -70,43 +70,42 @@ class EducationalProgramInfoController extends BaseController
             'educational_program_uid' => 'required|exists:educational_programs,uid'
         ]);
 
-        $educational_program_uid = $request->input('educational_program_uid');
-        $calification = $request->input('calification');
+        $educationalProgramUid = $request->input('educational_program_uid');
 
-        $calification_value = $request->input('calification');
+        $calificationValue = $request->input('calification');
 
         $calification = EducationalProgramsAssessmentsModel::where('user_uid', auth()->user()->uid)
-            ->where('educational_program_uid', $educational_program_uid)
+            ->where('educational_program_uid', $educationalProgramUid)
             ->first();
 
         if ($calification) {
-            $calification->calification = $calification_value;
+            $calification->calification = $calificationValue;
             $calification->save();
         } else {
             $calification = new EducationalProgramsAssessmentsModel();
             $calification->uid = generate_uuid();
             $calification->user_uid = auth()->user()->uid;
-            $calification->educational_program_uid = $educational_program_uid;
-            $calification->calification = $calification_value;
+            $calification->educational_program_uid = $educationalProgramUid;
+            $calification->calification = $calificationValue;
             $calification->save();
         }
 
         return response()->json(['message' => 'Se ha registrado correctamente la calificación'], 200);
     }
 
-    public function getEducationalProgramApi($educational_program_uid)
+    public function getEducationalProgramApi($educationalProgramUid)
     {
 
-        $educational_program = $this->getEducationalProgram($educational_program_uid);
+        $educationalProgram = $this->getEducationalProgram($educationalProgramUid);
 
-        return response()->json($educational_program);
+        return response()->json($educationalProgram);
     }
 
 
     private function getEducationalProgram($uid)
     {
 
-        $educational_program = EducationalProgramsModel::select('educational_programs.*', 'califications_avg.average_calification')
+        $educationalProgram = EducationalProgramsModel::select('educational_programs.*', 'califications_avg.average_calification')
             ->leftJoinSub(
                 EducationalProgramsAssessmentsModel::select('educational_program_uid', DB::raw('ROUND(AVG(calification), 1) as average_calification'))
                     ->groupBy('educational_program_uid'),
@@ -142,6 +141,6 @@ class EducationalProgramInfoController extends BaseController
             ->with(["categories", "center", "status", "educational_program_type"])
             ->first();
 
-        return $educational_program;
+        return $educationalProgram;
     }
 }

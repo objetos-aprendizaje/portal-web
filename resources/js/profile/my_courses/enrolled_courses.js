@@ -216,7 +216,7 @@ function setPaymentTerms(template, course) {
         const finishDate = new Date(paymentTerm.finish_date);
         const currentDate = new Date();
 
-        if (paymentTerm.user_payment && paymentTerm.user_payment.is_paid) {
+        if (paymentTerm.user_payment?.is_paid) {
             const paymentTermsLabels =
                 paymentTermsCloned.querySelectorAll(".paid-term-label");
             paymentTermsLabels.forEach((paymentTermLabel) => {

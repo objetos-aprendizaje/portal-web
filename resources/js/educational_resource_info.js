@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
  * Función que se encarga de rellenar las estrellas de la calificación al hacer hover sobre ellas.
  */
 function fillStarsHover() {
-    var stars = Array.from(
+    const stars = Array.from(
         document.querySelectorAll(".stars-califications svg")
     );
 
@@ -53,16 +53,16 @@ function forceDownload(url) {
  * @param {*} number Número de estrellas a rellenar
  */
 function fillStars(number) {
-    var stars = document.querySelectorAll(".stars-califications svg");
+    const stars = document.querySelectorAll(".stars-califications svg");
 
     // Resalta las estrellas correspondientes
-    for (var i = 0; i < number; i++) {
+    for (let i = 0; i < number; i++) {
         stars[i].style.fill = "#EABA0F";
         stars[i].style.stroke = "#EABA0F";
     }
 
     // Pone grises las estrellas restantes
-    for (var i = number; i < stars.length; i++) {
+    for (let i = number; i < stars.length; i++) {
         stars[i].style.fill = "#E4E4E4";
         stars[i].style.stroke = "#E4E4E4";
     }
@@ -72,12 +72,12 @@ function fillStars(number) {
  * Función que se encarga de manejar el click en la calificación de un recurso educativo.
  */
 function handleCalificateResource() {
-    var stars = document.querySelectorAll(".stars-califications svg");
+    const stars = document.querySelectorAll(".stars-califications svg");
 
     stars.forEach(function (star, index) {
         star.addEventListener("click", function () {
             // El usuario ha seleccionado index + 1 estrellas
-            var selectedStars = index + 1;
+            const selectedStars = index + 1;
             calificateResource(selectedStars);
         });
     });
@@ -111,13 +111,13 @@ function calificateResource(selectedStars) {
  * Función que se encarga de recargar la información del recurso educativo.
  */
 function reloadResourceInfo() {
-    const resource_uid = document.getElementById(
+    const resourceUid = document.getElementById(
         "educational_resource_uid"
     ).value;
 
     const params = {
         method: "GET",
-        url: "/resource/get_resource/" + resource_uid,
+        url: "/resource/get_resource/" + resourceUid,
         loader: true,
     };
 
@@ -137,5 +137,3 @@ function fillResourceInfo(resource) {
     );
     fillStars(Math.trunc(resource.average_calification));
 }
-
-function accessResource() {}

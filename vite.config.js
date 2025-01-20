@@ -24,7 +24,6 @@ export default defineConfig({
                 "resources/js/profile/categories.js",
                 "resources/js/cart.js",
                 "resources/js/educational_program_info.js",
-                "resources/js/profile/notifications.js",
                 "resources/js/profile/my_courses.js",
                 "resources/js/notifications_handler.js",
                 "resources/js/modal_handler.js",
@@ -44,7 +43,8 @@ export default defineConfig({
                 'node_modules/infinite-tree/dist/infinite-tree.css',
                 "resources/js/recover_password.js",
                 "resources/js/register.js",
-                "resources/js/accept_policies.js"
+                "resources/js/accept_policies.js",
+                "resources/js/profile/notifications/general_notifications.js"
             ],
             refresh: true,
         }),

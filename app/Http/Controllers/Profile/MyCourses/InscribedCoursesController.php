@@ -30,7 +30,7 @@ class InscribedCoursesController extends BaseController
     {
         $user = auth()->user();
 
-        $items_per_page = $request->items_per_page;
+        $itemsPerPage = $request->items_per_page;
 
         $search = $request->search;
 
@@ -58,7 +58,7 @@ class InscribedCoursesController extends BaseController
             });
         }
 
-        $coursesStudents = $coursesStudentsQuery->paginate($items_per_page);
+        $coursesStudents = $coursesStudentsQuery->paginate($itemsPerPage);
 
         $coursesStudents->getCollection()->transform(function ($courseStudent) {
             return [
@@ -168,16 +168,16 @@ class InscribedCoursesController extends BaseController
             return $coursePayment;
         }
 
-        $course_payment = new CoursesPaymentsModel();
-        $course_payment->uid = generate_uuid();
-        $course_payment->user_uid = auth()->user()->uid;
-        $course_payment->course_uid = $courseUid;
-        $course_payment->order_number = generateRandomNumber(12);
-        $course_payment->is_paid = 0;
+        $coursePayment = new CoursesPaymentsModel();
+        $coursePayment->uid = generate_uuid();
+        $coursePayment->user_uid = auth()->user()->uid;
+        $coursePayment->course_uid = $courseUid;
+        $coursePayment->order_number = generateRandomNumber(12);
+        $coursePayment->is_paid = 0;
 
-        $course_payment->save();
+        $coursePayment->save();
 
-        return $course_payment;
+        return $coursePayment;
     }
 
     // Enviar la imagen al webhook del backend y nos devuelve la ruta asignada

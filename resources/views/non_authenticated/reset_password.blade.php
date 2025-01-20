@@ -21,19 +21,19 @@
                             <div class="flex flex-col mb-[20px]">
 
                                 <div class="flex flex-col mb-[20px]">
-                                    <label class="px-3 mb-[8px]">Nueva contraseña</label>
+                                    <label class="px-3 mb-[8px]" for="password">Nueva contraseña</label>
                                     <input
                                         class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[60px]"
-                                        type="password" name="password" />
+                                        type="password" name="password" id="password" />
 
                                 </div>
 
                                 <div class="flex flex-col mb-[20px]">
 
-                                    <label class="px-3 mb-[8px]">Repite la contraseña</label>
+                                    <label class="px-3 mb-[8px]" for="confirm_password">Repite la contraseña</label>
                                     <input
                                         class="border-[1.5px] border-solid border-color_1 rounded-full p-3 focus:border-color_1 h-[60px]"
-                                        type="password" name="confirm_password" />
+                                        type="password" name="confirm_password" id="confirm_password" />
 
                                 </div>
                             </div>

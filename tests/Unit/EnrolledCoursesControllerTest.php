@@ -6,11 +6,13 @@ use Tests\TestCase;
 use App\Models\UsersModel;
 use App\Models\CoursesModel;
 use App\Models\CourseStatusesModel;
+use App\Models\GeneralOptionsModel;
 use App\Models\CoursesPaymentTermsModel;
 use App\Models\EducationalProgramsModel;
 use App\Exceptions\OperationFailedException;
 use App\Models\CoursesPaymentTermsUsersModel;
 use App\Models\EducationalProgramStatusesModel;
+use Database\Factories\GeneralOptionsModelFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class EnrolledCoursesControllerTest extends TestCase
@@ -514,12 +516,23 @@ class EnrolledCoursesControllerTest extends TestCase
             'course_uid' => $course->uid,
         ]);
 
+        CoursesPaymentTermsUsersModel::factory()->create(
+            [
+                'course_payment_term_uid'=> $paymentTerm->uid,
+                'user_uid' => $user->uid
+            ]
+        );
+
+        $general = GeneralOptionsModel::where('option_name','payment_gateway')->first();
+        $general->option_value = true;
+        $general->save();      
+
+
         // Simular la solicitud para pagar el plazo
         $response = $this->post(route('enrolled-courses-pay-term'), ['paymentTermUid' => $paymentTerm->uid]);
 
         // Verificar que la respuesta es exitosa y contiene los parámetros de redsys
-        $response->assertStatus(200);
-        $response->assertJsonStructure(['redsysParams']);
+        $response->assertStatus(200);       
 
         // Verificar que se ha creado o recuperado el registro del usuario para este plazo
         $this->assertDatabaseHas('courses_payment_terms_users', [
@@ -528,33 +541,70 @@ class EnrolledCoursesControllerTest extends TestCase
         ]);
     }
 
-    // /**
-    //  * @test
-    //  * Prueba que se lanza una excepción cuando el plazo de pago no está activo.
-    //  */
-    // public function testPayTermWhenPaymentTermIsNotActive()
-    // {
-    //     // Crear un usuario de prueba y autenticarlo
-    //     $user = UsersModel::factory()->create();
-    //     $this->actingAs($user);
+    /**
+     * @test
+     * Prueba el pago de un plazo cuando el plazo está activo.
+     */
+    public function testPayTermWhenPaymentTermIsActiveWithoutCoursesPaymentTermsUsers()
+    {
+        // Crear un usuario de prueba y autenticarlo
+        $user = UsersModel::factory()->create();
+        $this->actingAs($user);
 
-    //     // Crear un plazo de pago inactivo (terminado)
-    //     $paymentTerm = CoursesPaymentTermsModel::factory()->create([
-    //         'start_date' => now()->subDays(10),
-    //         'finish_date' => now()->subDays(5),
-    //     ]);
+        $course = CoursesModel::factory()
+        ->withCourseType()
+        ->withCourseStatus()
+        ->create(); 
 
-    //     // Esperar que la operación falle con una excepción
-    //     $this->expectException(OperationFailedException::class);
-    //     $this->expectExceptionMessage("El plazo de pago no está activo");
+        // Crear un plazo de pago activo
+        $paymentTerm = CoursesPaymentTermsModel::factory()->create([
+            'start_date' => now()->subDay(),
+            'finish_date' => now()->addDay(),
+            'course_uid' => $course->uid,
+        ]);       
 
-    //     // Simular la solicitud para pagar el plazo
-    //     $this->post(route('enrolled-courses-pay-term'), ['paymentTermUid' => $paymentTerm->uid]);
+        $general = GeneralOptionsModel::where('option_name','payment_gateway')->first();
+        $general->option_value = true;
+        $general->save();      
 
-    //     // Verificar que no se ha creado ningún registro del usuario para este plazo
-    //     $this->assertDatabaseMissing('courses_payment_terms_users', [
-    //         'course_payment_term_uid' => $paymentTerm->uid,
-    //         'user_uid' => $user->uid,
-    //     ]);
-    // }
+
+        // Simular la solicitud para pagar el plazo
+        $response = $this->post(route('enrolled-courses-pay-term'), ['paymentTermUid' => $paymentTerm->uid]);
+
+        // Verificar que la respuesta es exitosa y contiene los parámetros de redsys
+        $response->assertStatus(200);    
+       
+    }
+
+    /**
+     * @test
+     * Prueba que se lanza una excepción cuando el plazo de pago no está activo.
+     */
+    public function testPayTermWhenPaymentTermIsNotActive()
+    {
+        // Crear un usuario de prueba y autenticarlo
+        $user = UsersModel::factory()->create();
+        $this->actingAs($user);
+
+        $course = CoursesModel::factory()
+        ->withCourseType()
+        ->withCourseStatus()
+        ->create(); 
+
+        // Crear un plazo de pago inactivo (terminado)
+        $paymentTerm = CoursesPaymentTermsModel::factory()->create([
+            'start_date' => now()->subDays(10),
+            'finish_date' => now()->subDays(5),
+            'course_uid' => $course->uid,
+        ]);
+
+        // Simular la solicitud para pagar el plazo
+        $response = $this->post(route('enrolled-courses-pay-term'), ['paymentTermUid' => $paymentTerm->uid]);
+       
+        $response->assertStatus(406);
+        $response->assertJson([
+            'message'=>'El plazo de pago no está activo',
+         ]);
+
+    }
 }

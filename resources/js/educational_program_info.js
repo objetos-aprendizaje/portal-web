@@ -12,12 +12,12 @@ document.addEventListener("DOMContentLoaded", function () {
  * Función que se encarga de manejar el click en la calificación de un recurso educativo.
  */
 function handleCalificateResource() {
-    var stars = document.querySelectorAll(".stars-califications svg");
+    const stars = document.querySelectorAll(".stars-califications svg");
 
     stars.forEach(function (star, index) {
         star.addEventListener("click", function () {
             // El usuario ha seleccionado index + 1 estrellas
-            var selectedStars = index + 1;
+            const selectedStars = index + 1;
             calificateEducationalProgram(selectedStars);
         });
     });
@@ -51,13 +51,13 @@ function calificateEducationalProgram(selectedStars) {
  * Función que se encarga de recargar la información del recurso educativo.
  */
 function reloadEducationalProgramInfo() {
-    const educational_program_uid = document.getElementById(
+    const educationalProgramUid = document.getElementById(
         "educational_program_uid"
     ).value;
 
     const params = {
         method: "GET",
-        url: "/educational_program/get_educational_program/" + educational_program_uid,
+        url: "/educational_program/get_educational_program/" + educationalProgramUid,
         loader: true,
     };
 

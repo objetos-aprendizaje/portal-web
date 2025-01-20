@@ -30,7 +30,7 @@ class LearningResultsModelFactory extends Factory
 
     public function withCompetence(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'competence_uid' => CompetencesModel::factory()->create()->first(),
             ];

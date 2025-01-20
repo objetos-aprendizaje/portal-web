@@ -28,9 +28,7 @@ class UserPoliciesMiddleware
             $policiesMustAccept = [];
 
             foreach ($footerPages as $page) {
-                if (!isset($userPoliciesAccepted[$page->uid])) {
-                    $policiesMustAccept[] = $page;
-                } else if ($userPoliciesAccepted[$page->uid]->version < $page->version) {
+                if (!isset($userPoliciesAccepted[$page->uid]) || $userPoliciesAccepted[$page->uid]->version < $page->version) {
                     $policiesMustAccept[] = $page;
                 }
             }

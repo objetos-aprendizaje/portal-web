@@ -22,4 +22,8 @@ class CoursesEmailsContactsModel extends Model
     protected $fillable = ['uid', 'course_uid', 'email'];
 
     public $incrementing = false;
+
+    public $timestamps = false;
+
+    
 }

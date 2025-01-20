@@ -13,16 +13,16 @@ class CategoriesController extends BaseController
 
     public function index()
     {
-        $categories_anidated = CategoriesModel::whereNull('parent_category_uid')->with('subcategories')->get()->toArray();
+        $categoriesAnidated = CategoriesModel::whereNull('parent_category_uid')->with('subcategories')->get()->toArray();
 
-        $user_categories = auth()->user()->categories->pluck('uid')->toArray();
+        $userCategories = auth()->user()->categories->pluck('uid')->toArray();
 
         return view("profile.categories.index", [
             "resources" => [
                 'resources/js/profile/categories.js'
             ],
-            "user_categories" => $user_categories,
-            "categories" => $categories_anidated,
+            "user_categories" => $userCategories,
+            "categories" => $categoriesAnidated,
             "currentPage" => "categories",
             "page_title" => "Categorías interesadas"
         ]);
@@ -42,21 +42,21 @@ class CategoriesController extends BaseController
 
     private function syncCategories($categories) {
         DB::transaction(function () use ($categories) {
-            $user_uid = auth()->user()->uid;
-            $categories_bd = CategoriesModel::whereIn('uid', $categories)->get()->pluck('uid');
+            $userUid = auth()->user()->uid;
+            $categoriesBd = CategoriesModel::whereIn('uid', $categories)->get()->pluck('uid');
 
-            UserCategoriesModel::where('user_uid', $user_uid)->whereIn('category_uid', $categories_bd)->delete();
-            $categories_to_sync = [];
+            UserCategoriesModel::where('user_uid', $userUid)->whereIn('category_uid', $categoriesBd)->delete();
+            $categoriesToSync = [];
 
-            foreach ($categories_bd as $category_uid) {
-                $categories_to_sync[] = [
+            foreach ($categoriesBd as $categoryUid) {
+                $categoriesToSync[] = [
                     'uid' => generate_uuid(),
-                    'user_uid' => $user_uid,
-                    'category_uid' => $category_uid
+                    'user_uid' => $userUid,
+                    'category_uid' => $categoryUid
                 ];
             }
 
-            auth()->user()->categories()->sync($categories_to_sync);
+            auth()->user()->categories()->sync($categoriesToSync);
         });
     }
 }

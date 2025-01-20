@@ -35,7 +35,7 @@ class SendEmailJob implements ShouldQueue
     }
 
     private function setConfigEmailServer() {
-        $parameters_email_service = GeneralOptionsModel::whereIn('option_name', [
+        $parametersEmailService = GeneralOptionsModel::whereIn('option_name', [
             'smtp_server',
             'smtp_port',
             'smtp_user',
@@ -47,12 +47,12 @@ class SendEmailJob implements ShouldQueue
             return [$item['option_name'] => $item['option_value']];
         })->toArray();
 
-        Config::set('mail.mailers.smtp.host', $parameters_email_service['smtp_server'] ?? null);
-        Config::set('mail.mailers.smtp.port', $parameters_email_service['smtp_port'] ?? null);
-        Config::set('mail.mailers.smtp.username', $parameters_email_service['smtp_user'] ?? null);
-        Config::set('mail.mailers.smtp.password', $parameters_email_service['smtp_password'] ?? null);
-        Config::set('mail.from.name', $parameters_email_service['smtp_name_from'] ?? env('MAIL_FROM_NAME'));
-        Config::set('mail.mailers.smtp.encryption', $parameters_email_service['smtp_encryption'] ?? null);
-        Config::set('mail.from.address', $parameters_email_service['smtp_address_from'] ?? null);
+        Config::set('mail.mailers.smtp.host', $parametersEmailService['smtp_server'] ?? null);
+        Config::set('mail.mailers.smtp.port', $parametersEmailService['smtp_port'] ?? null);
+        Config::set('mail.mailers.smtp.username', $parametersEmailService['smtp_user'] ?? null);
+        Config::set('mail.mailers.smtp.password', $parametersEmailService['smtp_password'] ?? null);
+        Config::set('mail.from.name', $parametersEmailService['smtp_name_from'] ?? env('MAIL_FROM_NAME'));
+        Config::set('mail.mailers.smtp.encryption', $parametersEmailService['smtp_encryption'] ?? null);
+        Config::set('mail.from.address', $parametersEmailService['smtp_address_from'] ?? null);
     }
 }

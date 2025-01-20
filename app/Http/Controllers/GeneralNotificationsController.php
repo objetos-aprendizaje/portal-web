@@ -21,44 +21,39 @@ class GeneralNotificationsController extends BaseController
     /**
      * Devuelve una notificación general para un usuario y además la marca como vista
      */
-    public function getGeneralNotificationUser($notification_general_uid)
+    public function getGeneralNotificationUser($notificationGeneralUid)
     {
+        $userUid = Auth::user()['uid'];
 
-        if (!$notification_general_uid) {
-            return response()->json(['message' => env('ERROR_MESSAGE')], 400);
-        }
-
-        $user_uid = Auth::user()['uid'];
-
-        $general_notification = GeneralNotificationsModel::where('uid', $notification_general_uid)->addSelect([
+        $generalNotification = GeneralNotificationsModel::where('uid', $notificationGeneralUid)->addSelect([
             'is_read' => UserGeneralNotificationsModel::select(DB::raw('CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS INTEGER)'))
                 ->whereColumn('user_general_notifications.general_notification_uid', 'general_notifications.uid')
-                ->where('user_general_notifications.user_uid', $user_uid)
+                ->where('user_general_notifications.user_uid', $userUid)
                 ->limit(1)
         ])
             ->first();
 
-        if (!$general_notification) {
+        if (!$generalNotification) {
             return response()->json(['message' => 'La notificación general no existe'], 406);
         }
 
         // La marcamos como vista
-        if (!$general_notification['is_read']) {
-            $user_general_notification = new UserGeneralNotificationsModel();
-            $user_general_notification->uid = generate_uuid();
-            $user_general_notification->user_uid = $user_uid;
-            $user_general_notification->general_notification_uid = $general_notification['uid'];
-            $user_general_notification->view_date = date('Y-m-d H:i:s');
+        if (!$generalNotification['is_read']) {
+            $userGeneralNotification = new UserGeneralNotificationsModel();
+            $userGeneralNotification->uid = generate_uuid();
+            $userGeneralNotification->user_uid = $userUid;
+            $userGeneralNotification->general_notification_uid = $generalNotification['uid'];
+            $userGeneralNotification->view_date = date('Y-m-d H:i:s');
 
-            $user_general_notification->save();
+            $userGeneralNotification->save();
         }
 
         $generalNotificationMapped = [
-            "uid" => $general_notification->uid,
-            "title" => $general_notification->title,
-            "description" => $general_notification->description,
-            "start_date" => $general_notification->start_date,
-            "end_date" => $general_notification->end_date,
+            "uid" => $generalNotification->uid,
+            "title" => $generalNotification->title,
+            "description" => $generalNotification->description,
+            "start_date" => $generalNotification->start_date,
+            "end_date" => $generalNotification->end_date,
         ];
 
         return response()->json($generalNotificationMapped, 200);
@@ -66,20 +61,22 @@ class GeneralNotificationsController extends BaseController
 
     public function getGeneralNotificationAutomaticUser($generalNotificationAutomaticUid)
     {
-        $user_uid = Auth::user()['uid'];
+        $userUid = Auth::user()['uid'];
 
         $generalNotificationAutomatic = GeneralNotificationsAutomaticModel::where('uid', $generalNotificationAutomaticUid)
-            ->whereHas('users', function ($query) use ($user_uid) {
-                $query->where('users.uid', $user_uid);
+            ->whereHas('users', function ($query) use ($userUid) {
+                $query->where('users.uid', $userUid);
             })
             ->first();
 
-        if (!$generalNotificationAutomatic) abort(404, 'Notificación automática no encontrada');
+        if (!$generalNotificationAutomatic) {
+            abort(404, 'Notificación automática no encontrada');
+        }
 
         // Marcamos como vista la notificación al usuario
         if ($generalNotificationAutomatic) {
             GeneralNotificationsAutomaticUsersModel::where('general_notifications_automatic_uid', $generalNotificationAutomatic->uid)
-                ->where('user_uid', $user_uid)
+                ->where('user_uid', $userUid)
                 ->update(['is_read' => true]);
         }
 

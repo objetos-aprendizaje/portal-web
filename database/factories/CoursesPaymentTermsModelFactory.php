@@ -29,7 +29,7 @@ class CoursesPaymentTermsModelFactory extends Factory
 
     public function withCourse(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'course_uid' => CoursesModel::factory()->create()->first(),
             ];

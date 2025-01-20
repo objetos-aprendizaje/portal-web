@@ -102,8 +102,7 @@ class HistoricCoursesControllerTest extends TestCase
 */
 
     public function testGetHistoricCourses()
-    {
-        
+    {        
         // Buscamos un usuario  
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
@@ -112,12 +111,28 @@ class HistoricCoursesControllerTest extends TestCase
                 'email'=>'admin@admin.com'
             ])->first();
         }
+
         // Lo autenticarlo         
         $this->actingAs($user);
 
+        $status = CourseStatusesModel::where('code','FINISHED')->first();
+
+        $course = CoursesModel::factory()
+        ->withCourseType()
+        ->create(
+            [
+                'course_status_uid' =>$status->uid,                
+            ]
+        ); 
+
+        $user->courses_students()->attach($course->uid ,[
+            'uid'=> generate_uuid(),
+            'status'=> 'ENROLLED', 
+        ]);
+
         $response = $this->post(route('get-historic-courses'), [
-            'items_per_page' => 10,
-            'search' => 'test'
+            'items_per_page' => 5,
+            'search' => $course->title,
         ]);
 
         $response->assertStatus(200);
@@ -125,14 +140,8 @@ class HistoricCoursesControllerTest extends TestCase
             'current_page',
             'data' => [
                 '*' => [
-                    'id',
-                    'title',
-                    'description',
-                    'status' => [
-                        'id',
-                        'code',
-                        'name'
-                    ]
+                    'uid',
+                    'title',                    
                 ]
             ],
             'from',
