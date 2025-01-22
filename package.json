@@ -10,18 +10,21 @@
         "@semantic-release-plus/docker": "^3.1.3",
         "@tailwindcss/forms": "^0.5.7",
         "autoprefixer": "^10.4.16",
-        "axios": "^1.1.2",
+        "axios": "^1.7.4",
         "laravel-vite-plugin": "^0.8.0",
         "postcss": "^8.4.31",
         "sass": "^1.69.5",
         "semantic-release": "^24.2.0",
         "tailwindcss": "^3.3.5",
-        "vite": "^4.0.0"
+        "vite": "^4.5.6"
     },
     "dependencies": {
+        "braces": "^3.0.3",
+        "color-string": "^1.5.5",
         "flatpickr": "^4.6.13",
         "infinite-tree": "^1.18.0",
         "postcss-color-function": "^4.1.0",
+        "rollup": "^3.29.5",
         "swiper": "^11.1.1",
         "toastify-js": "^1.12.0",
         "tom-select": "^2.3.1",
@@ -36,10 +39,10 @@
             "@semantic-release/release-notes-generator",
             "@semantic-release/github",
             [
-              "@semantic-release-plus/docker",
-              {
-                "name": "ghcr.io/objetos-aprendizaje/portal-web:latest"
-              }
+                "@semantic-release-plus/docker",
+                {
+                    "name": "ghcr.io/objetos-aprendizaje/portal-web:latest"
+                }
             ],
             "./release-remoterepo-helm-upgrader.cjs"
         ]

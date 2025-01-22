@@ -47,9 +47,8 @@ class DoubtsController extends Controller
 
         $validator = Validator::make($request->all(), $rules, $messages);
 
-        $errorsValidator = $validator->errors();
-
-        return $errorsValidator;
+        return $validator->errors();
+        
     }
 
     public function sendDoubt(Request $request)
@@ -75,9 +74,9 @@ class DoubtsController extends Controller
 
         if ($learningObjectType == 'course') {
             $this->handleCourse($uid, $parameters);
-        } else if ($learningObjectType == 'educational_program') {
+        } elseif ($learningObjectType == 'educational_program') {
             $this->handleEducationalProgram($uid, $parameters);
-        } else if ($learningObjectType == 'educational_resource') {
+        } elseif ($learningObjectType == 'educational_resource') {
             $this->handleEducationalResource($uid, $parameters);
         }
 
@@ -101,7 +100,7 @@ class DoubtsController extends Controller
         $emailsToSend = [];
         if ($learningObject->contact_emails->count()) {
             $emailsToSend = $learningObject->contact_emails->pluck('email')->toArray();
-        } else if ($learningObject->course_type->redirection_queries->count()) {
+        } elseif ($learningObject->course_type->redirection_queries->count()) {
             $emailsToSend = $learningObject->course_type->redirection_queries->pluck('contact')->toArray();
         }
 
@@ -125,7 +124,7 @@ class DoubtsController extends Controller
         $emailsToSend = [];
         if ($educationalProgram->contact_emails->count()) {
             $emailsToSend = $educationalProgram->contact_emails->pluck('email')->toArray();
-        } else if ($educationalProgram->educational_program_type->redirection_queries->count()) {
+        } elseif ($educationalProgram->educational_program_type->redirection_queries->count()) {
             $emailsToSend = $educationalProgram->educational_program_type->redirection_queries->pluck('contact')->toArray();
         }
 

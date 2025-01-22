@@ -242,11 +242,10 @@ class HomeController extends BaseController
 
     private function getLearningResultsStudent()
     {
-        $userLearningResults = Auth::user()->learningResultsPreferences()
+        return Auth::user()->learningResultsPreferences()
             ->get()
             ->pluck("uid")->toArray();
 
-        return $userLearningResults;
     }
 
     private function getCoveredLearningResults($userLearningResults)

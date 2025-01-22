@@ -94,14 +94,7 @@ class HistoricEducationalProgramsControllerTest extends TestCase
                     'educational_program_uid' => $educationalProgram->uid,
                 ]);
         }
-
-        // CoursesModel::factory()
-        //     ->withCourseStatus()
-        //     ->withCourseType()
-        //     ->create([
-        //         'educational_program_uid' => $educationalPrograms[0]->uid,
-        //     ]);
-
+        
         // Crear una solicitud simulada con paginación
         $requestData = [
             'items_per_page' => 2,

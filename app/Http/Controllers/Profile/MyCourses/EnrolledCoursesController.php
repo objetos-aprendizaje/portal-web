@@ -122,14 +122,14 @@ class EnrolledCoursesController extends BaseController
             return $paymentTermUser;
         }
 
-        $paymentTermUser = CoursesPaymentTermsUsersModel::create([
+        return CoursesPaymentTermsUsersModel::create([
             "uid" => generate_uuid(),
             "course_payment_term_uid" => $paymentTermUid,
             "user_uid" => auth()->user()->uid,
             "order_number" => generateRandomNumber(12),
         ]);
 
-        return $paymentTermUser;
+        
     }
 
 

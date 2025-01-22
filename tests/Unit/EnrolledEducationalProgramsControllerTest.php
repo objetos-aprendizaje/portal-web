@@ -156,32 +156,32 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 'status' => 'ENROLLED',
                 'acceptance_status' => 'ACCEPTED'
             ]);
-        }
 
-        CoursesModel::factory()
-            ->withCourseStatus()
-            ->withCourseType()
-            ->create([
-                'educational_program_uid' => $educationalPrograms[0]->uid,
+            CoursesModel::factory()
+                ->withCourseStatus()
+                ->withCourseType()
+                ->create([
+                    'educational_program_uid' => $educationalProgram->uid,
+                ]);
+
+            // Crear un término de pago
+            $paymentTerm = EducationalProgramsPaymentTermsModel::factory()->create([
+                'educational_program_uid' => $educationalProgram->uid,
             ]);
 
+            // Crear un único registro de usuario asociado al término de pago
+            EducationalProgramsPaymentTermsUsersModel::factory()->create([
+                'educational_program_payment_term_uid' => $paymentTerm->uid,
+                'user_uid' => $user->uid,
+                'is_paid' => true,
+            ]);
 
-        // Crear un término de pago
-        $paymentTerm = EducationalProgramsPaymentTermsModel::factory()->create([
-            'educational_program_uid' => $educationalPrograms[0]->uid,
-        ]);
+            // Simular que la relación userPayment sea una colección
+            $paymentTerm->setRelation('userPayment', collect([
+                EducationalProgramsPaymentTermsUsersModel::where('educational_program_payment_term_uid', $paymentTerm->uid)->first(),
+            ]));
+        }
 
-        // Crear un único registro de usuario asociado al término de pago
-        EducationalProgramsPaymentTermsUsersModel::factory()->create([
-            'educational_program_payment_term_uid' => $paymentTerm->uid,
-            'user_uid' => $user->uid,
-            'is_paid' => true,
-        ]);
-
-        // Simular que la relación userPayment sea una colección
-        $paymentTerm->setRelation('userPayment', collect([
-            EducationalProgramsPaymentTermsUsersModel::where('educational_program_payment_term_uid', $paymentTerm->uid)->first(),
-        ]));
 
         // dd($paymentTermsUser);
 
@@ -220,27 +220,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         // Lo autenticarlo         
         $this->actingAs($user);
 
-        $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();
-
-        // Crear algunos programas formativos y matricular al usuario
-        // EducationalProgramsModel::factory()
-        //     ->withEducationalProgramType()
-        //     ->count(3)->create(
-        //         [
-        //             'educational_program_status_uid' => $status->uid
-        //         ]
-        //     );
-
-        // $educationalPrograms = EducationalProgramsModel::all();
-
-        // foreach ($educationalPrograms as $educationalProgram) {
-
-        //     $user->educationalPrograms()->attach($educationalProgram->uid, [
-        //         'uid' => generate_uuid(),
-        //         'status' => 'ENROLLED',
-        //         'acceptance_status' => 'ACCEPTED'
-        //     ]);            
-        // }
+        $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();      
 
 
         $educationalProgram = EducationalProgramsModel::factory()
@@ -539,6 +519,5 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
         $response->assertStatus(406);
 
         $response->assertJson(['message' => 'El plazo de pago no está activo']);
-        
     }
 }

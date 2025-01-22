@@ -424,56 +424,56 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         ]);
     }
 
-      /** @test */
-      public function testUserEnrollNotFreeProgramWihtoutPayment()
-      {
-          // Simular la autenticación del usuario
-          $user = UsersModel::factory()->create();
-          $this->actingAs($user);
-  
-          $status = EducationalProgramStatusesModel::where('code', 'ENROLLING')->first();
-  
-          app()->instance(
-              'general_options',
-              [
-                  'payment_gateway' => true,
-                  'redsys_commerce_code' => true,
-                  'redsys_currency' => true,
-                  'redsys_transaction_type' => false,
-                  'redsys_terminal' => true,
-                  'redsys_encryption_key' => true,
-              ]
-          );
-  
-          // Crear algunos programas formativos inscritos para el usuario
-          $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
-              'educational_program_status_uid' => $status->uid,
-              'cost' => 100,
-          ])->first();
-  
-          // Agregar al usuario como estudiante pero no aprobado
-          $educationalProgram->students()->attach($user->uid, ['acceptance_status' => 'ACCEPTED', 'uid' => generate_uuid()]);
-  
-          // Preparar los datos de la solicitud
-          $data = [
-              'educationalProgramUid' => $educationalProgram->uid,
-              // 'payment_gateway' => 'gateway_test',
-          ];
-  
-          // Realizar una solicitud POST a la ruta definida
-          $response = $this->post(route('enroll-educational-program-inscribed'), $data);
-  
-          // Verificar que no se requiere pago y que el usuario está matriculado correctamente
-          $response->assertStatus(200);
-          // $response->assertJson(['requirePayment' => true, 'message' => 'Matriculado en el curso correctamente']);
-  
-          // Verificar que el usuario esté matriculado en el programa educativo
-          $this->assertDatabaseHas('educational_programs_students', [
-              'user_uid' => $user->uid,
-              'educational_program_uid' => $educationalProgram->uid,
-              // 'status' => 'ENROLLED',
-          ]);
-      }   
+    /** @test */
+    public function testUserEnrollNotFreeProgramWihtoutPayment()
+    {
+        // Simular la autenticación del usuario
+        $user = UsersModel::factory()->create();
+        $this->actingAs($user);
+
+        $status = EducationalProgramStatusesModel::where('code', 'ENROLLING')->first();
+
+        app()->instance(
+            'general_options',
+            [
+                'payment_gateway' => true,
+                'redsys_commerce_code' => true,
+                'redsys_currency' => true,
+                'redsys_transaction_type' => false,
+                'redsys_terminal' => true,
+                'redsys_encryption_key' => true,
+            ]
+        );
+
+        // Crear algunos programas formativos inscritos para el usuario
+        $educationalProgram = EducationalProgramsModel::factory()->withEducationalProgramType()->create([
+            'educational_program_status_uid' => $status->uid,
+            'cost' => 100,
+        ])->first();
+
+        // Agregar al usuario como estudiante pero no aprobado
+        $educationalProgram->students()->attach($user->uid, ['acceptance_status' => 'ACCEPTED', 'uid' => generate_uuid()]);
+
+        // Preparar los datos de la solicitud
+        $data = [
+            'educationalProgramUid' => $educationalProgram->uid,
+            // 'payment_gateway' => 'gateway_test',
+        ];
+
+        // Realizar una solicitud POST a la ruta definida
+        $response = $this->post(route('enroll-educational-program-inscribed'), $data);
+
+        // Verificar que no se requiere pago y que el usuario está matriculado correctamente
+        $response->assertStatus(200);
+        // $response->assertJson(['requirePayment' => true, 'message' => 'Matriculado en el curso correctamente']);
+
+        // Verificar que el usuario esté matriculado en el programa educativo
+        $this->assertDatabaseHas('educational_programs_students', [
+            'user_uid' => $user->uid,
+            'educational_program_uid' => $educationalProgram->uid,
+            // 'status' => 'ENROLLED',
+        ]);
+    }
 
 
     /** @test download documento programa*/
@@ -570,7 +570,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         ])->first();
 
         // Crea un programa educativo inscrito para el usuario
-        $educationalProgramStudent = EducationalProgramsStudentsModel::factory()->create([
+        EducationalProgramsStudentsModel::factory()->create([
             'user_uid' => $user->uid,
             'educational_program_uid' => $educationalProgram->uid,
             'status' => 'INSCRIBED',
@@ -608,10 +608,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
         Storage::fake('documents');
         $file = UploadedFile::fake()->create('document.pdf', 100);
 
-        // Mockear la respuesta del backend
-        $filePath = 'documents/document.pdf';
-        // $this->mockFunction('sendFileToBackend', ['file_path' => $filePath]);
-
+     
         $educationalDocument = EducationalProgramsDocumentsModel::factory()->withEducationalProgram()->create()->first();
 
         // Preparar los datos de la solicitud

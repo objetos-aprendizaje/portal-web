@@ -145,13 +145,13 @@ class LoginController extends BaseController
             $user->email = $userSocialLogin->email;
             $user->first_name = $userSocialLogin->user['given_name'];
             $user->last_name = $userSocialLogin->user['family_name'] ?? null;
-        } else if ($loginMethod == "facebook") {
+        } elseif ($loginMethod == "facebook") {
             $user->email = $userSocialLogin->email;
             $user->first_name = $userSocialLogin->email;
-        } else if ($loginMethod == "twitter") {
+        } elseif ($loginMethod == "twitter") {
             $user->email = $userSocialLogin->email;
             $user->first_name = $userSocialLogin->name;
-        } else if ($loginMethod == "linkedin-openid") {
+        } elseif ($loginMethod == "linkedin-openid") {
             $user->email = $userSocialLogin->email;
             $user->first_name = $userSocialLogin->user['given_name'];
             $user->last_name = $userSocialLogin->user['family_name'];

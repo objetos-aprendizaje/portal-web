@@ -24,7 +24,7 @@ class CartController extends BaseController
 
         if ($learningObjectType == "course") {
             $learningObjectData = $this->getCourseData($uid);
-        } else if ($learningObjectType == "educational_program") {
+        } elseif ($learningObjectType == "educational_program") {
             $learningObjectData = $this->getEducationalProgramData($uid);
         }
 
@@ -112,7 +112,7 @@ class CartController extends BaseController
 
             $learningObject = CoursesModel::where('uid', $learningObjectUid)->with(['status', 'students'])->first();
             $statusWithLearningObject = $this->inscribeUserInCourse($learningObject);
-        } else if ($learningObjectType == "educational_program") {
+        } elseif ($learningObjectType == "educational_program") {
             $isInscribed = EducationalProgramsStudentsModel::where('user_uid', auth()->user()->uid)->where('educational_program_uid', $learningObjectUid)->exists();
             if($isInscribed) {
                 throw new OperationFailedException("Ya estás inscrito");
@@ -197,7 +197,7 @@ class CartController extends BaseController
 
         if ($learningObjectType == "course") {
             $redsysParams = $this->processCoursePayment($learningObjectUid);
-        } else if ($learningObjectType == "educational_program") {
+        } elseif ($learningObjectType == "educational_program") {
             // TODO
         }
 
@@ -250,7 +250,7 @@ class CartController extends BaseController
         if ($learningObjectType == "course") {
             $description = "COMPRA DE CURSO";
         }
-        else if ($learningObjectType == "educational_program") {
+        elseif ($learningObjectType == "educational_program") {
             $description = "COMPRA DE PROGRAMA FORMATIVO";
         }
 

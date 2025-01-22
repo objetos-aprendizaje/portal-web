@@ -105,17 +105,16 @@ class DoubtsControllerTest extends TestCase
 
         // Verificar que se enviaron las notificaciones
         Queue::assertPushed(SendEmailJob::class);
-
     }
 
-     /**
+    /**
      * @test
      * Prueba el envío de una duda para un curso
      */
     public function testSendDoubtForCourseWithRedirectionQueries()
     {
         // Simular la cola de correos
-        Queue::fake();      
+        Queue::fake();
 
         $educationalType = EducationalProgramTypesModel::factory()->create();
 
@@ -126,13 +125,13 @@ class DoubtsControllerTest extends TestCase
                 'learning_object_type' => 'COURSE',
                 'educational_program_type_uid' => $educationalType->uid,
                 'course_type_uid' => $type->uid,
-                'type' => 'email',    
-                'contact' => 'john@example.com',          
+                'type' => 'email',
+                'contact' => 'john@example.com',
             ]
         );
 
         $course = CoursesModel::factory()
-            ->withCourseStatus()            
+            ->withCourseStatus()
             ->create([
                 'title' => 'Curso de prueba',
                 'course_type_uid' => $type->uid,
@@ -235,10 +234,10 @@ class DoubtsControllerTest extends TestCase
                 'name' => 'Programa educativo de prueba',
                 'educational_program_type_uid' => $educationProgramType->uid,
             ])->first();
-        
+
         EducationalProgramsEmailContactsModel::factory()->count(3)->create(
             [
-                'educational_program_uid'=> $program->uid,
+                'educational_program_uid' => $program->uid,
             ]
         );
 
@@ -259,10 +258,9 @@ class DoubtsControllerTest extends TestCase
 
         // Verificar que el mensaje es enviado correctamente
         Queue::assertPushed(SendEmailJob::class);
-
     }
 
-     /**
+    /**
      * @test
      * Prueba el envío de una duda para un programa formativo
      */
@@ -285,7 +283,7 @@ class DoubtsControllerTest extends TestCase
         RedirectionQueriesLearningObjectsModel::factory()->count(2)->create(
             [
                 'learning_object_type' => 'EDUCATIONAL_PROGRAM',
-                'educational_program_type_uid' => $educationProgramType->uid,                
+                'educational_program_type_uid' => $educationProgramType->uid,
                 'type' => 'email',
             ]
         );
@@ -307,7 +305,6 @@ class DoubtsControllerTest extends TestCase
 
         // Verificar que el mensaje es enviado correctamente
         Queue::assertPushed(SendEmailJob::class);
-
     }
 
 
@@ -319,7 +316,7 @@ class DoubtsControllerTest extends TestCase
         $educationProgramType = EducationalProgramTypesModel::factory()->create()->first();
 
         // Crear un programa formativo en la base de datos
-        $program = EducationalProgramsModel::factory()
+        EducationalProgramsModel::factory()
             ->create([
                 'uid' => generate_uuid(),
                 'name' => 'Programa educativo de prueba',

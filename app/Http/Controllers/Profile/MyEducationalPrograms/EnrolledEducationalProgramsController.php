@@ -137,14 +137,14 @@ class EnrolledEducationalProgramsController extends BaseController
             return $paymentTermUser;
         }
 
-        $paymentTermUser = EducationalProgramsPaymentTermsUsersModel::create([
+        return EducationalProgramsPaymentTermsUsersModel::create([
             "uid" => generate_uuid(),
             "educational_program_payment_term_uid" => $paymentTermUid,
             "user_uid" => auth()->user()->uid,
             "order_number" => generateRandomNumber(12),
         ]);
 
-        return $paymentTermUser;
+        
     }
 
     public function accessCourse(Request $request)

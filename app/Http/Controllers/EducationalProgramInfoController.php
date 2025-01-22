@@ -55,9 +55,7 @@ class EducationalProgramInfoController extends BaseController
             }
         }
         // Obtén los valores del array temporal para eliminar las claves y tener solo los objetos teacher únicos.
-        $teachers = array_values($temp);
-
-        return $teachers;
+        return array_values($temp);
     }
 
 
