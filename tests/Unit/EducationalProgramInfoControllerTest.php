@@ -174,13 +174,7 @@ class EducationalProgramInfoControllerTest extends TestCase
             'uid' => $course->uid,
             'educational_program_uid' => $program->uid
         ]);
-
-        // Verificar que los profesores están en el JSON
-        // foreach ($teachers as $teacher) {
-        //     $response->assertJsonFragment([
-        //         'uid' => $teacher->uid
-        //     ]);
-        // }
+       
     }
 
 

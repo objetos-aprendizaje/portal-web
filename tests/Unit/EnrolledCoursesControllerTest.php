@@ -91,11 +91,7 @@ class EnrolledCoursesControllerTest extends TestCase
 
         // Verificar que la respuesta es exitosa
         $response->assertStatus(200);
-
-        // Verificar que los programas educativos matriculados se devuelven correctamente
-        // $response->assertJsonFragment([
-        //     'uid' => $educationalPrograms[0]->uid,
-        // ]);
+        
     }
 
     /**

@@ -150,11 +150,6 @@ class LoginControllerTest extends TestCase
         // Verificar que la vista correcta se cargue
         $response->assertViewIs('non_authenticated.login');
 
-        // Verificar que el logo y otros parámetros se pasen correctamente a la vista
-        // $response->assertViewHas('logo', 'logo.png');
-        // $response->assertViewHas('urlCas', url('saml2/cas-uuid/login'));
-        // $response->assertViewHas('urlRediris', url('saml2/rediris-uuid/login'));
-
         // Verificar que los parámetros de los sistemas de login se pasen correctamente
         $response->assertViewHas('parameters_login_systems', [
             'google_login_active' => '1',
@@ -335,11 +330,6 @@ class LoginControllerTest extends TestCase
         // Verificar que el usuario está autenticado correctamente
         $this->assertTrue(Auth::check());
 
-        // Verificar que los datos de sesión se han establecido correctamente
-        // $this->assertEquals(session('email'), 'test@example.com');
-        // $this->assertEquals(session('google_id'), 'google-id-123');
-        // $this->assertEquals(session('token_google'), 'google-token-xyz');
-
         // Verificar que la respuesta redirige correctamente a la página principal
         $response->assertRedirect('/');
     }
@@ -490,7 +480,7 @@ class LoginControllerTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'test@example.com',
             'first_name' => 'John',
-            'last_name'=>'Doe'
+            'last_name' => 'Doe'
         ]);
 
         $student_role = UserRolesModel::where('code', 'STUDENT')->first();
@@ -509,13 +499,6 @@ class LoginControllerTest extends TestCase
         // Verificar que el usuario está autenticado correctamente
         $this->assertTrue(Auth::check());
 
-
-        // Session::put('email', 'test@example.com');
-        // Session::put('linkedin_id', 'linkedin-id-123');
-        // Session::put('token_linkedin', 'test-token');
-
-        // Verificar que la respuesta redirige correctamente a la página principal
-        // $response->assertRedirect('/');
     }
 
     /**
@@ -555,179 +538,10 @@ class LoginControllerTest extends TestCase
         Socialite::shouldReceive('user')->andReturn($user_facebook_mock);
 
         // Hacer la solicitud a la ruta del callback de Facebook
-        $response = $this->get('/auth/callback/facebook');
-
-        // Verificar que los datos de sesión se han establecido correctamente
-        // $this->assertTrue(session()->has('email'), 'El correo electrónico no está presente en la sesión.');
-        // $this->assertEquals('test@example.com', session('email'), 'El correo electrónico en la sesión no coincide con el esperado.');
-        // $this->assertEquals('facebook-id-123', session('facebook_id'));
-        // $this->assertEquals('test-token', session('token_facebook'));
+        $response = $this->get('/auth/callback/facebook');        
 
         // Verificar que la respuesta redirige correctamente a la página principal
         $response->assertRedirect('/');
-    }
-
-    /**
-     * @test
-     * Prueba que el método saveUserAccess crea un registro de acceso para el usuario
-     */
-    // public function testSaveUserAccessCreatesUserAccess()
-    // {
-    //     // Crear un usuario simulado
-
-    //     $user = UsersModel::where('email', 'test@test.com')->first();
-    //     // Si no existe el usuario lo creamos
-    //     if (!$user) {
-    //         $user = UsersModel::factory()->create([
-    //             'email'=>'test@test.com'
-    //         ])->first();
-    //     };
-
-    //     UsersAccessesModel::factory()->create(
-    //         [
-    //             'user_uid' => $user->uid,
-    //             'date' => Carbon::now()
-    //         ]
-    //     );
-
-    //     // Utilizar reflexión para acceder al método privado
-    //     $controller = new LoginController();
-
-    //     // Crear una instancia de ReflectionMethod
-    //     $reflection = new \ReflectionMethod(LoginController::class, 'saveUserAccess');
-    //     $reflection->setAccessible(true);
-
-    //     // Ejecutar el método privado saveUserAccess
-    //     $reflection->invoke($controller, $user);
-
-    //     // Verificar que el registro de acceso fue creado en la base de datos
-    //     $this->assertDatabaseHas('users_accesses', [
-    //         'user_uid' => $user->uid,
-    //     ]);
-    // }
-
-
-    // /**
-    //  * @test
-    //  * Prueba que el método loginUser crea un nuevo usuario si no existe y registra el acceso
-    //  */
-    // public function testLoginUserCreatesNewUserIfNotExistsAndRegistersAccess()
-    // {
-    //     // Simular un usuario social
-    //     $socialUser = new \stdClass();
-    //     $socialUser->email = 'newuser@example.com';
-    //     $socialUser->first_name = 'John';
-    //     $socialUser->last_name = 'Doe';
-
-    //     // Simular que el usuario no existe en la base de datos
-    //     $this->assertDatabaseMissing('users', ['email' => $socialUser->email]);
-
-    //     // Simular la búsqueda del rol de estudiante
-    //     $studentRole = UserRolesModel::factory()->create(['code' => 'STUDENT']);
-
-    //     $user = UsersModel::where('email', $socialUser->email)->first();
-
-    //     UsersAccessesModel::factory()->create(
-    //         [
-    //             'user_uid' => $user->uid,
-    //             'date' => Carbon::now()
-    //         ]
-    //     );
-
-    //      // Utilizar reflexión para acceder al método privado
-    //      $controller = new LoginController();
-
-    //      // Crear una instancia de ReflectionMethod
-    //      $reflection = new \ReflectionMethod(LoginController::class, 'saveUserAccess');
-    //      $reflection->setAccessible(true);
-
-    //     // Ejecutar el método privado saveUserAccess
-    //     $reflection->invoke($controller, $user);
-
-    //     $this->assertDatabaseHas('users', [
-    //         'email' => $socialUser->email,
-    //         'first_name' => $socialUser->first_name,
-    //         'last_name' => $socialUser->last_name
-    //     ]);
-    //     // Verificar que el usuario fue creado
-
-    //     // Verificar que el usuario tiene el rol de STUDENT
-
-    //     $this->assertTrue($user->roles()->where('code', 'STUDENT')->exists());
-
-    //     // Verificar que se registró el acceso del usuario
-    //     $this->assertDatabaseHas('users_accesses', [
-    //         'user_uid' => $user->uid,
-    //     ]);
-
-    //     // Simular el inicio de sesión
-    //     Auth::shouldReceive('login')->once()->with($user);
-    // }
-
-
-    /**
-     * @test
-     * Prueba el callback de autenticación con Google
-     */
-    // public function testHandleGoogleCallbackAuthenticatesUser()
-    // {
-    //     // Simular la respuesta de Google usando Mockery
-    //     $user_google_mock = Mockery::mock(\Laravel\Socialite\Contracts\User::class);
-    //     $user_google_mock->shouldReceive('getEmail')->andReturn('test@example.com');
-    //     $user_google_mock->user = [
-    //         'given_name' => 'John',
-    //         'family_name' => 'Doe'
-    //     ];
-
-    //     // Simular la autenticación de Google usando Socialite
-    //     Socialite::shouldReceive('driver->user')
-    //         ->andReturn($user_google_mock);
-
-    //     // Simular el comportamiento de Auth
-    //     Auth::shouldReceive('login') // Simular el inicio de sesión del usuario
-    //         ->once()
-    //         ->with(Mockery::type(UsersModel::class)); // Verificar que se pasa un objeto UsersModel a Auth::login
-    //     Auth::shouldReceive('check')->andReturn(true);  // Simular que el usuario ya está autenticado
-
-    //     // Simular que el rol de estudiante ya existe
-    //     $student_role = UserRolesModel::factory()->create([
-    //         'code' => 'STUDENT',
-    //     ]);
-
-    //     // Verificar que el usuario tiene el rol de estudiante asignado
-
-    //    UsersModel::factory()->create(
-    //         [
-    //             'email' => 'test@example.com',
-    //             'first_name' => 'John',
-    //             'last_name' => 'Doe',
-    //         ]
-    //     );
-
-    //     $user = UsersModel::where('email', 'test@example.com')->first();
-
-    //     $roles = UserRolesModel::firstOrCreate(['code' => 'STUDENT'], ['uid' => generate_uuid()]); // Crea roles de prueba
-    //     $user->roles()->attach($roles->uid, ['uid' => generate_uuid()]);
-
-    //     // Hacer la solicitud a la ruta del callback de Google
-    //     $response = $this->get('/auth/callback/google');
-
-    //     // Verificar que el usuario fue creado correctamente en la base de datos
-    //     $this->assertDatabaseHas('users', [
-    //         'email' => 'test@example.com',
-    //         'first_name' => 'John',
-    //         'last_name' => 'Doe',
-    //     ]);
-
-    //     $this->assertTrue($user->roles()->where('code', 'STUDENT')->exists());
-
-    //     // Verificar que el usuario está autenticado correctamente
-    //     $this->assertTrue(Auth::check());
-
-
-
-    //     // Verificar que la respuesta redirige correctamente a la página principal
-    //     $response->assertRedirect('/');
-    // }
+    }   
 
 }

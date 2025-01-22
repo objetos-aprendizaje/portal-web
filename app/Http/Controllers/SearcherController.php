@@ -86,7 +86,7 @@ class SearcherController extends Controller
 
         if ($orderBy == "closer") {
             $learningObjectsQuery->orderByRaw('COALESCE(temp_table.inscription_start_date, \'9999-12-31\') ASC');
-        } else if ($orderBy == "puntuation") {
+        } elseif ($orderBy == "puntuation") {
             $learningObjectsQuery->orderByRaw('temp_table.average_calification IS NULL, temp_table.average_calification DESC');
         }
 
@@ -210,7 +210,7 @@ class SearcherController extends Controller
                 $educationalProgramsQuery->where(function ($query) {
                     $query->where('cost', 0)->where('payment_mode', 'SINGLE_PAYMENT');
                 });
-            } else if ($filters['modalityPayment'] == "PAID") {
+            } elseif ($filters['modalityPayment'] == "PAID") {
                 $educationalProgramsQuery->where(function ($query) {
                     $query->where('cost', '>', 0)->orWhere('payment_mode', 'INSTALLMENT_PAYMENT');
                 });
@@ -364,7 +364,7 @@ class SearcherController extends Controller
                 $coursesQuery->where(function ($query) {
                     $query->where('cost', 0)->where('payment_mode', 'SINGLE_PAYMENT');
                 });
-            } else if ($filters['modalityPayment'] == "PAID") {
+            } elseif ($filters['modalityPayment'] == "PAID") {
                 $coursesQuery->where(function ($query) {
                     $query->where('cost', '>', 0)->orWhere('payment_mode', 'INSTALLMENT_PAYMENT');
                 });

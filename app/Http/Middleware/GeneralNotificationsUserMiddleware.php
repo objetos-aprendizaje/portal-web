@@ -51,7 +51,7 @@ class GeneralNotificationsUserMiddleware
     private function buildGeneralNotificationsQuery($userUid, $uidsRoles)
     {
 
-        $generalNotificationsQuery = GeneralNotificationsModel::select([
+        return GeneralNotificationsModel::select([
             'general_notifications.uid',
             'general_notifications.title',
             'general_notifications.description',
@@ -78,13 +78,11 @@ class GeneralNotificationsUserMiddleware
                     ->limit(1)
             ])
             ->orderBy('start_date', 'desc');
-
-        return $generalNotificationsQuery;
     }
 
     private function buildGeneralNotificationsAutomaticQuery($userUid)
     {
-        $generalNotificationsAutomaticQuery = GeneralNotificationsAutomaticModel::select([
+        return GeneralNotificationsAutomaticModel::select([
             'general_notifications_automatic.uid',
             'general_notifications_automatic.title',
             'general_notifications_automatic.description',
@@ -101,8 +99,7 @@ class GeneralNotificationsUserMiddleware
                     ->where('general_notifications_automatic_users.user_uid', $userUid)
                     ->limit(1)
             ]);
-
-        return $generalNotificationsAutomaticQuery;
+      
     }
 
 

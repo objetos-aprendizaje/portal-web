@@ -312,11 +312,7 @@ class EmbeddingsServiceTest extends TestCase
 
     public function testGetSimilarCoursesListReturnsCorrectCourses()
     {
-        // Crear cursos simulados con embeddings
-
-        $embeddingVector = '[' . implode(',', array_fill(0, 1536, '0.1')) . ']';
-        $embeddingVector1 = '[' . implode(',', array_fill(0, 1536, '0.1')) . ']';
-
+        // Crear cursos simulados con embeddings     
 
         $courses = CoursesModel::factory()->count(3)
             ->withCourseType()
@@ -459,7 +455,6 @@ class EmbeddingsServiceTest extends TestCase
         // Verificar que se devuelve la cantidad correcta de recursos educativos
         $this->assertEquals(0, $similarResources->count());
 
-        // Verificar que el recurso educativo devuelto es efectivamente similar al recurso educativo de comparación
-        // $this->assertTrue($similarResources->contains($comparisonResource));
+        
     }
 }

@@ -104,10 +104,7 @@ class CartControllerTest extends TestCase
                 'cost' => 20,
             ]
         )->first();
-
-        // $options = ['redsys_enabled' => false];
-
-        // app()->instance('general_options', $options);
+      
 
         // Realizar la llamada a la ruta
         $response = $this->get('/cart/course/' . $course->uid);
@@ -115,28 +112,7 @@ class CartControllerTest extends TestCase
         // Verificar el estado de la respuesta
         $response->assertStatus(405);
     }
-
-    /** @test*/
-
-
-    // public function testIndex405CostRedsysEnabledIsFalse()
-    // {
-    //     // Crea un curso de prueba
-    //     $course = CoursesModel::factory()->withCourseStatus()->withCourseType()->create([
-    //         'uid' => generate_uuid(),
-    //         'title' => 'Test Course',
-    //         'description' => 'This is a test course.',
-    //         'cost' => 100,
-    //         'ects_workload' => 5,
-    //         'image_path' => 'images/test-images/articulo0.png',
-    //     ])->first();
-    //     // dd($course);
-
-    //     app()->instance('general_options', ['redsys_enabled' => false]);
-
-    //     $response = $this->get('/cart/course/'.$course->uid);
-    //     $response->assertStatus(405);
-    // }
+  
 
     /** @test*/
     public function testIndexReturnsViewForEducationalProgram()

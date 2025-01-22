@@ -94,8 +94,8 @@ class RedsysAPI{
 	}
 	/******  Convertir Array en Objeto JSON ******/
 	function arrayToJson(){
-		$json = json_encode($this->vars_pay); //(PHP 5 >= 5.2.0)
-		return $json;
+		return json_encode($this->vars_pay); //(PHP 5 >= 5.2.0)
+		
 	}
 	function createMerchantParameters(){
 		// Se transforma el array de datos en un objeto Json
@@ -204,5 +204,3 @@ class RedsysAPI{
 		return $this->encodeBase64($res);
 	}
 }
-
-?>

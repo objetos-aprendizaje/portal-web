@@ -49,4 +49,8 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        origin: '/',
+        cors: true
+    }
 });

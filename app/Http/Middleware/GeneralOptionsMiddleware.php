@@ -51,9 +51,8 @@ class GeneralOptionsMiddleware
         $boldFonts = $this->getBoldFonts($generalOptions);
 
         // Concatenamos las fuentes
-        $fonts = array_merge($regularFonts, $mediumFonts, $boldFonts);
+       return array_merge($regularFonts, $mediumFonts, $boldFonts);
 
-        return $fonts;
     }
 
     private function getRegularFonts($generalOptions) {

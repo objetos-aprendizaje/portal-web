@@ -294,7 +294,7 @@ class InscribedCoursesControllerTest extends TestCase
             'cost' => 0,
         ])->first();
 
-        $CoursesStudents = CoursesStudentsModel::factory()->create([
+        CoursesStudentsModel::factory()->create([
             'user_uid' => $user->uid,
             'course_uid' => $course->uid,
             'status' => 'INSCRIBED',
@@ -336,7 +336,7 @@ class InscribedCoursesControllerTest extends TestCase
             'cost' => 100,
         ])->first();
 
-        $CoursesStudents = CoursesStudentsModel::factory()->create([
+        CoursesStudentsModel::factory()->create([
             'user_uid' => $user->uid,
             'course_uid' => $course->uid,
             'status' => 'INSCRIBED',
@@ -393,7 +393,7 @@ class InscribedCoursesControllerTest extends TestCase
             'cost' => 100,
         ])->first();
 
-        $CoursesStudents = CoursesStudentsModel::factory()->create([
+       CoursesStudentsModel::factory()->create([
             'user_uid' => $user->uid,
             'course_uid' => $course->uid,
             'status' => 'INSCRIBED',
@@ -446,7 +446,7 @@ class InscribedCoursesControllerTest extends TestCase
             'cost' => 0,
         ])->first();
 
-        $CoursesStudents = CoursesStudentsModel::factory()->create([
+        CoursesStudentsModel::factory()->create([
             'user_uid' => $user->uid,
             'course_uid' => $course->uid,
             'status' => 'INSCRIBED',
@@ -606,9 +606,9 @@ class InscribedCoursesControllerTest extends TestCase
 
         $document = CourseDocumentsModel::factory()->count(2)->create(
             [
-                'course_uid'=> $course->uid
+                'course_uid' => $course->uid
             ]
-        );      
+        );
 
         // Simular los archivos enviados en la solicitud
         $file1 = UploadedFile::fake()->create('document1.pdf', 100, 'application/pdf');
@@ -639,15 +639,6 @@ class InscribedCoursesControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([
             'message' => 'Documentos guardados correctamente',
-        ]);
-
-        // Verificar que los documentos se hayan guardado correctamente en la base de datos
-        // foreach ($files as $uid => $file) {
-        //     $this->assertDatabaseHas('courses_students_documents', [
-        //         'course_document_uid' => $uid,
-        //         'user_uid' => $user->uid,
-        //         'document_path' => $mockedFileResponses[$file->getClientOriginalName()],
-        //     ]);
-        // }
+        ]);        
     }
 }

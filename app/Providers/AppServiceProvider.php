@@ -110,7 +110,7 @@ class AppServiceProvider extends ServiceProvider
                 "email" => $userDataSaml['id'],
                 "nif" => $userDataSaml['attributes']['sPUID'][0],
             ];
-        } else if($loginSystem == "rediris") {
+        } elseif($loginSystem == "rediris") {
             $dataLogin = [
                 "email" => $userDataSaml['attributes']['urn:oid:0.9.2342.19200300.100.1.3'][0],
             ];

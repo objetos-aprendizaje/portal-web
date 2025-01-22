@@ -34,8 +34,8 @@ class CourseInfoControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $educationalType = EducationalProgramTypesModel::factory()->create();
-       
+        EducationalProgramTypesModel::factory()->create();
+
 
         $course = CoursesModel::factory()
             ->withCourseStatus()
@@ -49,7 +49,7 @@ class CourseInfoControllerTest extends TestCase
                     'realization_start_date' =>  Carbon::now()->addDays(46)->format('Y-m-d\TH:i'),
                     'realization_finish_date' => Carbon::now()->addDays(60)->format('Y-m-d\TH:i'),
                     'cost' => 100,
-                    
+
                 ]
             )
             ->first();
@@ -76,7 +76,7 @@ class CourseInfoControllerTest extends TestCase
             'uid' => generate_uuid()  // Generar un UID para la tabla pivote
         ]);
 
-        $student = $course->students()->attach($user->uid, [
+        $course->students()->attach($user->uid, [
             'uid' => generate_uuid()  // Generar un UID para la tabla pivote
         ]);
 
@@ -92,23 +92,23 @@ class CourseInfoControllerTest extends TestCase
             'course_uid' => $course,
         ]);
 
-        $blocks = CoursesAssessmentsModel::get();
+        CoursesAssessmentsModel::get();
 
         // Hacer la solicitud GET a la ruta del curso
-        $response = $this->get("/course/" . $course->uid);    
+        $response = $this->get("/course/" . $course->uid);
 
         // Verificaciones
         $response->assertStatus(200);
-        $response->assertViewIs('course-info');              
+        $response->assertViewIs('course-info');
     }
 
     public function testIndexLoadsCourseInfoPageWithCorrectData()
     {
         // Crear un curso con sus relaciones
-        $user = UsersModel::factory()->create();        
+        $user = UsersModel::factory()->create();
 
-        $educationalType = EducationalProgramTypesModel::factory()->create();
-       
+        EducationalProgramTypesModel::factory()->create();
+
 
         $course = CoursesModel::factory()
             ->withCourseStatus()
@@ -121,7 +121,7 @@ class CourseInfoControllerTest extends TestCase
                     'enrolling_finish_date' => now()->subMonths(1),
                     'realization_start_date' =>  Carbon::now()->addDays(46)->format('Y-m-d\TH:i'),
                     'realization_finish_date' => Carbon::now()->addDays(60)->format('Y-m-d\TH:i'),
-                    'cost' => 100,                    
+                    'cost' => 100,
                 ]
             )
             ->first();
@@ -148,7 +148,7 @@ class CourseInfoControllerTest extends TestCase
             'uid' => generate_uuid()  // Generar un UID para la tabla pivote
         ]);
 
-        $student = $course->students()->attach($user->uid, [
+        $course->students()->attach($user->uid, [
             'uid' => generate_uuid()  // Generar un UID para la tabla pivote
         ]);
 
@@ -164,14 +164,12 @@ class CourseInfoControllerTest extends TestCase
             'course_uid' => $course,
         ]);
 
-        $blocks = CoursesAssessmentsModel::get();
-
         // Hacer la solicitud GET a la ruta del curso
-        $response = $this->get("/course/" . $course->uid);    
+        $response = $this->get("/course/" . $course->uid);
 
         // Verificaciones
         $response->assertStatus(200);
-        $response->assertViewIs('course-info');              
+        $response->assertViewIs('course-info');
     }
 
     /**

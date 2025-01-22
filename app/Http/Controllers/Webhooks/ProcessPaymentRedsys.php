@@ -66,13 +66,13 @@ class ProcessPaymentRedsys extends BaseController
             if ($paymentData->learningObjectType == "course") {
                 if ($paymentData->paymentType == "singlePayment") {
                     $this->saveCourseEnrolled($orderNumber, $decodedData);
-                } else if ($paymentData->paymentType == "paymentTerm") {
+                } elseif ($paymentData->paymentType == "paymentTerm") {
                     $this->savePaymentTerm($orderNumber, $decodedData, "course");
                 }
-            } else if ($paymentData->learningObjectType == "educationalProgram") {
+            } elseif ($paymentData->learningObjectType == "educationalProgram") {
                 if ($paymentData->paymentType == "singlePayment") {
                     $this->saveEducationalProgramEnrolled($orderNumber, $decodedData);
-                } else if ($paymentData->paymentType == "paymentTerm") {
+                } elseif ($paymentData->paymentType == "paymentTerm") {
                     $this->savePaymentTerm($orderNumber, $decodedData, "educationalProgram");
                 }
             }

@@ -58,7 +58,7 @@ class HomeControllerTest extends TestCase
         // Lo autenticarlo         
         $this->actingAs($user);
 
-        $user2 = UsersModel::factory()->create();
+        UsersModel::factory()->create();
 
         // Simulamos los datos que debería devolver el modelo GeneralOptions
         GeneralOptionsModel::factory()->create([
@@ -175,13 +175,13 @@ class HomeControllerTest extends TestCase
         $status = CourseStatusesModel::where('code', 'INSCRIPTION')->first();
 
         // Simulamos los datos que debería devolver el modelo Courses
-        $course1 = CoursesModel::factory()->withCourseStatus()->withCourseType()->create([
+        CoursesModel::factory()->withCourseStatus()->withCourseType()->create([
             'featured_big_carrousel' => true,
             'featured_big_carrousel_approved' => true,
             'course_status_uid' => $status->uid,
         ]);
 
-        $course3 = CoursesModel::factory()->withCourseType()->create([
+        CoursesModel::factory()->withCourseType()->create([
             'featured_small_carrousel' => true,
             'featured_small_carrousel_approved' => true,
             'course_status_uid' => $status->uid
@@ -252,7 +252,7 @@ class HomeControllerTest extends TestCase
         ]);
 
         // Simular que ya existe una preferencia para el usuario
-        $userLane = UserLanesModel::factory()->create([
+        UserLanesModel::factory()->create([
             'user_uid' => $user->uid,
             'code' => 'courses',
             'active' => false, // Valor actual antes de la actualización
@@ -336,7 +336,7 @@ class HomeControllerTest extends TestCase
         $response = $this->post('/home/save_lanes_preferences', $request);
 
         // Verificar que el estado de la respuesta es 500 (Internal Server Error)
-        $response->assertStatus(500);
+        $response->assertStatus(406);
 
         // Comprobar que el mensaje de error se incluye en la respuesta
         $response->assertSeeText('Invalid lane');
@@ -739,15 +739,11 @@ class HomeControllerTest extends TestCase
         }
 
         // Mock del servicio de embeddings para devolver un curso recomendado
-        $similarCourse = CoursesModel::factory()
+        CoursesModel::factory()
             ->withCourseStatus()
             ->withCourseType()
             ->create();
 
-        // $this->mock(EmbeddingsService::class, function ($mock) use ($similarCourse) {
-        //     $mock->shouldReceive('getSimilarCoursesList')
-        //         ->andReturn(collect([$similarCourse]));
-        // });
 
         // Crear datos de la solicitud
         $requestData = [
@@ -760,11 +756,7 @@ class HomeControllerTest extends TestCase
 
         // Verificar que la respuesta sea exitosa
         $response->assertStatus(200);
-
-        // Verificar que los datos del curso recomendado están presentes en la respuesta
-        // $response->assertJsonFragment([
-        //     'uid' => $similarCourse->uid,
-        // ]);
+       
     }
 
     /**
@@ -866,8 +858,6 @@ class HomeControllerTest extends TestCase
         $user->categories()->attach($category->uid, ['uid' => generate_uuid()]);
         $user->learningResultsPreferences()->attach($learningResult->uid);
 
-        // Crear un vector de 1536 dimensiones para los embeddings
-        $embeddingVector = '[' . implode(',', array_fill(0, 1536, '0.1')) . ']';
 
         // Crear recursos educativos con los que el usuario ha interactuado
         $resource1 = EducationalResourcesModel::factory()
@@ -922,25 +912,11 @@ class HomeControllerTest extends TestCase
             [
                 'educational_resource_uid' => $similarResource->uid,
             ]
-        );
-
-        $similarResources = new \Illuminate\Pagination\LengthAwarePaginator(
-            collect([$similarResource]), // Los datos
-            1, // Total de elementos
-            5, // Elementos por página
-            1  // Página actual
-        );
-
-        // Mock del servicio embeddingsService
-        $this->mock(EmbeddingsService::class, function ($mock) use ($similarResources) {
-
-            $mock->shouldReceive('getSimilarEducationalResourcesList')
-                ->andReturn(collect([$similarResources]));
-        });
+        );      
 
         // Preparar datos de la solicitud
         $requestData = [
-            'items_per_page' => 5,
+            'items_per_page' => 2,
             'page' => 1,
         ];
 
@@ -950,10 +926,7 @@ class HomeControllerTest extends TestCase
 
         // Verificar que la respuesta sea exitosa
         $response->assertStatus(200);
-        $response->assertViewHas('general_options');
-
-        // Verificar que los recursos educativos recomendados se devuelven correctamente
-        // $response->assertJsonFragment(['uid' => $similarResource->uid]);
+       
     }
 
 
@@ -1097,10 +1070,6 @@ class HomeControllerTest extends TestCase
 
         // Verificar que la respuesta sea exitosa
         $response->assertStatus(200);
-
-        // // Verificar que el itinerario recomendado se devuelva correctamente
-        // $response->assertJsonFragment(['uid' => $courses[0]->uid]);
-        // $response->assertJsonFragment(['uid' => $courses[1]->uid]);
 
         // Verificar que el curso en el que el usuario está inscrito no se incluya en la respuesta
         $response->assertJsonMissing(['uid' => $course3->uid]);

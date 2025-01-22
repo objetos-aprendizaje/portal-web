@@ -41,10 +41,6 @@ class CompetencesLearningResultsControllerTest extends TestCase
 
         $subCompetences =  CompetencesModel::get();
 
-        // $subCompetences = CompetenceFrameworksModel::factory()->count(3)->create([
-        //     'parent_competence_uid' => $competenceFramework->uid
-        // ]);
-
         // Crear resultados de aprendizaje asociados a las subcompetencias
         foreach ($subCompetences as $subCompetence) {
             $learningResults = LearningResultsModel::factory()->count(2)->create(
