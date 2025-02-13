@@ -102,6 +102,18 @@ class CourseInfoControllerTest extends TestCase
         $response->assertViewIs('course-info');
     }
 
+    public function testIndexCourseNotExist(){
+
+         CoursesModel::factory()
+        ->withCourseStatus()
+        ->withCourseType()->create();
+
+        $response = $this->get("/course/" . generate_uuid());
+
+        $response->assertStatus(404);
+
+    }
+
     public function testIndexLoadsCourseInfoPageWithCorrectData()
     {
         // Crear un curso con sus relaciones
@@ -178,7 +190,7 @@ class CourseInfoControllerTest extends TestCase
      */
     public function testCalificateCourse()
     {
-        // Crear un usuario y autenticarlo       
+        // Crear un usuario y autenticarlo
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 

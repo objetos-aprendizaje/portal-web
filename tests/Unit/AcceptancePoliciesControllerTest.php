@@ -19,16 +19,16 @@ class AcceptancePoliciesControllerTest extends TestCase
      */
     public function testIndexLoadsAcceptancePoliciesPageWithPoliciesToAccept()
     {
-         // Buscamos un usuario  
-         $user = UsersModel::where('email', 'admin@admin.com')->first();
-         // Si no existe el usuario lo creamos
-         if (!$user) {
-             $user = UsersModel::factory()->create([
-                 'email'=>'admin@admin.com'
-             ])->first();
-         }
-         // Lo autenticarlo         
-         $this->actingAs($user);
+        // Buscamos un usuario
+        $user = UsersModel::where('email', 'admin@admin.com')->first();
+        // Si no existe el usuario lo creamos
+        if (!$user) {
+            $user = UsersModel::factory()->create([
+                'email' => 'admin@admin.com'
+            ])->first();
+        }
+        // Lo autenticarlo
+        $this->actingAs($user);
 
         // Crear algunas políticas de footer
         $footerPage1 = FooterPagesModel::factory()->create(['acceptance_required' => 1, 'version' => 1]);
@@ -71,15 +71,15 @@ class AcceptancePoliciesControllerTest extends TestCase
      */
     public function testAcceptPoliciesStoresPoliciesCorrectly()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear algunas políticas en la base de datos

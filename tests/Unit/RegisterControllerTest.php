@@ -59,7 +59,7 @@ class RegisterControllerTest extends TestCase
         ];
         Cache::shouldReceive('get')->with('parameters_login_systems')->andReturn($parameters_login_systems);
 
-        // Simular la obtención del logotipo desde la base de datos       
+        // Simular la obtención del logotipo desde la base de datos
         $general_2 = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
         $general_2->option_value = 'https://example.com/logo.png';
         $general_2->save();
@@ -109,7 +109,7 @@ class RegisterControllerTest extends TestCase
             'option_value' => 'https://example.com/no-logo.png',
         ]);
 
-        $response = $this->get(route('register'));
+        $this->get(route('register'));
     }
 
     /**
@@ -118,7 +118,6 @@ class RegisterControllerTest extends TestCase
      */
     public function testIndexReturnsRegisterGetCasUrlAndGetRedirisUrlFalse()
     {
-
         $general = GeneralOptionsModel::where('option_name', 'registration_active')->first();
         $general->option_value = true;
         $general->save();
@@ -128,7 +127,7 @@ class RegisterControllerTest extends TestCase
             'cas_active' => true,
             'rediris_active' => true,
         ];
-        App::instance('general_options', $generalOptionsMock);      
+        App::instance('general_options', $generalOptionsMock);
 
 
         // Simular la configuración de parámetros de sistemas de login
@@ -142,7 +141,7 @@ class RegisterControllerTest extends TestCase
         ];
         Cache::shouldReceive('get')->with('parameters_login_systems')->andReturn($parameters_login_systems);
 
-        // Simular la obtención del logotipo desde la base de datos       
+        // Simular la obtención del logotipo desde la base de datos
         $general_2 = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
         $general_2->option_value = 'https://example.com/logo.png';
         $general_2->save();
@@ -183,9 +182,7 @@ class RegisterControllerTest extends TestCase
             'urlRediris' => false,
             'parameters_login_systems' => $parameters_login_systems,
         ]);
-       
     }
-    
 
     /**
      * @test
@@ -194,7 +191,7 @@ class RegisterControllerTest extends TestCase
     public function testResendEmailConfirmationUser()
     {
         // Crear un usuario no verificado en la base de datos
-        $user = UsersModel::factory()->create([
+        UsersModel::factory()->create([
             'email' => 'test@example.com',
             'verified' => false,
         ]);
@@ -208,7 +205,7 @@ class RegisterControllerTest extends TestCase
         // Verificar que la respuesta es exitosa
         $response->assertStatus(200);
 
-        // Verificar que se ha enviado el email de confirmación      
+        // Verificar que se ha enviado el email de confirmación
 
         Queue::assertPushed(SendEmailJob::class, 1);
 
@@ -216,11 +213,6 @@ class RegisterControllerTest extends TestCase
         $response->assertJson([
             'message' => 'Se ha reenviado el email'
         ]);
-
-        // Verificar que se ha generado y guardado un nuevo token de verificación
-        // $this->assertDatabaseHas('email_verifies', [
-        //     'user_uid' => $user->uid,
-        // ]);
     }
 
     /**
@@ -240,30 +232,6 @@ class RegisterControllerTest extends TestCase
             'message' => 'No se ha encontrado ninguna cuenta con esa dirección de correo'
         ]);
     }
-
-    // /**
-    //  * @test
-    //  * Prueba para error al reenviar confirmación de email cuando la cuenta ya está verificada.
-    //  */
-    // public function testResendEmailConfirmationFailsWhenUserAlreadyVerified()
-    // {
-    //     // Crear un usuario verificado en la base de datos
-    //     $user = UsersModel::factory()->create([
-    //         'email' => 'test@example.com',
-    //         'verified' => true,
-    //     ]);
-
-    //     // Hacer la solicitud POST para reenviar la confirmación de email
-    //     $response = $this->post('/register/resend_email_confirmation', ['email' => 'test@example.com']);
-
-    //     // Verificar que se lanza una excepción con el código de estado 405
-    //     $response->assertStatus(405);
-
-    //     // Verificar que el mensaje de error es el esperado
-    //     $response->assertJson([
-    //         'message' => 'Su cuenta ya está verificada'
-    //     ]);
-    // }
 
     /**
      * @test
@@ -299,9 +267,6 @@ class RegisterControllerTest extends TestCase
 
         // Verificar que se ha enviado un correo de verificación
         Queue::assertPushed(SendEmailJob::class, 1);
-        // Queue::assertPushed(SendEmailJob::class, function ($job) use ($user) {
-        //     return $job->email === $user->email;
-        // });
 
         // Verificar que la respuesta redirige correctamente a la página de inicio de sesión
         $response->assertRedirect('/login');
@@ -329,7 +294,7 @@ class RegisterControllerTest extends TestCase
         $user = UsersModel::where('email', "prueba@prueba.com")->first();
 
         // Crear un registro de verificación de correo electrónico en la base de datos
-        $verify = EmailVerifyModel::factory()->create([
+        EmailVerifyModel::factory()->create([
             'user_uid' => $user->uid,
             'token' => 'valid-token',
             'expires_at' => now()->addMinutes(30),
@@ -375,7 +340,7 @@ class RegisterControllerTest extends TestCase
         $user = UsersModel::where('email', "prueba@prueba.com")->first();
 
         // Crear un registro de verificación de correo electrónico en la base de datos con un token expirado
-        $verify = EmailVerifyModel::factory()->create([
+        EmailVerifyModel::factory()->create([
             'user_uid' => $user->uid,
             'token' => 'expired-token',
             'expires_at' => now()->subMinutes(30),
@@ -384,7 +349,7 @@ class RegisterControllerTest extends TestCase
         // Hacer la solicitud GET a la ruta de verificación de correo electrónico con un token expirado
         $response = $this->get(route('verification.verify', ['token' => 'expired-token']));
 
-        // Verificar que el usuario no ha sido marcado como verificado en la base de datos     
+        // Verificar que el usuario no ha sido marcado como verificado en la base de datos
         $this->assertEquals(0, $user->verified);
 
         // Verificar que el registro de verificación todavía existe en la base de datos

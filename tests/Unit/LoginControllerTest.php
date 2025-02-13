@@ -14,6 +14,7 @@ use App\Models\UsersAccessesModel;
 use App\Models\GeneralOptionsModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
@@ -100,11 +101,109 @@ class LoginControllerTest extends TestCase
     public function testIndexLoadsLoginPageWithLogo()
     {
         // Crear una opción general en la base de datos para el logo
-        GeneralOptionsModel::factory()->create([
-            'option_name' => 'poa_logo_1',
-            'option_value' => 'logo.png'
-        ]);
+        $logoBd = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
 
+        if($logoBd){
+            $logoBd->option_value = 'logo.png';
+            $logoBd->save();
+        }else{
+            GeneralOptionsModel::factory()->create([
+                'option_name' => 'poa_logo_1',
+                'option_value' => 'logo.png'
+            ]);
+        }
+        // Crear las opciones necesarias para los sistemas de login
+        GeneralOptionsModel::factory()->create(['option_name' => 'google_login_active', 'option_value' => '1']);
+        GeneralOptionsModel::factory()->create(['option_name' => 'google_client_id', 'option_value' => 'google-client-id']);
+        GeneralOptionsModel::factory()->create(['option_name' => 'google_client_secret', 'option_value' => 'google-client-secret']);
+        GeneralOptionsModel::factory()->create(['option_name' => 'facebook_login_active', 'option_value' => '1']);
+        GeneralOptionsModel::factory()->create(['option_name' => 'facebook_client_id', 'option_value' => 'facebook-client-id']);
+        GeneralOptionsModel::factory()->create(['option_name' => 'facebook_client_secret', 'option_value' => 'facebook-client-secret']);
+        GeneralOptionsModel::factory()->create(['option_name' => 'twitter_login_active', 'option_value' => '1']);
+        GeneralOptionsModel::factory()->create(['option_name' => 'twitter_client_id', 'option_value' => 'twitter-client-id']);
+        GeneralOptionsModel::factory()->create(['option_name' => 'twitter_client_secret', 'option_value' => 'twitter-client-secret']);
+        GeneralOptionsModel::factory()->create(['option_name' => 'linkedin_login_active', 'option_value' => '1']);
+        GeneralOptionsModel::factory()->create(['option_name' => 'linkedin_client_id', 'option_value' => 'linkedin-client-id']);
+        GeneralOptionsModel::factory()->create(['option_name' => 'linkedin_client_secret', 'option_value' => 'linkedin-client-secret']);
+
+        // Simular la caché de los parámetros del sistema de login
+        Cache::shouldReceive('get')
+            ->with('parameters_login_systems')
+            ->andReturn([
+                'google_login_active' => '1',
+                'google_client_id' => 'google-client-id',
+                'google_client_secret' => 'google-client-secret',
+                'facebook_login_active' => '1',
+                'facebook_client_id' => 'facebook-client-id',
+                'facebook_client_secret' => 'facebook-client-secret',
+                'twitter_login_active' => '1',
+                'twitter_client_id' => 'twitter-client-id',
+                'twitter_client_secret' => 'twitter-client-secret',
+                'linkedin_login_active' => '1',
+                'linkedin_client_id' => 'linkedin-client-id',
+                'linkedin_client_secret' => 'linkedin-client-secret'
+            ]);
+
+        // Crear los registros simulados para CAS y Rediris
+        Saml2TenantsModel::factory()->create(['key' => 'cas', 'uuid' => "50440107-2cdd-488f-a6f3-f8082921f715"]);
+        Saml2TenantsModel::factory()->create(['key' => 'rediris', 'uuid' => "50440107-2cdd-488f-a6f3-f8082921f720"]);
+
+        // Hacer la solicitud GET a la ruta de login
+        $response = $this->get(route('login'));
+
+        // Verificar que la respuesta es exitosa
+        $response->assertStatus(200);
+
+        // Verificar que la vista correcta se cargue
+        $response->assertViewIs('non_authenticated.login');
+
+        // Verificar que los parámetros de los sistemas de login se pasen correctamente
+        $response->assertViewHas('parameters_login_systems', [
+            'google_login_active' => '1',
+            'google_client_id' => 'google-client-id',
+            'google_client_secret' => 'google-client-secret',
+            'facebook_login_active' => '1',
+            'facebook_client_id' => 'facebook-client-id',
+            'facebook_client_secret' => 'facebook-client-secret',
+            'twitter_login_active' => '1',
+            'twitter_client_id' => 'twitter-client-id',
+            'twitter_client_secret' => 'twitter-client-secret',
+            'linkedin_login_active' => '1',
+            'linkedin_client_id' => 'linkedin-client-id',
+            'linkedin_client_secret' => 'linkedin-client-secret'
+        ]);
+    }
+
+    /**
+     * @test
+     * Prueba que la vista de inicio de sesión se carga correctamente con el logo desde la base de datos
+     */
+    public function testIndexLoadsLoginPageWithoutLogo()
+    {
+        $cas = GeneralOptionsModel::where('option_name', 'cas_active')->first();
+
+        if($cas){
+            $cas->option_value = true;
+            $cas->save();
+        }else{
+            GeneralOptionsModel::factory()->create([
+                'option_name' => 'cas_active',
+                'option_value' => true,
+            ]);
+        }
+
+        $rediris = GeneralOptionsModel::where('option_name', 'rediris_active')->first();
+
+        if($rediris){
+            $rediris->option_value = true;
+            $rediris->save();
+        }else{
+            GeneralOptionsModel::factory()->create([
+                'option_name' => 'rediris_active',
+                'option_value' => true,
+            ]);
+        }
+       
         // Crear las opciones necesarias para los sistemas de login
         GeneralOptionsModel::factory()->create(['option_name' => 'google_login_active', 'option_value' => '1']);
         GeneralOptionsModel::factory()->create(['option_name' => 'google_client_id', 'option_value' => 'google-client-id']);
@@ -174,7 +273,7 @@ class LoginControllerTest extends TestCase
     public function testAuthenticateSuccessful()
     {
         // Crear un usuario verificado en la base de datos
-        $user = UsersModel::factory()->create([
+        UsersModel::factory()->create([
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
             'verified' => true
@@ -220,7 +319,7 @@ class LoginControllerTest extends TestCase
     public function testAuthenticateUserNotVerified()
     {
         // Crear un usuario no verificado en la base de datos
-        $user = UsersModel::factory()->create([
+        UsersModel::factory()->create([
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
             'verified' => false
@@ -248,7 +347,7 @@ class LoginControllerTest extends TestCase
     public function testAuthenticateRedirectsToStoredUrl()
     {
         // Crear un usuario verificado en la base de datos
-        $user = UsersModel::factory()->create([
+        UsersModel::factory()->create([
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
             'verified' => true
@@ -273,7 +372,7 @@ class LoginControllerTest extends TestCase
     /**
      * @test
      * Prueba que el callback de Google maneja la autenticación correctamente
-     * Todo: pendiente por revisar
+     *
      */
     public function testHandleGoogleCallbackAuthenticatesUser()
     {
@@ -296,7 +395,7 @@ class LoginControllerTest extends TestCase
             ->andReturn($user_google_mock);
 
         // Simular que el rol de estudiante ya existe
-        $student_role = UserRolesModel::factory()->create([
+        UserRolesModel::factory()->create([
             'code' => 'STUDENT',
         ]);
 
@@ -323,7 +422,6 @@ class LoginControllerTest extends TestCase
         ]);
 
         $this->actingAs($user);
-
 
         $this->assertTrue($user->roles()->where('code', 'STUDENT')->exists());
 
@@ -426,6 +524,33 @@ class LoginControllerTest extends TestCase
         $response->assertRedirect('/');
     }
 
+    public function testHandleTwitterCallbackAuthenticatesUserWithoutEmail()
+    {
+        // Simular la respuesta de Twitter usando Mockery
+        $user_twitter_mock = Mockery::mock(\Laravel\Socialite\Contracts\User::class);
+        $user_twitter_mock->email = '';
+        $user_twitter_mock->id = 'twitter-id-123';
+        $user_twitter_mock->token = 'twitter-token-xyz';
+        $user_twitter_mock->name = 'John Doe';
+
+        // Simular la autenticación de Twitter usando Socialite
+        Socialite::shouldReceive('driver')->with('twitter')->andReturnSelf();
+        Socialite::shouldReceive('user')->andReturn($user_twitter_mock);
+
+        // Hacer la solicitud a la ruta del callback de Twitter
+        $response = $this->get('/auth/callback/twitter');
+
+        // Verificar que la respuesta redirige correctamente a la página principal
+        $response->assertRedirect('/login');
+
+        $response->assertRedirect(route('login'));
+
+        // Verificar los datos de la sesión
+        $sessionData = session()->all();
+        $this->assertArrayHasKey('errors', $sessionData, 'No se ha podido obtener el email del usuario del método elegido');
+       
+    }
+
 
     public function testRedirectToLinkedin()
     {
@@ -474,7 +599,7 @@ class LoginControllerTest extends TestCase
         Socialite::shouldReceive('user')->andReturn($user_linkedin_mock);
 
         // Hacer la solicitud a la ruta del callback de LinkedIn
-        $response = $this->get('/auth/callback/linkedin-openid');
+        $this->get('/auth/callback/linkedin-openid');
 
         // Verificar que el usuario fue creado correctamente en la base de datos
         $this->assertDatabaseHas('users', [
@@ -498,7 +623,24 @@ class LoginControllerTest extends TestCase
 
         // Verificar que el usuario está autenticado correctamente
         $this->assertTrue(Auth::check());
+    }
 
+
+    public function testHandleWithErrorMethodAuthenticatesUser()
+    {
+        // Limpiar usuarios de la base de datos antes de la prueba
+        UsersModel::factory()->create([
+            'email' => 'test@example.com',
+            'first_name' => 'John',
+            'last_name' => 'Doe'
+        ]);
+       
+        // Hacer la solicitud a la ruta del callback de LinkedIn
+        $response = $this->get('/auth/callback/linkedin-openid-22');
+
+        $response->assertStatus(500);
+        $response->assertSeeText('Método de login no válido');
+      
     }
 
     /**
@@ -538,10 +680,10 @@ class LoginControllerTest extends TestCase
         Socialite::shouldReceive('user')->andReturn($user_facebook_mock);
 
         // Hacer la solicitud a la ruta del callback de Facebook
-        $response = $this->get('/auth/callback/facebook');        
+        $response = $this->get('/auth/callback/facebook');
 
         // Verificar que la respuesta redirige correctamente a la página principal
         $response->assertRedirect('/');
-    }   
+    }
 
 }

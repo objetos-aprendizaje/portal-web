@@ -30,11 +30,14 @@
         @vite($resources)
     @endif
 
-    <script>
-        @if (Session::has('error'))
-            var error = "{{ Session::get('error') }}";
-        @endif
-    </script>
+    @if ($errors->any())
+        <script>
+            window.errors = [];
+            @foreach ($errors->all() as $error)
+                window.errors.push('{{ $error }}');
+            @endforeach
+        </script>
+    @endif
 
 </head>
 

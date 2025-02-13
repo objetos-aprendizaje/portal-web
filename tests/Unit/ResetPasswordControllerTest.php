@@ -49,7 +49,7 @@ class ResetPasswordControllerTest extends TestCase
         ]);
 
         // Crear un token de restablecimiento de contraseña en la base de datos
-        $resetPasswordToken = ResetPasswordTokensModel::factory()->create([
+        ResetPasswordTokensModel::factory()->create([
             'uid_user' => $user->uid,
             'token' => 'valid-token',
             'expiration_date' => now()->addMinutes(30),
@@ -68,11 +68,6 @@ class ResetPasswordControllerTest extends TestCase
         // Verificar que la contraseña del usuario ha sido actualizada en la base de datos
         $this->assertTrue(Hash::check('new_password123', $user->fresh()->password));
 
-        // Verificar que el token de restablecimiento de contraseña ha sido eliminado
-        // $this->assertDatabaseMissing('reset_password_tokens', [
-        //     'token' => 'valid-token',
-        // ]);
-
         // Verificar que la respuesta redirige correctamente a la página de inicio de sesión
         $response->assertRedirect(route('login'));
 
@@ -82,6 +77,37 @@ class ResetPasswordControllerTest extends TestCase
         $this->assertEquals(['Se ha restablecido la contraseña'], $sessionData['success']);
     }
 
+    public function testResetPasswordFailExpirationDate()
+    {
+        // Crear un usuario en la base de datos
+        $user = UsersModel::factory()->create([
+            'password' => password_hash('old_password', PASSWORD_BCRYPT),
+        ]);
+
+        // Crear un token de restablecimiento de contraseña en la base de datos
+        ResetPasswordTokensModel::factory()->create([
+            'uid_user' => $user->uid,
+            'token' => 'valid-token',
+            'expiration_date' => now()->subMinutes(30),
+        ]);
+
+        // Simular los datos de la solicitud de restablecimiento de contraseña
+        $requestData = [
+            'token' => 'valid-token',
+            'password' => 'new_password123',
+        ];
+
+        // Hacer la solicitud POST a la ruta de restablecimiento de contraseña
+        $response = $this->post('/reset_password/send', $requestData);
+
+        // Verificar que la respuesta redirige correctamente a la página de inicio de sesión
+        $response->assertRedirect(route('login'));
+
+        // Verificar los datos de la sesión
+        $sessionData = session()->all();
+        $this->assertArrayHasKey('errors', $sessionData, 'Ha expirado el tiempo para restablecer la contraseña. Por favor, solicítelo de nuevo');
+       
+    }
 
     /**
      * @test
@@ -110,7 +136,6 @@ class ResetPasswordControllerTest extends TestCase
      */
     public function testResetPasswordFailsWithInvalidPassword()
     {
-
         // Crear un usuario en la base de datos
          $user = UsersModel::factory()->create([
             'password' => password_hash('old_password', PASSWORD_BCRYPT),
@@ -118,7 +143,7 @@ class ResetPasswordControllerTest extends TestCase
 
 
         // Crear un token de restablecimiento de contraseña válido
-        $resetPasswordToken = ResetPasswordTokensModel::factory()->create([
+        ResetPasswordTokensModel::factory()->create([
             'uid_user' => $user->uid,
             'token' => 'valid-token',
             'expiration_date' => now()->addMinutes(30),

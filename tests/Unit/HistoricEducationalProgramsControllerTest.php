@@ -20,15 +20,15 @@ class HistoricEducationalProgramsControllerTest extends TestCase
      */
     public function testIndexLoadsHistoricEducationalProgramsPageWithCorrectData()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Hacer una solicitud GET a la ruta del histórico de programas formativos
@@ -46,25 +46,22 @@ class HistoricEducationalProgramsControllerTest extends TestCase
         $response->assertViewHas('currentPage', 'historicEducationalPrograms');
     }
 
-
     /**
      * @test
      * Prueba que los programas formativos históricos se devuelven correctamente con paginación
      */
     public function testGetHistoricEducationalProgramsReturnsCorrectData()
     {
-       
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
-
 
         $status = EducationalProgramStatusesModel::where('code', 'FINISHED')->first();
 
@@ -80,7 +77,7 @@ class HistoricEducationalProgramsControllerTest extends TestCase
 
         $educationalPrograms = EducationalProgramsModel::get();
 
-        foreach ($educationalPrograms as $key => $educationalProgram) {
+        foreach ($educationalPrograms as $educationalProgram) {
 
             $user->educationalPrograms()->attach($educationalProgram->uid, [
                 'uid' => generate_uuid(),
@@ -94,7 +91,7 @@ class HistoricEducationalProgramsControllerTest extends TestCase
                     'educational_program_uid' => $educationalProgram->uid,
                 ]);
         }
-        
+
         // Crear una solicitud simulada con paginación
         $requestData = [
             'items_per_page' => 2,
@@ -119,15 +116,15 @@ class HistoricEducationalProgramsControllerTest extends TestCase
      */
     public function testGetHistoricEducationalProgramsSearchWorks()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $status = EducationalProgramStatusesModel::where('code', 'FINISHED')->first();
@@ -144,7 +141,7 @@ class HistoricEducationalProgramsControllerTest extends TestCase
 
         $educationalPrograms = EducationalProgramsModel::get();
 
-        foreach ($educationalPrograms as $key => $educationalProgram) {
+        foreach ($educationalPrograms as $educationalProgram) {
             // Crear algunos programas formativos y marcarlos como 'FINISHED'
             $user->educationalPrograms()->attach($educationalProgram->uid, [
                 'uid' => generate_uuid(),
@@ -189,15 +186,15 @@ class HistoricEducationalProgramsControllerTest extends TestCase
      */
     public function testAccessCourseWhenProgramIsFinished()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $status = EducationalProgramStatusesModel::where('code', 'FINISHED')->first();
@@ -215,12 +212,12 @@ class HistoricEducationalProgramsControllerTest extends TestCase
 
         // Crear un curso asociado al programa
         $course = CoursesModel::factory()
-        ->withCourseStatus()
-        ->withCourseType()
-        ->create([
-            'educational_program_uid' => $educationalProgram->uid,
-            'lms_url' => 'https://lms.example.com/course/123'
-        ])->first();
+            ->withCourseStatus()
+            ->withCourseType()
+            ->create([
+                'educational_program_uid' => $educationalProgram->uid,
+                'lms_url' => 'https://lms.example.com/course/123'
+            ])->first();
 
         // Crear una solicitud simulada para acceder al curso
         $requestData = [
@@ -253,20 +250,20 @@ class HistoricEducationalProgramsControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();
 
-       // Crear un programa formativo con estado diferente a 'FINISHED'
+        // Crear un programa formativo con estado diferente a 'FINISHED'
         EducationalProgramsModel::factory()
             ->withEducationalProgramType()
             ->create(
@@ -279,10 +276,10 @@ class HistoricEducationalProgramsControllerTest extends TestCase
 
         // Crear un curso asociado al programa
         $course = CoursesModel::factory()
-        ->withCourseStatus()
-        ->withCourseType()->create([
-            'educational_program_uid' => $educationalProgram->uid
-        ])->first();
+            ->withCourseStatus()
+            ->withCourseType()->create([
+                'educational_program_uid' => $educationalProgram->uid
+            ])->first();
 
         // Crear una solicitud simulada para acceder al curso
         $requestData = [

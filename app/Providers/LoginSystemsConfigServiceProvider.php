@@ -59,21 +59,21 @@ class LoginSystemsConfigServiceProvider extends ServiceProvider
         $parametersLoginSystems = Cache::get('parameters_login_systems');
 
         config([
-            'services.google.client_id' => $parametersLoginSystems['google_client_id'],
-            'services.google.client_secret' => $parametersLoginSystems['google_client_secret'],
-            'services.google.redirect' => env('GOOGLE_REDIRECT_URL'),
+            // 'services.google.client_id' => $parametersLoginSystems['google_client_id'],
+            // 'services.google.client_secret' => $parametersLoginSystems['google_client_secret'],
+            // 'services.google.redirect' => env('GOOGLE_REDIRECT_URL'),
 
-            'services.facebook.client_id' => $parametersLoginSystems['facebook_client_id'],
-            'services.facebook.client_secret' => $parametersLoginSystems['facebook_client_secret'],
-            'services.facebook.redirect' => env('FACEBOOK_REDIRECT_URL'),
+            // 'services.facebook.client_id' => $parametersLoginSystems['facebook_client_id'],
+            // 'services.facebook.client_secret' => $parametersLoginSystems['facebook_client_secret'],
+            // 'services.facebook.redirect' => env('FACEBOOK_REDIRECT_URL'),
 
-            'services.twitter.client_id' => $parametersLoginSystems['twitter_client_id'],
-            'services.twitter.client_secret' => $parametersLoginSystems['twitter_client_secret'],
-            'services.twitter.redirect' => env('TWITTER_REDIRECT_URL'),
+            // 'services.twitter.client_id' => $parametersLoginSystems['twitter_client_id'],
+            // 'services.twitter.client_secret' => $parametersLoginSystems['twitter_client_secret'],
+            // 'services.twitter.redirect' => env('TWITTER_REDIRECT_URL'),
 
-            'services.linkedin-openid.client_id' => $parametersLoginSystems['linkedin_client_id'],
-            'services.linkedin-openid.client_secret' => $parametersLoginSystems['linkedin_client_secret'],
-            'services.linkedin-openid.redirect' => env('LINKEDIN_REDIRECT_URL'),
+            // 'services.linkedin-openid.client_id' => $parametersLoginSystems['linkedin_client_id'],
+            // 'services.linkedin-openid.client_secret' => $parametersLoginSystems['linkedin_client_secret'],
+            // 'services.linkedin-openid.redirect' => env('LINKEDIN_REDIRECT_URL'),
         ]);
     }
 }

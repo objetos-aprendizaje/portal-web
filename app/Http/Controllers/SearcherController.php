@@ -169,6 +169,10 @@ class SearcherController extends Controller
             });
         }
 
+        if (isset($filters['assessments'])) {
+            $educationalProgramsQuery->where('califications_avg.average_calification', $filters['assessments']);
+        }
+
         if (isset($filters['competences'])) {
             $competences = $filters['competences'];
 
@@ -195,7 +199,9 @@ class SearcherController extends Controller
         }
 
         if (isset($filters['search'])) {
-            $educationalProgramsQuery->where('educational_programs.name', 'ilike', '%' . $filters['search'] . '%')->orWhere('description', 'ilike', '%' . $filters['search'] . '%');
+            $educationalProgramsQuery->where(function ($query) use ($filters) {
+                $query->where('educational_programs.name', 'ilike', '%' . $filters['search'] . '%')->orWhere('description', 'ilike', '%' . $filters['search'] . '%');
+            });
         }
 
         if (isset($filters["learningResults"])) {
@@ -208,11 +214,15 @@ class SearcherController extends Controller
         if (isset($filters['modalityPayment'])) {
             if ($filters['modalityPayment'] == "FREE") {
                 $educationalProgramsQuery->where(function ($query) {
-                    $query->where('cost', 0)->where('payment_mode', 'SINGLE_PAYMENT');
+                    $query->where(function ($subQuery) {
+                        $subQuery->where('cost', 0)
+                            ->orWhereNull('cost');
+                    })->where('payment_mode', 'SINGLE_PAYMENT');
                 });
             } elseif ($filters['modalityPayment'] == "PAID") {
                 $educationalProgramsQuery->where(function ($query) {
-                    $query->where('cost', '>', 0)->orWhere('payment_mode', 'INSTALLMENT_PAYMENT');
+                    $query->where('cost', '>', 0)
+                        ->orWhere('payment_mode', 'INSTALLMENT_PAYMENT');
                 });
             }
         }
@@ -262,10 +272,13 @@ class SearcherController extends Controller
         }
 
         if (isset($filters['search'])) {
-            $educationalResourcesQuery->where('title', 'ilike', '%' . $filters['search'] . '%')->orWhere('description', 'ilike', '%' . $filters['search'] . '%');
-            if (isset($filters['add_uuids_to_search'])) {
-                $educationalResourcesQuery->orWhereIn('educational_resources.uid', $filters['add_uuids_to_search']);
-            }
+            $educationalResourcesQuery->where(function ($query) use ($filters) {
+                $query->where('title', 'ilike', '%' . $filters['search'] . '%')->orWhere('description', 'ilike', '%' . $filters['search'] . '%');
+
+                if (isset($filters['add_uuids_to_search'])) {
+                    $query->orWhereIn('educational_resources.uid', $filters['add_uuids_to_search']);
+                }
+            });
         }
 
         return $educationalResourcesQuery;

@@ -91,54 +91,8 @@ class EnrolledCoursesControllerTest extends TestCase
 
         // Verificar que la respuesta es exitosa
         $response->assertStatus(200);
-        
     }
 
-    /**
-     * @test
-     * Prueba que la búsqueda de programas educativos matriculados funciona correctamente
-     */
-    // public function testGetEnrolledEducationalProgramsSearchWorks()
-    // {
-    //     // Crear un usuario y autenticarlo
-    //     $user = UsersModel::factory()->create();
-    //     $this->actingAs($user);
-
-    //     // Crear algunos programas educativos y matricular al usuario
-    //     EducationalProgramsModel::factory()
-    //         ->withEducationalProgramType()
-    //         ->count(3)
-    //         ->create();
-
-    //     $educationalPrograms = EducationalProgramsModel::all();
-
-    //     $user->educationalPrograms()->attach($educationalPrograms[0]->uid, [
-    //         'uid' => generate_uuid(),
-    //         'status' => 'ENROLLED'
-    //     ]);
-
-    //     // Crear una solicitud simulada con búsqueda
-    //     $requestData = [
-    //         'items_per_page' => 2,
-    //         'search' => $educationalPrograms[0]->name // Buscar por nombre del primer programa
-    //     ];
-
-    //     // Hacer la solicitud POST a la ruta de obtener programas educativos matriculados
-    //     $response = $this->post(route('my-educational-programs-enrolled-get'), $requestData);
-
-    //     // Verificar que la respuesta es exitosa
-    //     $response->assertStatus(200);
-
-    //     // Verificar que solo el programa que coincide con la búsqueda se devuelve
-    //     $response->assertJsonFragment([
-    //         'uid' => $educationalPrograms[0]->uid,
-    //     ]);
-
-    //     // Asegurarse de que no se devuelven otros programas
-    //     $response->assertJsonMissing([
-    //         'uid' => $educationalPrograms[1]->uid,
-    //     ]);
-    // }
 
     /**
      * @test
@@ -200,7 +154,7 @@ class EnrolledCoursesControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        // Buscar un usuario y autenticarlo          
+        // Buscar un usuario y autenticarlo
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         //Si no existe el usuario lo creamos
         if (!$user) {
@@ -250,7 +204,7 @@ class EnrolledCoursesControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        // Buscar un usuario      
+        // Buscar un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         //Si no existe el usuario lo creamos
         if (!$user) {
@@ -258,7 +212,7 @@ class EnrolledCoursesControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo    
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear un curso
@@ -294,7 +248,7 @@ class EnrolledCoursesControllerTest extends TestCase
      */
     public function testGetEnrolledCoursesReturnsCorrectData()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -302,7 +256,7 @@ class EnrolledCoursesControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear algunos cursos de prueba con estados y términos de pago
@@ -320,7 +274,7 @@ class EnrolledCoursesControllerTest extends TestCase
         $courses = CoursesModel::get();
 
         // Simular que el usuario está inscrito en estos cursos
-        foreach ($courses as $key => $course) {
+        foreach ($courses as $course) {
             $user->courses_students()->attach($course->uid, [
                 'uid' => generate_uuid(),
                 'status' => 'ENROLLED'
@@ -397,18 +351,17 @@ class EnrolledCoursesControllerTest extends TestCase
         // Simular la solicitud con paginación y búsqueda vacía
         $requestData = [
             'items_per_page' => 10,
-            'search' => $courses[0]->title, 
+            'search' => $courses[0]->title,
         ];
 
         // Hacer la solicitud POST a la ruta de obtener cursos inscritos
         $response = $this->postJson(route('get-enrolled-courses'), $requestData);
 
         // Verificar que la respuesta es exitosa
-        $response->assertStatus(200);       
+        $response->assertStatus(200);
 
         // Verificar que los títulos de los cursos están presentes en la respuesta JSON
         $response->assertJsonFragment(['title' => $courses[0]->title]);
-        // $response->assertJsonFragment(['title' => $courses[1]->title]);
     }
 
 
@@ -419,7 +372,7 @@ class EnrolledCoursesControllerTest extends TestCase
      */
     public function testAccessCourseWhenInDevelopment()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -427,7 +380,7 @@ class EnrolledCoursesControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
 
@@ -459,7 +412,7 @@ class EnrolledCoursesControllerTest extends TestCase
      */
     public function testAccessCourseWhenNotInDevelopment()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -467,7 +420,7 @@ class EnrolledCoursesControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Buscar un estado diferente a 'DEVELOPMENT' y un curso asociado
@@ -501,9 +454,9 @@ class EnrolledCoursesControllerTest extends TestCase
         $this->actingAs($user);
 
         $course = CoursesModel::factory()
-        ->withCourseType()
-        ->withCourseStatus()
-        ->create(); 
+            ->withCourseType()
+            ->withCourseStatus()
+            ->create();
 
         // Crear un plazo de pago activo
         $paymentTerm = CoursesPaymentTermsModel::factory()->create([
@@ -514,21 +467,21 @@ class EnrolledCoursesControllerTest extends TestCase
 
         CoursesPaymentTermsUsersModel::factory()->create(
             [
-                'course_payment_term_uid'=> $paymentTerm->uid,
+                'course_payment_term_uid' => $paymentTerm->uid,
                 'user_uid' => $user->uid
             ]
         );
 
-        $general = GeneralOptionsModel::where('option_name','payment_gateway')->first();
+        $general = GeneralOptionsModel::where('option_name', 'payment_gateway')->first();
         $general->option_value = true;
-        $general->save();      
+        $general->save();
 
 
         // Simular la solicitud para pagar el plazo
         $response = $this->post(route('enrolled-courses-pay-term'), ['paymentTermUid' => $paymentTerm->uid]);
 
         // Verificar que la respuesta es exitosa y contiene los parámetros de redsys
-        $response->assertStatus(200);       
+        $response->assertStatus(200);
 
         // Verificar que se ha creado o recuperado el registro del usuario para este plazo
         $this->assertDatabaseHas('courses_payment_terms_users', [
@@ -548,28 +501,27 @@ class EnrolledCoursesControllerTest extends TestCase
         $this->actingAs($user);
 
         $course = CoursesModel::factory()
-        ->withCourseType()
-        ->withCourseStatus()
-        ->create(); 
+            ->withCourseType()
+            ->withCourseStatus()
+            ->create();
 
         // Crear un plazo de pago activo
         $paymentTerm = CoursesPaymentTermsModel::factory()->create([
             'start_date' => now()->subDay(),
             'finish_date' => now()->addDay(),
             'course_uid' => $course->uid,
-        ]);       
+        ]);
 
-        $general = GeneralOptionsModel::where('option_name','payment_gateway')->first();
+        $general = GeneralOptionsModel::where('option_name', 'payment_gateway')->first();
         $general->option_value = true;
-        $general->save();      
+        $general->save();
 
 
         // Simular la solicitud para pagar el plazo
         $response = $this->post(route('enrolled-courses-pay-term'), ['paymentTermUid' => $paymentTerm->uid]);
 
         // Verificar que la respuesta es exitosa y contiene los parámetros de redsys
-        $response->assertStatus(200);    
-       
+        $response->assertStatus(200);
     }
 
     /**
@@ -583,9 +535,9 @@ class EnrolledCoursesControllerTest extends TestCase
         $this->actingAs($user);
 
         $course = CoursesModel::factory()
-        ->withCourseType()
-        ->withCourseStatus()
-        ->create(); 
+            ->withCourseType()
+            ->withCourseStatus()
+            ->create();
 
         // Crear un plazo de pago inactivo (terminado)
         $paymentTerm = CoursesPaymentTermsModel::factory()->create([
@@ -596,11 +548,10 @@ class EnrolledCoursesControllerTest extends TestCase
 
         // Simular la solicitud para pagar el plazo
         $response = $this->post(route('enrolled-courses-pay-term'), ['paymentTermUid' => $paymentTerm->uid]);
-       
+
         $response->assertStatus(406);
         $response->assertJson([
-            'message'=>'El plazo de pago no está activo',
-         ]);
-
+            'message' => 'El plazo de pago no está activo',
+        ]);
     }
 }

@@ -19,7 +19,7 @@ class EducationalProgramsDocumentsModelFactory extends Factory
     {
         return [
             'uid' => generate_uuid(),
-            'document_name'=> $this->faker->sentence(1),            
+            'document_name'=> $this->faker->sentence(1),
         ];
     }
     

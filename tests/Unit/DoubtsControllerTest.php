@@ -167,7 +167,7 @@ class DoubtsControllerTest extends TestCase
                 'title' => 'Curso de prueba',
             ]);
 
-        // Crear una solicitud de duda simulada   
+        // Crear una solicitud de duda simulada
         $data = [
             'learning_object_type' => 'course',
             'uid' => generate_uuid(),

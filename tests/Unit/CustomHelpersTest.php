@@ -213,7 +213,7 @@ class CustomHelpersTest extends TestCase
         $filePath = saveFile($file, $destinationPath, $filename);
 
         // Aplicar la función sanitizeFilename al nombre del archivo antes de verificar
-        $sanitizedFilename = sanitizeFilename($filename);
+        sanitizeFilename($filename);
 
         // Verificar que el archivo se ha guardado en la ubicación correcta
         // $this->assertTrue(Storage::disk('local')->exists($destinationPath . '/' . $filename . '.' . $file->getClientOriginalExtension()));
@@ -313,7 +313,7 @@ class CustomHelpersTest extends TestCase
         $tempFilePath = storeFileTemporarily($file);
 
         // Convertir la ruta generada en formato de sistema operativo actual
-        $expectedDir = realpath($tempDir);
+        realpath($tempDir);
 
         // Verificar que la ruta del archivo temporal contiene el directorio correcto
         // $this->assertTrue(str_contains(realpath(dirname($tempFilePath)), $expectedDir));

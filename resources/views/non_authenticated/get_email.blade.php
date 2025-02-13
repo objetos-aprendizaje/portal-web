@@ -20,7 +20,7 @@
                             @csrf
                             <div class="mb-[25px]">
                                 <div class="flex flex-col mb-[20px]">
-                                    <label class="px-3 mb-[8px]" for="email" for="email">Correo</label>
+                                    <label class="px-3 mb-[8px]" for="email">Correo</label>
                                     <input
                                         class="border-[1.5px] border-solid border-primary rounded-full p-3 focus:border-primary h-[60px]"
                                         type="text" name="email" value="" id="email" />

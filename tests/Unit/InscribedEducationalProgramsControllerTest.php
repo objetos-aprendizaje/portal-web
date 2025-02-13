@@ -215,11 +215,25 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         // Comprobar si el usuario ya está inscrito en el programa
         if (!$user->educationalPrograms()->where('educational_program_uid', $programs1->uid)->exists()) {
-            $user->educationalPrograms()->attach($programs1->uid, ['uid' => generate_uuid(), 'status' => 'INSCRIBED', 'acceptance_status' => 'ACCEPTED', 'educational_program_uid' => $programs1->uid]);
+            $user->educationalPrograms()->attach($programs1->uid, 
+                [
+                    'uid' => generate_uuid(), 
+                    'status' => 'INSCRIBED', 
+                    'acceptance_status' => 'ACCEPTED', 
+                    'educational_program_uid' => $programs1->uid,
+                ]
+            );
         }
 
         if (!$user->educationalPrograms()->where('educational_program_uid', $programs2->uid)->exists()) {
-            $user->educationalPrograms()->attach($programs2->uid, ['uid' => generate_uuid(), 'status' => 'INSCRIBED', 'educational_program_uid' => $programs2->uid]);
+            $user->educationalPrograms()->attach($programs2->uid, 
+                [
+                    'uid' => generate_uuid(), 
+                    'status' => 'INSCRIBED', 
+                    'educational_program_uid' => $programs2->uid,
+                    'acceptance_status' => 'ACCEPTED', 
+                ]
+            );
         }
 
 
@@ -414,8 +428,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         // Verificar que no se requiere pago y que el usuario está matriculado correctamente
         $response->assertStatus(200);
-        // $response->assertJson(['requirePayment' => true, 'message' => 'Matriculado en el curso correctamente']);
-
+        
         // Verificar que el usuario esté matriculado en el programa educativo
         $this->assertDatabaseHas('educational_programs_students', [
             'user_uid' => $user->uid,
@@ -465,7 +478,6 @@ class InscribedEducationalProgramsControllerTest extends TestCase
 
         // Verificar que no se requiere pago y que el usuario está matriculado correctamente
         $response->assertStatus(200);
-        // $response->assertJson(['requirePayment' => true, 'message' => 'Matriculado en el curso correctamente']);
 
         // Verificar que el usuario esté matriculado en el programa educativo
         $this->assertDatabaseHas('educational_programs_students', [
@@ -592,8 +604,7 @@ class InscribedEducationalProgramsControllerTest extends TestCase
      */
     public function testSaveDocumentsEducationalProgram()
     {
-
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -601,13 +612,12 @@ class InscribedEducationalProgramsControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear un archivo simulado
         Storage::fake('documents');
         $file = UploadedFile::fake()->create('document.pdf', 100);
-
      
         $educationalDocument = EducationalProgramsDocumentsModel::factory()->withEducationalProgram()->create()->first();
 

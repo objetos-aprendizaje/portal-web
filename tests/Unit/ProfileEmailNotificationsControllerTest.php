@@ -12,7 +12,6 @@ class ProfileEmailNotificationsControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-
     /**
      * @test
      * Prueba que la vista de notificaciones del perfil
@@ -20,7 +19,7 @@ class ProfileEmailNotificationsControllerTest extends TestCase
     public function testIndexLoadsProfileEmailNotifications()
     {
         // Crear un usuario y autenticarlo
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -28,7 +27,7 @@ class ProfileEmailNotificationsControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $roles = $user->roles()->get();
@@ -45,7 +44,6 @@ class ProfileEmailNotificationsControllerTest extends TestCase
             $notification->roles()->attach($roles->pluck('uid')->toArray());
         }
 
-        // dd($automaticNotificationTypes);
         // Hacer una solicitud GET a la ruta de notificaciones del perfil
         $response = $this->get(route('profile-email-notifications'));
 
@@ -66,40 +64,38 @@ class ProfileEmailNotificationsControllerTest extends TestCase
         $response->assertViewHas('currentPage', 'profileEmailNotifications');
         $response->assertViewHas('page_title', 'Configuración de notificaciones por email');
         $response->assertViewHas('automaticNotificationTypes', $automaticNotificationTypes);
-       
     }
 
-
-     /**
+    /**
      * @test
      * Prueba que se guardan correctamente las preferencias de notificaciones del usuario
      */
     public function testSaveNotificationsProfileEmailNotifications()
     {
         // Crear un usuario y autenticarlo
-        // Buscar un usuario y autenticarlo          
+        // Buscar un usuario y autenticarlo
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         //Si no existe el usuario lo creamos
-        if(!$user){
+        if (!$user) {
             $user = UsersModel::factory()->create([
                 'email' => 'admin@admin.com'
-            ])->first();            
+            ])->first();
         }
-        
-        // Lo autenticarlo         
+
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear algunos tipos de notificaciones y notificaciones automáticas
         NotificationsTypesModel::factory()->count(3)->create();
         $notificationTypes = NotificationsTypesModel::get();
 
-        $automaticNotificationTypes = AutomaticNotificationTypesModel::get();
+        $automaticNotificationTypes = AutomaticNotificationTypesModel::factory()->count(3)->create();
 
         // Datos simulados enviados desde el formulario de notificaciones
         $requestData = [
             'general_notifications_allowed' => true,
-            'email_notifications_allowed' => true,            
-            'email_notification_types_disabled' => $notificationTypes->pluck('uid')->toArray(),            
+            'email_notifications_allowed' => true,
+            'email_notification_types_disabled' => $notificationTypes->pluck('uid')->toArray(),
             'automatic_email_notification_types_disabled' => $automaticNotificationTypes->pluck('uid')->toArray(),
         ];
 
@@ -118,7 +114,5 @@ class ProfileEmailNotificationsControllerTest extends TestCase
             'general_notifications_allowed' => true,
             'email_notifications_allowed' => true,
         ]);
-
-       
     }
 }

@@ -111,9 +111,14 @@
                                     <h5>Categorías</h5>
                                 </div>
                                 <div>
-                                    @foreach ($educational_resource->categories as $category)
-                                        <p>{{ $category['name'] }}</p>
-                                    @endforeach
+                                    @if ($educational_resource->categories->isEmpty())
+                                        <p>Sin categorías</p>
+                                    @else
+                                        @foreach ($educational_resource->categories as $category)
+                                            <p>{{ $category['name'] }}</p>
+                                        @endforeach
+                                    @endif
+
                                 </div>
                             </div>
 

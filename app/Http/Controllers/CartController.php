@@ -84,7 +84,7 @@ class CartController extends BaseController
             $ectsWorkload += $course->ects_workload;
         }
 
-        $data = [
+        return [
             "uid" => $educationalProgram->uid,
             "title" => $educationalProgram->name,
             "description" => $educationalProgram->description,
@@ -92,8 +92,7 @@ class CartController extends BaseController
             "ects_workload" => $ectsWorkload,
             "image_path" => $educationalProgram->image_path,
         ];
-
-        return $data;
+        
     }
 
     public function inscribe(Request $request)
@@ -198,7 +197,7 @@ class CartController extends BaseController
         if ($learningObjectType == "course") {
             $redsysParams = $this->processCoursePayment($learningObjectUid);
         } elseif ($learningObjectType == "educational_program") {
-            // TODO
+            
         }
 
         return response()->json($redsysParams, 200);

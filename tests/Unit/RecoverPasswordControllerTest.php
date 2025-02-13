@@ -77,7 +77,7 @@ class RecoverPasswordControllerTest extends TestCase
     public function testRecoverPasswordSendsEmailIfUserExists()
     {
         // Crear un usuario en la base de datos
-        $user = UsersModel::factory()->create([
+        UsersModel::factory()->create([
             'email' => 'test@example.com',
         ]);
 

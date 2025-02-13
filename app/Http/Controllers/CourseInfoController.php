@@ -42,11 +42,18 @@ class CourseInfoController extends BaseController
         ]);
 
         $showDoubtsButton = $course->contact_emails->count() || $course->course_type->redirection_queries->count();
+
+        $studentInscribed = false;
+        if(Auth::user()) {
+            $studentInscribed = CoursesStudentsModel::where('course_uid', $course->uid)->where('user_uid', Auth::user()->uid)->exists();
+        }
+
         return view("course-info", [
             'course' => $course,
             'studentCourseInfo' => $studentCourseInfo,
             'learningResults' => $learningResults,
             'showDoubtsButton' => $showDoubtsButton,
+            "studentInscribed" => $studentInscribed,
             "resources" => [
                 'resources/js/course_info.js'
             ],

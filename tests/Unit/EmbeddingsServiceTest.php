@@ -121,14 +121,14 @@ class EmbeddingsServiceTest extends TestCase
         // Mock del servicio y simulación del método `getEmbedding`
         $mockService = Mockery::mock(EmbeddingsService::class)->makePartial();
         $mockService->shouldReceive('getEmbedding')
-            ->andReturn(array_fill(0, 1536, 0.1));
+            ->andReturn(array_fill(0, 150, 0.1));
 
         // Simulación de la respuesta de OpenAI
         Http::fake([
             'https://api.openai.com/v1/embeddings' => Http::response([
                 'data' => [
                     [
-                        'embedding' => array_fill(0, 1536, 0.1)
+                        'embedding' => array_fill(0, 150, 0.1)
                     ]
                 ]
             ], 200)
@@ -146,164 +146,8 @@ class EmbeddingsServiceTest extends TestCase
         $savedEmbedding = CoursesEmbeddingsModel::where('course_uid', $course->uid)->first();
         $this->assertNotNull($savedEmbedding);
         $this->assertIsArray($savedEmbedding->embeddings);
-        $this->assertCount(1536, $savedEmbedding->embeddings);
+        $this->assertCount(150, $savedEmbedding->embeddings);
     }
-
-
-    // Todo:esta prueba esta presentando error, y hasta el momento no esta en uso
-    /**
-     * @test
-     * Prueba que `getSimilarCourses` devuelva los cursos más similares.
-     */
-    // public function testGetSimilarCoursesReturnsMostSimilarCourses()
-    // {
-
-    //     // Busco openai_key y le actualizo el valor
-    //     $general_option = GeneralOptionsModel::where('option_name', 'openai_key')->first();
-
-    //     $general_option->option_value = 'test_api_key';
-
-    //     $general_option->save();
-
-
-    //     // Crear un curso principal de prueba con un embedding simulado
-    //     $mainCourse = CoursesModel::factory()->withCourseStatus()->withCourseType()->create();
-    //     $mainEmbedding = array_fill(0, 1536, 0.5); // Embedding del curso principal
-    //     CoursesEmbeddingsModel::create([
-    //         'course_uid' => $mainCourse->uid,
-    //         'embeddings' => $mainEmbedding
-    //     ]);
-
-    //     // Crear otros cursos de prueba con embeddings variados
-    //     $similarCoursesData = [];
-    //     foreach (range(1, 5) as $i) {
-    //         $course = CoursesModel::factory()->withCourseStatus()->withCourseType()->create();
-    //         $embedding = array_fill(0, 1536, 0.5 + ($i * 0.01)); // Embeddings variados
-    //         CoursesEmbeddingsModel::create([
-    //             'course_uid' => $course->uid,
-    //             'embeddings' => $embedding
-    //         ]);
-    //         $similarCoursesData[$course->uid] = $embedding;
-    //     }
-
-    //     // Mock del servicio de embeddings
-    //     $service = Mockery::mock(EmbeddingsService::class)->makePartial();
-    //     $service->shouldReceive('getSimilarCourses')
-    //         ->with($mainCourse, 5)
-    //         ->andReturnUsing(function ($course, $limit) use ($similarCoursesData) {
-    //             // Simular la lógica para ordenar por similitud y limitar la cantidad
-    //             return collect($similarCoursesData)
-    //                 ->map(function ($embedding, $courseUid) {
-    //                     return ['uid' => $courseUid, 'similarity' => 1 - DB::raw("<=> {$embedding}")];
-    //                 })
-    //                 ->sortByDesc('similarity')
-    //                 ->take($limit)
-    //                 ->values();
-    //         });
-
-    //     // Ejecutar la función para obtener los cursos similares
-    //     $similarCourses = $service->getSimilarCourses($mainCourse, 5);
-
-    //     // Verificar que la respuesta contiene 5 cursos
-    //     $this->assertCount(5, $similarCourses);
-
-    //     // Verificar que no contiene el curso principal
-    //     foreach ($similarCourses as $course) {
-    //         $this->assertNotEquals($mainCourse->uid, $course['uid']);
-    //     }
-
-    //     // Verificar que los cursos se devuelven en orden de similitud
-    //     $similarities = $similarCourses->pluck('similarity')->all();
-    //     $this->assertEquals($similarities, array_sort($similarities, SORT_DESC));
-    // }
-
-    //Todo:  Esta prueba de comenta para luego revisarla
-    /**
-     * @test
-     * Prueba que se obtienen cursos similares correctamente.
-     */
-
-    // public function testGetSimilarCoursesReturnsCorrectData()
-    // {      
-
-    //     $embeddingVector = array_fill(0, 1536, 0.2); 
-
-    //     // Crear un curso con embeddings
-    //     $course = CoursesModel::factory()
-    //         ->withCourseStatus()
-    //         ->withCourseType()->create();
-
-    //     CoursesEmbeddingsModel::factory()->create(
-    //         [
-    //             'course_uid' => $course->uid,
-    //         ]
-    //     );
-
-    //     // Crear otros cursos con embeddings
-    //     $similarCourse1 = CoursesModel::factory()
-    //         ->withCourseStatus()
-    //         ->withCourseType()->create();
-
-    //     CoursesEmbeddingsModel::factory()->create(
-    //         [
-    //             'course_uid' => $similarCourse1->uid,
-    //         ]
-    //     );
-
-    //     $similarCourse2 = CoursesModel::factory()
-    //         ->withCourseStatus()
-    //         ->withCourseType()->create();
-
-    //     CoursesEmbeddingsModel::factory()->create(
-    //         [
-    //             'course_uid' => $similarCourse2->uid,
-    //             'embeddings' => $embeddingVector,
-    //         ]
-    //     );
-
-    //     $nonSimilarCourse = CoursesModel::factory()
-    //         ->withCourseStatus()
-    //         ->withCourseType()->create();
-
-    //     // Instanciar el servicio y obtener los cursos similares
-    //     $service = new EmbeddingsService();
-    //     $result = $service->getSimilarCourses($course, 2);
-
-    //     // Verificar que los cursos similares se devuelven correctamente
-    //     $this->assertCount(2, $result);
-    //     $this->assertTrue($result->contains($similarCourse1));
-    //     $this->assertTrue($result->contains($similarCourse2));
-    //     $this->assertFalse($result->contains($nonSimilarCourse));
-
-    //     // Verificar que el curso original no está en los resultados
-    //     $this->assertFalse($result->contains($course));
-    // }
-
-    /**
-     * @test
-     * Prueba que no se incluyen cursos con embeddings nulos.
-     */
-    // public function testGetSimilarCoursesExcludesNullEmbeddings()
-    // {
-    //     $embeddingVector = '[' . implode(',', array_fill(0, 1536, '0.1')) . ']';
-    //     // Crear un curso con embeddings
-    //     $course = CoursesModel::factory()
-    //         ->withCourseStatus()
-    //         ->withCourseType()
-    //         ->create();
-
-    //     // Crear un curso con embeddings nulos
-    //     $nullEmbeddingCourse = CoursesModel::factory()
-    //         ->withCourseStatus()
-    //         ->withCourseType()->create();
-
-    //     // Instanciar el servicio y obtener los cursos similares
-    //     $service = new EmbeddingsService();
-    //     $result = $service->getSimilarCourses($course, 5);
-
-    //     // Verificar que los cursos con embeddings nulos no se incluyen en los resultados
-    //     $this->assertFalse($result->contains($nullEmbeddingCourse));
-    // }
 
     /**
      * @test
@@ -312,8 +156,7 @@ class EmbeddingsServiceTest extends TestCase
 
     public function testGetSimilarCoursesListReturnsCorrectCourses()
     {
-        // Crear cursos simulados con embeddings     
-
+        // Crear cursos simulados con embeddings
         $courses = CoursesModel::factory()->count(3)
             ->withCourseType()
             ->create([
@@ -360,9 +203,6 @@ class EmbeddingsServiceTest extends TestCase
         // Convertir el curso de comparación en una colección Eloquent
         $coursesCollection = $courses->push($comparisonCourse);
 
-        // dd( $coursesCollection);
-
-
         // Instanciar el servicio
         $service = new EmbeddingsService();
 
@@ -377,9 +217,7 @@ class EmbeddingsServiceTest extends TestCase
 
 
         $this->assertEquals(0, $similarCourses->count());
-
-        // Verificar que el curso devuelto es efectivamente similar al curso de comparación
-        // $this->assertTrue($similarCourses->contains($comparisonCourse));
+        
     }
 
     /**

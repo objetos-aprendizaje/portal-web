@@ -2,7 +2,7 @@
     <div class="modal-body w-full md:w-[600px]">
         <div class="modal-header">
             <div>
-                <h2 class="modal-title" id="notification-title"></h2>
+                <h2 class="modal-title" id="notification-title">Subir documentos</h2>
             </div>
 
             <div>

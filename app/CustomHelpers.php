@@ -16,6 +16,12 @@ function generate_uuid()
     return (string) Str::uuid();
 }
 
+// Se agrego esta funcion por error presentado al correr las migraciones
+function generateUuid()
+{
+    return (string) Str::uuid();
+}
+
 function generateRandomNumber($length)
 {
     $min = pow(10, $length - 1);
@@ -37,14 +43,13 @@ function getPagination($totalLearningObjects, $currentPage = 1, $itemsPerPage = 
     $nextPage = $currentPage < $totalPages ? $currentPage + 1 : null;
 
     // Crea el array de páginas
-    $pages = [
+    return [
         'current' => $currentPage,
         'previous' => $previousPage,
         'next' => $nextPage,
         'last' => $totalPages,
     ];
 
-    return $pages;
 }
 
 function sanitizeFilename($filename)
@@ -383,13 +388,12 @@ function saveEmailVerification($userUid, $token)
 
 function generateVerificationUrl($userUid, $token)
     {
-        $verificationUrl = URL::temporarySignedRoute(
+        return URL::temporarySignedRoute(
             'verification.verify',
             now()->addMinutes(60),
             ['id' => $userUid, 'token' => $token]
         );
-
-        return $verificationUrl;
+        
     }
 
 function sendEmailVerification($verificationUrl, $token, $userEmail)

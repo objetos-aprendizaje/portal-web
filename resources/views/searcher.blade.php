@@ -189,7 +189,7 @@
                         <div>
                             <a aria-label="enlace" title="objeto de aprendizaje" class="learning-object-url"
                                 href="javascript:void(0)" target="_blank">
-                                <h2 class="block-title"></h2>
+                                <h2 class="block-title">Título programa</h2>
                             </a>
                         </div>
 

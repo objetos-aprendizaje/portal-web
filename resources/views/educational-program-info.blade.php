@@ -39,16 +39,25 @@
             <div class="lg:w-[475px] lg:flex-shrink-0 mb-[31px] lg:mb-0">
 
                 <div class="shadow-xl pb-[20px] mb-[50px]">
-                    <img alt="{{ $educational_program->name }}" class="mb-[30px]  h-[425px]"
+                    <img alt="{{ $educational_program->name }}" class="mb-[30px]"
                         src="{{ env('BACKEND_URL') . '/' . $educational_program->image_path }}">
 
                     @if ($educational_program->status_code == 'INSCRIPTION')
-                        <div class="text-center mb-[30px]">
-                            <a aria-label="enlace" href="/cart/educational_program/{{ $educational_program->uid }}">
-                                <button type="button" class="btn btn-primary">Inscribirme ahora
-                                    {{ e_heroicon('chevron-right', 'outline') }}</button>
-                            </a>
-                        </div>
+                        @if (!$studentInscribed)
+                            <div class="text-center mb-[30px]">
+                                <a aria-label="enlace" href="/cart/educational_program/{{ $educational_program->uid }}">
+                                    <button type="button" class="btn btn-primary">Inscribirme ahora
+                                        {{ e_heroicon('chevron-right', 'outline') }}</button>
+                                </a>
+                            </div>
+                        @else
+                            <div class="flex justify-center items-center">
+                                <div class=" bg-[#C4C4C4] text-white inline-flex p-3 gap-2 rounded-lg justify-center mb-6">
+                                    {{ e_heroicon('exclamation-triangle', 'outline') }}
+                                    Ya te encuentras inscrito en este programa
+                                </div>
+                            </div>
+                        @endif
                     @endif
 
                     <div class="px-[20px]">
@@ -74,7 +83,7 @@
                                 {{ e_heroicon('academic-cap', 'outline', null, 20, 20) }}
                                 <h5>Estado del programa</h5>
                             </div>
-                            <p>{{ $course->status->name }}</p>
+                            <p>{{ $educational_program->status->name }}</p>
                         </div>
 
                         @if ($studentEducationalProgramInfo)
@@ -84,7 +93,8 @@
                                     {{ e_heroicon('document-check', 'outline', null, 20, 20) }}
                                     <h5>Tu estado</h5>
                                 </div>
-                                <p>{{ $studentEducationalProgramInfo->status == 'INSCRIBED' ? 'Inscrito' : 'Matriculado' }}</p>
+                                <p>{{ $studentEducationalProgramInfo->status == 'INSCRIBED' ? 'Inscrito' : 'Matriculado' }}
+                                </p>
                             </div>
                         @endif
 
@@ -188,19 +198,20 @@
                             </div>
                         </div>
 
-                        <hr class="border-dashed border-[#ACACAC] my-[12px]">
-
-                        <div class="grid grid-cols-2">
-                            <div class="flex gap-[10px] font-roboto-bold">
-                                {{ e_heroicon('user-circle', 'outline', null, 20, 20) }}
-                                <h5>Profesorado</h5>
+                        @if ($teachers && count($teachers))
+                            <hr class="border-dashed border-[#ACACAC] my-[12px]">
+                            <div class="grid grid-cols-2">
+                                <div class="flex gap-[10px] font-roboto-bold">
+                                    {{ e_heroicon('user-circle', 'outline', null, 20, 20) }}
+                                    <h5>Profesorado</h5>
+                                </div>
+                                <div>
+                                    @foreach ($teachers as $teacher)
+                                        <p>{{ $teacher->first_name }} {{ $teacher->last_name }}</p>
+                                    @endforeach
+                                </div>
                             </div>
-                            <div>
-                                @foreach ($teachers as $teacher)
-                                    <p>{{ $teacher->first_name }} {{ $teacher->last_name }}</p>
-                                @endforeach
-                            </div>
-                        </div>
+                        @endif
 
                         <hr class="border-dashed border-[#ACACAC] my-[12px]">
                         <div class="grid grid-cols-2">
@@ -209,9 +220,13 @@
                                 <h5>Categorías</h5>
                             </div>
                             <div>
-                                @foreach ($educational_program->categories as $category)
-                                    <p>{{ $category['name'] }}</p>
-                                @endforeach
+                                @if ($educational_program->categories->count())
+                                    @foreach ($educational_program->categories as $category)
+                                        <p>{{ $category['name'] }}</p>
+                                    @endforeach
+                                @else
+                                    No hay categorías asociadas
+                                @endif
                             </div>
                         </div>
 

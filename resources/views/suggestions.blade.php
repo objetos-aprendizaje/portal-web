@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <div class="flex flex-col gap-[8px]">
-                    <label class="mx-[24px] leading-6 w-full">Comentarios o sugerencias</label>
+                    <label class="mx-[24px] leading-6 w-full" for="message">Comentarios o sugerencias</label>
                     <textarea class="poa-input poa-input-amplified-textarea" name="message" id="message"></textarea>
                 </div>
                 <div class="flex">

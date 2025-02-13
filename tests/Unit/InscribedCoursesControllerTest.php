@@ -573,7 +573,7 @@ class InscribedCoursesControllerTest extends TestCase
             'course_uid' => $course->uid
         ])->first();
 
-        $documentCourse = CoursesStudentsDocumentsModel::create([
+        CoursesStudentsDocumentsModel::create([
             'uid' => generate_uuid(),
             'user_uid' => $user->uid,
             'document_path' => $documentPath,
@@ -590,8 +590,6 @@ class InscribedCoursesControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-
-    //Todo: falta revisar este metodo
     /**
      * @test
      * Este test verifica que el método saveDocumentsCourse guarda correctamente los documentos de un estudiante.
@@ -625,7 +623,7 @@ class InscribedCoursesControllerTest extends TestCase
             'document2.docx' => '/uploads/document2.docx',
         ];
 
-        function sendFileToBackend($file, $url, $header)
+        function sendFileToBackend($file,)
         {
             global $mockedFileResponses;
 
@@ -639,6 +637,6 @@ class InscribedCoursesControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([
             'message' => 'Documentos guardados correctamente',
-        ]);        
+        ]);
     }
 }
