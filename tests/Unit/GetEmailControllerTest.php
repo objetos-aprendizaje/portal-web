@@ -12,14 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class GetEmailControllerTest extends TestCase
 {
     use RefreshDatabase;
-
-    /**
-     * A basic unit test example.
-     */
-    public function test_example(): void
-    {
-        $this->assertTrue(true);
-    }
+    
 
     public function testIndexGetEmail()
     {
@@ -47,59 +40,95 @@ class GetEmailControllerTest extends TestCase
         $response->assertViewIs('non_authenticated.get_email');
     }
 
-
-    // Todo: Solventar error de envio de correo 
+  
     /**
      * Test que verifica la actualización del correo electrónico y la redirección.
      *
      */
-    // public function testAddUserEmail()
-    // {
-    //     // Crear un usuario de prueba
-    //     $user = UsersModel::factory()->create([
-    //         'nif' => '12345678A',
-    //         'identity_verified' => false,
-    //     ]);
+    public function testAddUserEmail()
+    {
+        // Crear un usuario de prueba
+        $user = UsersModel::factory()->create([
+            'nif' => '12345678A',
+            'identity_verified' => false,
+        ]);
 
-    //     GeneralOptionsModel::factory()->create(
-    //         [
-    //             'option_name' => 'commercial_name',
-    //             'option_value' => 'Pruebas'
-    //         ]
+        $data_email = [
+            [
+                'option_name' => 'smtp_port',
+                'option_value' => 587,
+            ],
+            [
+                'option_name' => 'smtp_user',
+                'option_value' => 'portalobjetosaprendizaje@um.es'
+            ],
+            [
+                'option_name' => 'smtp_address_from',
+                'option_value' =>  'juanantonio.cabello@um.es',
+            ],
+            [
+                'option_name' => 'smtp_encryption',
+                'option_value' => 'TLS',
+            ],
+            [
+                'option_name' => 'smtp_name_from',
+                'option_value' => 'POA Desarrollo'
+            ],
+            [
+                'option_name' => 'smtp_server',
+                'option_value' => 'smtp.um.es',
+            ],
+        ];
 
-    //     );
+        foreach( $data_email as $item){
 
-    //     $general_options  = [
-    //         'commercial_name' => 'Pruebas',
-    //     ];
+            GeneralOptionsModel::factory()->create(
+                [
+                    'option_name' => $item['option_name'],
+                    'option_value' => $item['option_value'],
+                ]
+            );
+        }
 
-    //     app()->instance('general_options', $general_options);
+        GeneralOptionsModel::factory()->create(
+            [
+                'option_name' => 'commercial_name',
+                'option_value' => 'Pruebas'
+            ]
 
-    //     View::share('general_options', $general_options);
+        );
 
-    //     // Simular la sesión
-    //     Session::put('dataCertificate', [
-    //         'nif' => $user->nif,
-    //     ]);
+        $general_options  = [
+            'commercial_name' => 'Pruebas',
+        ];
 
-    //     // Datos del formulario
-    //     $data = [
-    //         'email' => 'test@example.com',
-    //         'email_verification' => 'test@example.com',
-    //     ];
+        app()->instance('general_options', $general_options);
 
-    //     // Realizar la petición POST
-    //     $response = $this->post(route('add-user'), $data);
+        View::share('general_options', $general_options);
 
-    //     // Verificar que se redirija al login
-    //     $response->assertRedirect('/login');
+        // Simular la sesión
+        Session::put('dataCertificate', [
+            'nif' => $user->nif,
+        ]);
 
-    //     // Verificar que el correo electrónico se actualizó correctamente
-    //     $updatedUser = UsersModel::where('nif', $user->nif)->first();
-    //     $this->assertEquals($data['email'], $updatedUser->email);
-    //     $this->assertTrue($updatedUser->identity_verified);
+        // Datos del formulario
+        $data = [
+            'email' => 'test@example.com',
+            'email_verification' => 'test@example.com',
+        ];
 
-    //     // Verificar que la sesión se eliminó
-    //     $this->assertNull(Session::get('dataCertificate'));
-    // }
+        // Realizar la petición POST
+        $response = $this->post(route('add-user'), $data);
+
+        // Verificar que se redirija al login
+        $response->assertRedirect('/login');
+
+        // Verificar que el correo electrónico se actualizó correctamente
+        $updatedUser = UsersModel::where('nif', $user->nif)->first();
+        $this->assertEquals($data['email'], $updatedUser->email);
+        $this->assertTrue($updatedUser->identity_verified);
+
+        // Verificar que la sesión se eliminó
+        $this->assertNull(Session::get('dataCertificate'));
+    }
 }

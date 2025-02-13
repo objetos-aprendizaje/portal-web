@@ -9,6 +9,7 @@ use App\Models\CoursesModel;
 use App\Models\EducationalProgramsModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\EducationalProgramsAssessmentsModel;
+use App\Models\EducationalProgramStatusesModel;
 
 class EducationalProgramInfoControllerTest extends TestCase
 {
@@ -21,10 +22,13 @@ class EducationalProgramInfoControllerTest extends TestCase
     public function testIndexLoadsViewWithProgramAndUniqueTeachers()
     {
         // Crear un programa educativo en la base de datos
+        $statusInscribedEducationalProgram = EducationalProgramStatusesModel::where("code", "INSCRIPTION")->first();
         $program = EducationalProgramsModel::factory()
-            ->withEducationalProgramType()->create([
+            ->withEducationalProgramType()
+            ->create([
                 'uid' => generate_uuid(),
-                'name' => 'Programa educativo de prueba'
+                'name' => 'Programa educativo de prueba',
+                'educational_program_status_uid' => $statusInscribedEducationalProgram->uid
             ])->first();
 
         // Crear varios cursos asociados al programa educativo
@@ -39,8 +43,6 @@ class EducationalProgramInfoControllerTest extends TestCase
         $teachers = UsersModel::factory()->count(5)->create();
 
         $teachersToAttach = $teachers->random(3)->pluck('uid')->toArray();
-
-        // dd($teachersToAttach);
 
         foreach ($teachersToAttach as $teacherUid) {
             $course->teachers()->attach($teacherUid, [
@@ -73,16 +75,21 @@ class EducationalProgramInfoControllerTest extends TestCase
     public function testIndexLoadsViewWithProgramAndUserLogged()
     {
 
-        // Crear un usuario y autenticarlo      
+        // Crear un usuario y autenticarlo
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
+
+        $status = EducationalProgramStatusesModel::where('code','ENROLLING')->first();
 
         // Crear un programa educativo en la base de datos
         $program = EducationalProgramsModel::factory()
             ->withEducationalProgramType()->create([
                 'uid' => generate_uuid(),
-                'name' => 'Programa educativo de prueba'
+                'name' => 'Programa educativo de prueba',
+                'educational_program_status_uid' => $status->uid                
             ])->first();
+
+            
 
         // Crear varios cursos asociados al programa educativo
         $course = CoursesModel::factory()
@@ -96,8 +103,6 @@ class EducationalProgramInfoControllerTest extends TestCase
         $teachers = UsersModel::factory()->count(5)->create();
 
         $teachersToAttach = $teachers->random(3)->pluck('uid')->toArray();
-
-        // dd($teachersToAttach);
 
         foreach ($teachersToAttach as $teacherUid) {
             $course->teachers()->attach($teacherUid, [
@@ -119,7 +124,7 @@ class EducationalProgramInfoControllerTest extends TestCase
         });
 
         // Verificar que los profesores únicos se pasan a la vista
-        $response->assertViewHas('teachers', function ($viewTeachers) use ($teachers) {
+        $response->assertViewHas('teachers', function ($viewTeachers) {
             return count($viewTeachers) <= 5; // Asegurar que los profesores únicos se pasan
         });
 
@@ -174,7 +179,6 @@ class EducationalProgramInfoControllerTest extends TestCase
             'uid' => $course->uid,
             'educational_program_uid' => $program->uid
         ]);
-       
     }
 
 
@@ -184,7 +188,7 @@ class EducationalProgramInfoControllerTest extends TestCase
      */
     public function testCalificateRegistersNewCalification()
     {
-        // Crear un usuario y autenticarlo      
+        // Crear un usuario y autenticarlo
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 
@@ -222,7 +226,7 @@ class EducationalProgramInfoControllerTest extends TestCase
      */
     public function testCalificateUpdatesExistingCalification()
     {
-        // Crear un usuario y autenticarlo    
+        // Crear un usuario y autenticarlo
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 
@@ -235,7 +239,7 @@ class EducationalProgramInfoControllerTest extends TestCase
             ])->first();
 
         // Crear una calificación existente para el programa educativo
-        $assessment = EducationalProgramsAssessmentsModel::factory()->create([
+        EducationalProgramsAssessmentsModel::factory()->create([
             'user_uid' => $user->uid,
             'educational_program_uid' => $program->uid,
             'calification' => 3,

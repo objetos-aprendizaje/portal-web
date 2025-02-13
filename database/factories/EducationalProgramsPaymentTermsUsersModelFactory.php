@@ -18,7 +18,7 @@ class EducationalProgramsPaymentTermsUsersModelFactory extends Factory
     {
         return [
             'uid' => generate_uuid(),
-            'order_number' =>$this->faker->numberBetween(1, 10),           
+            'order_number' =>$this->faker->numberBetween(1, 30),
             'is_paid' => $this->faker->numberBetween(0, 1),
         ];
     }

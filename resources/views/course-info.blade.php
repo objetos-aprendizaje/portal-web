@@ -49,16 +49,26 @@
                     <img aria-label="enlace" alt="{{ $course->title }}" class="mb-[30px] w-full h-[425px]"
                         src="{{ $course->image_path ? env('BACKEND_URL') . '/' . $course->image_path : '/images/articulo0.png' }}">
 
-                    @if ($course->status->code == 'INSCRIPTION')
-                        <div class="text-center mb-[30px]">
-                            <a class="no-effect-hover" href="/cart/course/{{ $course->uid }}">
-                                <button type="button" class="btn btn-primary">Inscribirme ahora
-                                    {{ e_heroicon('chevron-right', 'outline') }}</button>
-                            </a>
-                        </div>
-                    @endif
-
                     <div class="px-[20px]">
+                        @if ($course->status->code == 'INSCRIPTION')
+                            @if (!$studentInscribed)
+                                <div class="text-center mb-[30px]">
+                                    <a class="no-effect-hover" href="/cart/course/{{ $course->uid }}">
+                                        <button type="button" class="btn btn-primary">Inscribirme ahora
+                                            {{ e_heroicon('chevron-right', 'outline') }}</button>
+                                    </a>
+                                </div>
+                            @else
+                                <div class="flex justify-center items-center">
+                                    <div
+                                        class="bg-[#C4C4C4] text-white inline-flex p-3 gap-2 rounded-lg justify-center mb-6">
+                                        {{ e_heroicon('exclamation-triangle', 'outline') }}
+                                        Ya te encuentras inscrito en este curso
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
+
                         <div class="flex justify-between items-center">
                             <div>
                                 <h2 class="text-black m-0">{{ $course->title }}</h2>
@@ -228,9 +238,13 @@
                                 <h5>Categorías</h5>
                             </div>
                             <div>
-                                @foreach ($course->categories as $category)
-                                    <p>{{ $category['name'] }}</p>
-                                @endforeach
+                                @if (!$course->categories->count())
+                                    <p>No hay categorías asociadas</p>
+                                @else
+                                    @foreach ($course->categories as $category)
+                                        <p>{{ $category['name'] }}</p>
+                                    @endforeach
+                                @endif
                             </div>
                         </div>
 

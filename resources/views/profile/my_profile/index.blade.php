@@ -41,7 +41,7 @@
                 </div>
                 <div class="field">
                     <div class="label-container label-center">
-                        <label for="first_name">Nombre</label>
+                        <label for="first_name">Nombre <span class="text-danger">*</span></label>
                     </div>
                     <div class="content-container little">
                         <input value="{{ $user->first_name }}" placeholder="Manuel" class="poa-input" type="text"
@@ -51,7 +51,7 @@
 
                 <div class="field">
                     <div class="label-container label-center">
-                        <label for="last_name">Apellidos</label>
+                        <label for="last_name">Apellidos <span class="text-danger">*</span></label>
                     </div>
                     <div class="content-container little">
                         <input value="{{ $user->last_name }}" placeholder="Pérez Gutiérrez" type="text" id="last_name"
@@ -61,7 +61,7 @@
 
                 <div class="field">
                     <div class="label-container label-center">
-                        <label for="nif">NIF</label>
+                        <label for="nif">NIF <span class="text-danger">*</span></label>
                     </div>
                     <div class="content-container little">
                         <input value="{{ $user->nif }}" placeholder="12345678X" type="text" id="nif"

@@ -17,7 +17,7 @@ class EducationalProgramsStudentsDocumentsModelFactory extends Factory
     public function definition(): array
     {
         return [
-            'uid'=>generate_uuid(),            
+            'uid'=>generate_uuid(),
         ];
     }
 }

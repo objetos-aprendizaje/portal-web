@@ -31,7 +31,7 @@ function submitUserProfileForm() {
         url: "/profile/update_account/update",
     };
 
-    resetFormErrors("user-form");
+    resetFormErrors("user-profile-form");
 
     apiFetch(params)
         .then(() => {})

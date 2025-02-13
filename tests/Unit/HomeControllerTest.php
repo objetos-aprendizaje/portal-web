@@ -46,7 +46,7 @@ class HomeControllerTest extends TestCase
 
     public function testIndexReturnsCorrectViewWithData()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
 
         // Si no existe el usuario lo creamos
@@ -55,7 +55,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         UsersModel::factory()->create();
@@ -99,7 +99,6 @@ class HomeControllerTest extends TestCase
                 'user_uid' => $user->uid,
             ]
         );
-
 
         $educationalStatus = EducationalProgramStatusesModel::where('code', 'ACCEPTED_PUBLICATION')->first();
 
@@ -151,7 +150,7 @@ class HomeControllerTest extends TestCase
 
     public function testIndexReturnsCorrectViewWithDataNotLogged()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
 
         // Si no existe el usuario lo creamos
@@ -234,7 +233,7 @@ class HomeControllerTest extends TestCase
 
     public function testSaveLanesPreferencesWithValidLane()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -242,7 +241,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear un request simulado con lane y active
@@ -277,8 +276,7 @@ class HomeControllerTest extends TestCase
 
     public function testSaveLanesPreferencesCreatesNewPreference()
     {
-
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -286,7 +284,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear un request simulado con lane y active
@@ -315,7 +313,7 @@ class HomeControllerTest extends TestCase
     public function testSaveLanesPreferencesWithInvalidLane()
     {
 
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -323,7 +321,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear un request simulado con un lane inválido
@@ -349,7 +347,7 @@ class HomeControllerTest extends TestCase
     public function testGetActiveCoursesReturnsCourses()
     {
 
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -357,7 +355,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear un curso y asociarlo al usuario simulando la relación de 'courses_students'
@@ -402,7 +400,7 @@ class HomeControllerTest extends TestCase
     public function testGetActiveCoursesWithoutActiveCourses()
     {
 
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -410,7 +408,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear un request simulado con el número de items por página
@@ -434,8 +432,7 @@ class HomeControllerTest extends TestCase
      */
     public function testGetInscribedCoursesReturnsCourses()
     {
-
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -443,7 +440,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear un curso y asociarlo al usuario simulando la relación de 'courses_students'
@@ -513,7 +510,7 @@ class HomeControllerTest extends TestCase
      */
     public function testGetTeacherCoursesReturnsCourses()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -521,7 +518,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear un curso y asociarlo al usuario como profesor
@@ -580,7 +577,7 @@ class HomeControllerTest extends TestCase
      */
     public function testGetTeacherCoursesWithoutCourses()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -588,7 +585,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear un request simulado con el número de items por página
@@ -612,7 +609,7 @@ class HomeControllerTest extends TestCase
      */
     public function testGetMyEducationalResourcesReturnsCorrectData()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -620,7 +617,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear recursos educativos
@@ -672,7 +669,7 @@ class HomeControllerTest extends TestCase
     public function testGetRecommendedCoursesReturnsCorrectData()
     {
 
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -680,7 +677,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
 
@@ -765,7 +762,7 @@ class HomeControllerTest extends TestCase
      */
     public function testGetRecommendedCoursesReturnsFailGeneralOption()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -773,7 +770,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear datos de la solicitud
@@ -795,7 +792,7 @@ class HomeControllerTest extends TestCase
      */
     public function testGetRecommendedCoursesReturnsFailCoursesUser()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -803,7 +800,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear datos de la solicitud
@@ -829,8 +826,7 @@ class HomeControllerTest extends TestCase
      */
     public function testGetRecommendedEducationalResourcesReturnsCorrectRecommendations()
     {
-
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -838,7 +834,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $general = GeneralOptionsModel::where('option_name', 'enabled_recommendation_module')->first();
@@ -849,7 +845,6 @@ class HomeControllerTest extends TestCase
 
         app()->instance('general_options', $options);
 
-
         // Crear categorías y resultados de aprendizaje asociados al usuario
         $category = CategoriesModel::factory()->create();
 
@@ -857,7 +852,6 @@ class HomeControllerTest extends TestCase
 
         $user->categories()->attach($category->uid, ['uid' => generate_uuid()]);
         $user->learningResultsPreferences()->attach($learningResult->uid);
-
 
         // Crear recursos educativos con los que el usuario ha interactuado
         $resource1 = EducationalResourcesModel::factory()
@@ -912,14 +906,13 @@ class HomeControllerTest extends TestCase
             [
                 'educational_resource_uid' => $similarResource->uid,
             ]
-        );      
+        );
 
         // Preparar datos de la solicitud
         $requestData = [
             'items_per_page' => 2,
             'page' => 1,
         ];
-
 
         // Hacer la solicitud POST a la ruta de obtener recursos educativos recomendados
         $response = $this->post(route('get-recommended-educational-resources'), $requestData);
@@ -929,15 +922,13 @@ class HomeControllerTest extends TestCase
        
     }
 
-
     /**
      * @test
      * Prueba que el método getRecommendedEducationalResources con error
      */
     public function testGetRecommendedEducationalResourcesReturnsFailGeneralOptions()
     {
-
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -945,9 +936,8 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
-
 
         // Hacer la solicitud POST a la ruta de obtener recursos educativos recomendados
         $response = $this->post(route('get-recommended-educational-resources'), []);
@@ -956,15 +946,13 @@ class HomeControllerTest extends TestCase
         $response->assertStatus(406);
     }
 
-
     /**
      * @test
      * Prueba que el método getRecommendedEducationalResources con error
      */
     public function testGetRecommendedEducationalResourcesReturnsFailEducationalResourcesUser()
     {
-
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -972,7 +960,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $general = GeneralOptionsModel::where('option_name', 'enabled_recommendation_module')->first();
@@ -994,14 +982,13 @@ class HomeControllerTest extends TestCase
         $response->assertJson(['message' => 'No educational resources found for the user']);
     }
 
-
     /**
      * @test
      * Prueba que el itinerario recomendado se devuelve correctamente.
      */
     public function testGetRecommendedItineraryReturnsCorrectItinerary()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -1009,7 +996,7 @@ class HomeControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $user2 = UsersModel::factory()->create();
@@ -1024,7 +1011,6 @@ class HomeControllerTest extends TestCase
         }
 
         // Crear los cursos que cubre uno de los resultados de aprendizaje
-
         CoursesModel::factory()
             ->withCourseStatus()->withCourseType()->count(2)
             ->create();

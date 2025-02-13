@@ -43,22 +43,20 @@ class SearcherControllerTest extends TestCase
      */
     public function testSearcherPageLoads()
     {
-
-
         // Simular categorías con subcategorías
         $category1 = CategoriesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Category 1'])->first();
 
-        $subcategory1 = CategoriesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Subcategory 1', 'parent_category_uid' => $category1->uid]);
-        $subcategory2 = CategoriesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Subcategory 2', 'parent_category_uid' => $category1->uid]);
+        CategoriesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Subcategory 1', 'parent_category_uid' => $category1->uid]);
+        CategoriesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Subcategory 2', 'parent_category_uid' => $category1->uid]);
 
-        $category2 = CategoriesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Category 2']);
+        CategoriesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Category 2']);
 
         // Simular competencias con subcompetencias
         $competence1 = CompetencesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Competence 1'])->first();
-        $subcompetence1 = CompetencesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Subcompetence 1', 'parent_competence_uid' => $competence1->uid]);
-        $subcompetence2 = CompetencesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Subcompetence 2', 'parent_competence_uid' => $competence1->uid]);
+        CompetencesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Subcompetence 1', 'parent_competence_uid' => $competence1->uid]);
+        CompetencesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Subcompetence 2', 'parent_competence_uid' => $competence1->uid]);
 
-        $competence2 = CompetencesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Competence 2']);
+        CompetencesModel::factory()->create(['uid' => generate_uuid(), 'name' => 'Competence 2']);
 
         // Crear un mock de la configuración general
         app()->instance('general_options', ['learning_objects_appraisals' => true]);
@@ -117,12 +115,7 @@ class SearcherControllerTest extends TestCase
 
         $response->assertViewHas('categories');
         $response->assertViewHas('variables_js');
-
-        // // Verificar el contenido de las variables JS
-        // $viewData = $response->viewData();
-        // $this->assertEquals(collect([$category1->toArray(), $category2->toArray()]), collect($viewData['categories']));
-        // $this->assertEquals(collect([$competence1->toArray(), $competence2->toArray()]), collect($viewData['competences']));
-        // $this->assertTrue($viewData['variables_js']['learning_objects_appraisals']);
+       
     }
 
     /**
@@ -133,7 +126,7 @@ class SearcherControllerTest extends TestCase
     {
 
         $user = UsersModel::where('email', 'admin@admin.com')->first();
-        
+
 
         $status = CourseStatusesModel::where('code', 'INSCRIPTION')->first();
 
@@ -186,7 +179,6 @@ class SearcherControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-
     /**
      * @test Retorna LearningObjects con tipo de recurso por defecto
      */
@@ -222,7 +214,6 @@ class SearcherControllerTest extends TestCase
     /** @test Validación de filtros*/
     public function testValidatesFilters()
     {
-
         $this->expectException(OperationFailedException::class);
         $this->expectExceptionMessage("El estado del objeto de aprendizaje no es válido");
 

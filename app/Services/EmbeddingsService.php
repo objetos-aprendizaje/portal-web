@@ -56,7 +56,7 @@ class EmbeddingsService
     {
         $embedding = $course->embeddings();
 
-        $similarCourses = CoursesModel::select('courses.*')
+        return CoursesModel::select('courses.*')
             ->leftJoin('courses_embeddings', 'courses.uid', '=', 'courses_embeddings.course_uid')
             ->selectRaw('1 - (courses_embeddings.embeddings <=> ?) AS similarity', [$embedding])
             ->where('embeddings', '!=', null)
@@ -64,8 +64,6 @@ class EmbeddingsService
             ->orderByDesc('similarity')
             ->limit($limit)
             ->get();
-
-        return $similarCourses;
     }
 
     public function getSimilarCoursesList(Collection $courses, $filterCategories = [], $filterLearningResults = [], $limit = 5, $page = 1)
@@ -121,9 +119,8 @@ class EmbeddingsService
             });
         }
 
-        $similarCourses = $similarCoursesQuery->paginate($limit, ['*'], 'page', $page);
-
-        return $similarCourses;
+        return $similarCoursesQuery->paginate($limit, ['*'], 'page', $page);
+        
     }
 
     public function getSimilarEducationalResourcesList(Collection $educationalResources, $filterCategories = [], $filterLearningResults = [], $limit = 5, $page = 1)
@@ -138,8 +135,7 @@ class EmbeddingsService
             // Convert the string of embeddings into an array
             if (isset($embedding->embeddings)) {
                 return $embedding->embeddings;
-            }
-            else {
+            } else {
                 return null;
             }
         })->toArray();
@@ -187,8 +183,7 @@ class EmbeddingsService
             });
         }
 
-        $similarEducationalResources = $similarEducationalResourcesQuery->paginate($limit, ['*'], 'page', $page);
-
-        return $similarEducationalResources;
+        return $similarEducationalResourcesQuery->paginate($limit, ['*'], 'page', $page);
+        
     }
 }

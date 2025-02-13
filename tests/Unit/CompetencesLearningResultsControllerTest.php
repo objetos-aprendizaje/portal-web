@@ -43,7 +43,7 @@ class CompetencesLearningResultsControllerTest extends TestCase
 
         // Crear resultados de aprendizaje asociados a las subcompetencias
         foreach ($subCompetences as $subCompetence) {
-            $learningResults = LearningResultsModel::factory()->count(2)->create(
+            LearningResultsModel::factory()->count(2)->create(
                 [
                     'competence_uid' => $subCompetence->uid
                 ]
@@ -85,7 +85,7 @@ class CompetencesLearningResultsControllerTest extends TestCase
      */
     public function testSaveLearningResultsSavesCorrectly()
     {
-        // Buscar un usuario y autenticarlo    
+        // Buscar un usuario y autenticarlo
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 
@@ -131,7 +131,7 @@ class CompetencesLearningResultsControllerTest extends TestCase
         // Desactivar el manejo automático de excepciones para capturar la excepción
         $this->withoutExceptionHandling();
 
-        // Buscar un usuario y autenticarlo    
+        // Buscar un usuario y autenticarlo
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         $this->actingAs($user);
 

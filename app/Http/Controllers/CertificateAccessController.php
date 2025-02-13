@@ -2,33 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UserRoleRelationshipsModel;
-use App\Models\UserRolesModel;
 use App\Models\UsersModel;
+use Illuminate\Http\Request;
+use App\Models\UserRolesModel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\UserRoleRelationshipsModel;
+use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class CertificateAccessController extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    public function loginCertificate()
+    public function loginCertificate(Request $request)
     {
-        $data = $_GET['data'];
-        $expiration = $_GET['expiration'];
-        $hash = $_GET['hash'];
+        $data = $request->input('data');
+        $expiration = $request->input('expiration');
+        $hash = $request->input('hash');
 
-        $hashCheck = md5($data . $expiration . env('KEY_CHECK_CERTIFICATE_ACCESS'));
+        $hashCheck = ($data . $expiration . env('KEY_CHECK_CERTIFICATE_ACCESS'));
 
         if ($expiration < time() || $hash != $hashCheck) {
             return redirect('/login');
         }
 
-        $data = json_decode($data);
-
+        $decodedHtml = html_entity_decode($data);
+        $data = json_decode($decodedHtml);
         $user = UsersModel::whereRaw('UPPER(nif) = ?', [strtoupper($data->nif)])->first();
 
         if (!$user) {

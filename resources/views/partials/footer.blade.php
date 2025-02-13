@@ -14,41 +14,41 @@
             </a>
         </div>
 
-        <p class="max-w-[526px]">{{ $general_options['footer_text_1'] }}</p>
+        <div class="max-w-[526px]">{!! $general_options['footer_text_1'] !!}</div>
     </div>
 
     <hr>
 
-    <div class="lg:flex lg:gap-8 container mx-auto mt-[51px] mb-[30px] ">
-        <div class="lg:w-1/2 text-center lg:text-left">
-            <h3 class="font-bold text-color_3 text-xl leading-[22px] mb-7">Enlaces</h3>
 
-            <ul class="mt-6 space-y-4 text-sm">
+    <div class="lg:flex lg:gap-8 container mx-auto mt-[51px] mb-[30px]">
+        @if (!empty($footer_pages) || $existsEmailSuggestions)
+            <div class="lg:w-1/2 text-center lg:text-left">
+                <h3 class="font-bold text-color_3 text-xl leading-[22px] mb-7">Enlaces</h3>
+                <ul class="mt-6 space-y-4 text-sm">
+                    @foreach ($footer_pages as $footer_page)
+                        <li>
+                            <a aria-label="enlace" href="/page/{{ $footer_page['slug'] }}" class="text-color_3">
+                                {{ $footer_page['name'] }}
+                            </a>
+                        </li>
+                    @endforeach
 
-                @foreach ($footer_pages as $footer_page)
-                    <li>
-                        <a aria-label="enlace" href="/page/{{ $footer_page['slug'] }}" class="text-color_3">
-                            {{ $footer_page['name'] }}
-                        </a>
-                    </li>
-                @endforeach
-
-                @if ($existsEmailSuggestions)
-                    <li>
-                        <a aria-label="enlace" href="/suggestions" class="text-color_3">
-                            Envío de sugerencias
-                        </a>
-                    </li>
-                @endif
-            </ul>
-        </div>
-
+                    @if ($existsEmailSuggestions)
+                        <li>
+                            <a aria-label="enlace" href="/suggestions" class="text-color_3">
+                                Envío de sugerencias
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </div>
+        @endif
 
         <div class="flex-col gap-[40px] hidden lg:flex w-1/2">
             <h3 class="font-bold text-color_3 text-xl leading-[22px]">¿Aún no encuentras lo que buscas?
             </h3>
 
-            <p class="leading-6">{{ $general_options['footer_text_2'] }}</p>
+            <div class="leading-6">{!! $general_options['footer_text_2'] !!}</div>
             <div
                 class=" bg-white items-center p-1 border rounded-xl my-auto  lg:flex hidden min-w-[150px] w-full max-w-[348px] justify-end searcher-footer">
                 <label for="searcher_button_footer" class="hidden">Introduce texto para buscar</label>

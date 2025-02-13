@@ -23,7 +23,7 @@ class LoginController extends BaseController
 
         $logoBd = GeneralOptionsModel::where('option_name', 'poa_logo_1')->first();
 
-        if ($logoBd != null) {
+        if ($logoBd->option_value != null) {
             $logo = $logoBd['option_value'];
         }
         else {
@@ -155,6 +155,10 @@ class LoginController extends BaseController
             $user->email = $userSocialLogin->email;
             $user->first_name = $userSocialLogin->user['given_name'];
             $user->last_name = $userSocialLogin->user['family_name'];
+        }
+
+        if(!$user->email) {
+            return redirect('login')->withErrors('No se ha podido obtener el email del usuario del método elegido');
         }
 
         try {

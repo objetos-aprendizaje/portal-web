@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use App\Models\GeneralOptionsModel;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 class SendEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -31,7 +32,12 @@ class SendEmailJob implements ShouldQueue
 
     public function handle()
     {
-        Mail::to($this->email)->send(new SendEmail($this->subject, $this->parameters, $this->template));
+        try {
+            Mail::to($this->email)->send(new SendEmail($this->subject, $this->parameters, $this->template));
+        }
+        catch (\Exception $e) {
+            Log::error('Error sending email: ' . $e->getMessage());
+        }
     }
 
     private function setConfigEmailServer() {

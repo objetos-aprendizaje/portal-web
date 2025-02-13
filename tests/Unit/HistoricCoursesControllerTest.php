@@ -16,14 +16,15 @@ use App\Http\Controllers\Profile\MyCourses\HistoricCoursesController;
 class HistoricCoursesControllerTest extends TestCase
 {
     /**
- * @group configdesistema
- */
+     * @group configdesistema
+     */
     use RefreshDatabase;
 
-/**
- * @testdox Inicialización de inicio de sesión
- */
-    public function setUp(): void {
+    /**
+     * @testdox Inicialización de inicio de sesión
+     */
+    public function setUp(): void
+    {
         parent::setUp();
         $this->withoutMiddleware();
         $general_options = GeneralOptionsModel::all()->pluck('option_value', 'option_name')->toArray();
@@ -64,11 +65,10 @@ class HistoricCoursesControllerTest extends TestCase
 
         // Comparte la variable $header_pages para esta prueba
         View::share('header_pages', $headerPages);
-
     }
-/**
- * @test Index histórico cursos
- */
+    /**
+     * @test Index histórico cursos
+     */
 
     public function testIndexHistoricCourses()
     {
@@ -81,9 +81,9 @@ class HistoricCoursesControllerTest extends TestCase
         $response->assertViewHas('currentPage');
     }
 
-/**
-* @test Vista Historico de cursos
-*/
+    /**
+     * @test Vista Historico de cursos
+     */
 
     public function testHistoricCoursesMethod()
     {
@@ -97,37 +97,37 @@ class HistoricCoursesControllerTest extends TestCase
         $this->assertArrayHasKey('currentPage', $view->getData());
     }
 
-/**
-* @test Muestra lista de cursos
-*/
+    /**
+     * @test Muestra lista de cursos
+     */
 
     public function testGetHistoricCourses()
-    {        
-        // Buscamos un usuario  
+    {
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
             $user = UsersModel::factory()->create([
-                'email'=>'admin@admin.com'
+                'email' => 'admin@admin.com'
             ])->first();
         }
 
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
-        $status = CourseStatusesModel::where('code','FINISHED')->first();
+        $status = CourseStatusesModel::where('code', 'FINISHED')->first();
 
         $course = CoursesModel::factory()
-        ->withCourseType()
-        ->create(
-            [
-                'course_status_uid' =>$status->uid,                
-            ]
-        ); 
+            ->withCourseType()
+            ->create(
+                [
+                    'course_status_uid' => $status->uid,
+                ]
+            );
 
-        $user->courses_students()->attach($course->uid ,[
-            'uid'=> generate_uuid(),
-            'status'=> 'ENROLLED', 
+        $user->courses_students()->attach($course->uid, [
+            'uid' => generate_uuid(),
+            'status' => 'ENROLLED',
         ]);
 
         $response = $this->post(route('get-historic-courses'), [
@@ -141,7 +141,7 @@ class HistoricCoursesControllerTest extends TestCase
             'data' => [
                 '*' => [
                     'uid',
-                    'title',                    
+                    'title',
                 ]
             ],
             'from',
@@ -217,10 +217,4 @@ class HistoricCoursesControllerTest extends TestCase
         // Verificar que se reciba un error 403
         $response->assertStatus(403);
     }
-
-
-
-
-
-
 }

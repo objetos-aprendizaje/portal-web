@@ -47,7 +47,6 @@ class MyProfileControllerTest extends TestCase
         View::share('general_notifications', $generalNotifications);
         View::share('unread_general_notifications', true); // Cambia a false si no hay notificaciones no leídas
 
-
         // Act
         $response = $this->get('/profile/update_account');
 
@@ -71,7 +70,7 @@ class MyProfileControllerTest extends TestCase
                 'first_name' => 'John',
                 'last_name' => 'Doe',
             ]
-        );  
+        );
 
         $this->actingAs($user);
 
@@ -79,23 +78,64 @@ class MyProfileControllerTest extends TestCase
         Storage::fake('public');
         $image = UploadedFile::fake()->image('profile.jpg');
 
-        // Mockear la función updateImageBackend para que devuelva una ruta simulada
-        // $this->partialMock(MyProfileController::class, function ($mock) {
-        //     $mock->shouldReceive('updateImageBackend')
-        //         ->andReturn('images/profile.jpg');
-        // });
-
         // Simular la solicitud con datos y una imagen
         $response = $this->post('/profile/update_account/update', [
             'first_name' => 'John',
-            'last_name' => 'Doe',
+            'last_name'  => 'Doe',
+            'nif'        => '49338622B',
             'photo_path' => $image,
         ]);
 
         // Verificar que la respuesta es correcta (200 OK)
         $response->assertStatus(200);
         $response->assertJson(['message' => 'Tu perfil se ha actualizado correctamente']);
-
         
+    }
+
+    /**
+     * @test
+     * Prueba la actualización del perfil de usuario incluyendo la subida de la imagen.
+     */
+    public function testUpdateUserUpdatesProfileWithFails()
+    {
+        // Crear un usuario de prueba y autenticarlo
+        $user = UsersModel::factory()->create(
+            [
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+            ]
+        );
+
+        $this->actingAs($user);
+
+        // Simular la solicitud con datos con error
+        $response = $this->post('/profile/update_account/update', [
+            'first_name' => 'John',
+            'last_name'  => 'Doe',
+            'nif'        => '12345',
+        ]);
+
+        // Verificar que la respuesta es correcta (200 OK)
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'Algunos campos son incorrectos']);
+    }
+
+
+    public function testDeleteImageUser(){
+
+        $user = UsersModel::factory()->create([
+            'photo_path'=>'mi-imagen.png'
+        ]);
+
+        $this->actingAs($user);
+
+
+        $response = $this->deleteJson('/profile/update_account/delete_image');
+
+        // Verifica la respuesta
+        $response->assertStatus(200);
+            
+        $response->assertJson(['message' => 'Imagen eliminada correctamente']);
+
     }
 }

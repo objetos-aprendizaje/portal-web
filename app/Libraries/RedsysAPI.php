@@ -71,8 +71,7 @@ class RedsysAPI{
 
 	/******  MAC Function ******/
 	function mac256($ent,$key){
-		$res = hash_hmac('sha256', $ent, $key, true);//(PHP 5 >= 5.1.2)
-		return $res;
+		return hash_hmac('sha256', $ent, $key, true);//(PHP 5 >= 5.1.2)		
 	}
 
 

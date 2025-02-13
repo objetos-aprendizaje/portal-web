@@ -484,9 +484,7 @@ class CartControllerTest extends TestCase
     }
 
 
-
-    // Todo: estas pruebas estan presentando error, se comenta para su revisión luego, fecha creación :17-01-25
-    /** @test*/    
+    /** @test*/
     public function testInscriptionAlreadyExists()
     {
         $user = UsersModel::factory()->create()->first();
@@ -509,8 +507,8 @@ class CartControllerTest extends TestCase
         $data = [
             'learningObjectType' => 'course',
             'learningObjectUid' => $course->uid,
-        ];     
-
+        ];
+        
         // Realiza la solicitud POST a la ruta
         $response= $this->postJson('/cart/inscribe', $data);
         $response->assertStatus(406);

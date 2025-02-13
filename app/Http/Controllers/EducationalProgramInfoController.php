@@ -20,7 +20,7 @@ class EducationalProgramInfoController extends BaseController
 
         $educationalProgram = $this->getEducationalProgram($uid);
 
-        if(Auth::check()) {
+        if (Auth::check()) {
             $studentEducationalProgramInfo = EducationalProgramsStudentsModel::where('educational_program_uid', $educationalProgram->uid)->where('user_uid', Auth::user()->uid)->first();
         } else {
             $studentEducationalProgramInfo = null;
@@ -33,6 +33,11 @@ class EducationalProgramInfoController extends BaseController
 
         $showDoubtsButton = $educationalProgram->contact_emails->count() || $educationalProgram->educational_program_type->redirection_queries->count();
 
+        $studentInscribed = false;
+        if (Auth::user()) {
+            $studentInscribed = EducationalProgramsStudentsModel::where('educational_program_uid', $educationalProgram->uid)->where('user_uid', Auth::user()->uid)->exists();
+        }
+
         return view("educational-program-info", [
             "resources" => [
                 'resources/js/educational_program_info.js'
@@ -41,12 +46,13 @@ class EducationalProgramInfoController extends BaseController
             "educational_program" => $educationalProgram,
             "teachers" => $teachers,
             'page_title' => $educationalProgram->name,
-            'studentEducationalProgramInfo' => $studentEducationalProgramInfo
+            'studentEducationalProgramInfo' => $studentEducationalProgramInfo,
+            'studentInscribed' => $studentInscribed
         ]);
     }
 
-    private function getTeachersUnique($educationalProgram) {
-        $teachers = [];
+    private function getTeachersUnique($educationalProgram)
+    {
         $temp = [];
         foreach ($educationalProgram->courses as $course) {
             foreach ($course->teachers as $teacher) {
@@ -130,8 +136,9 @@ class EducationalProgramInfoController extends BaseController
                 'educational_program_type.redirection_queries'
             ])
             ->addSelect(DB::raw('(SELECT SUM(CAST(ects_workload AS numeric)) FROM courses WHERE courses.educational_program_uid = educational_programs.uid) as total_ects_workload'))
-            ->addSelect(['total_cost' => CoursesModel::select(DB::raw('SUM(cost)'))
-                ->whereColumn('educational_program_uid', 'educational_programs.uid')
+            ->addSelect([
+                'total_cost' => CoursesModel::select(DB::raw('SUM(cost)'))
+                    ->whereColumn('educational_program_uid', 'educational_programs.uid')
             ])
             ->addSelect('educational_program_statuses.code as status_code')
             ->leftJoin('educational_program_statuses', 'educational_programs.educational_program_status_uid', '=', 'educational_program_statuses.uid')

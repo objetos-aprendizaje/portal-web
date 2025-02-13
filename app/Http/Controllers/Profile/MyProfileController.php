@@ -6,6 +6,8 @@ use App\Models\DepartmentsModel;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use App\Rules\NifNie;
 
 class MyProfileController extends BaseController
 {
@@ -32,6 +34,24 @@ class MyProfileController extends BaseController
 
     public function updateUser(Request $request)
     {
+        $messages = [
+            'first_name.required' => 'El campo Nombre es obligatorio',
+            'last_name.required' => 'El campo Apellidos es obligatorio',
+            'nif.required' => 'El campo NIF es obligatorio',
+            'nif.max' => 'El campo NIF no puede tener más de 9 caracteres',
+        ];
+
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'nif' => ['required', 'max:9', new NifNie],
+            'photo_path' => 'max:6144'
+        ], $messages);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Algunos campos son incorrectos', 'errors' => $validator->errors()], 422);
+        }
+
         $user = Auth::user();
 
         $user->first_name = $request->first_name;

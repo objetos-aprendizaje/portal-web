@@ -1,4 +1,5 @@
 import { apiFetch } from "./app.js";
+import { showToast } from "./toast.js";
 
 document.addEventListener("DOMContentLoaded", function () {
     document
@@ -19,7 +20,19 @@ document.addEventListener("DOMContentLoaded", function () {
             resendEmailConfirmation(email);
         });
     });
+
+    showErrors();
 });
+
+function showErrors() {
+    if (!window.errors) {
+        return;
+    }
+
+    window.errors.forEach((error) => {
+        showToast(error, "error");
+    });
+}
 
 function resendEmailConfirmation(email) {
     const params = {

@@ -19,8 +19,7 @@ class GeneralNotificationsControllerTest extends TestCase
      */
     public function testGetGeneralNotificationUserMarksAsRead()
     {
-
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -28,7 +27,7 @@ class GeneralNotificationsControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear una notificación general en la base de datos
@@ -46,7 +45,6 @@ class GeneralNotificationsControllerTest extends TestCase
         $this->assertDatabaseHas('user_general_notifications', [
             'user_uid' => $user->uid,
             'general_notification_uid' => $generalNotification->uid,
-            // 'view_date' => now()->format('Y-m-d H:i:s'),
         ]);
     }
 
@@ -56,8 +54,7 @@ class GeneralNotificationsControllerTest extends TestCase
      */
     public function testGetGeneralNotificationNotExist()
     {
-
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -65,7 +62,7 @@ class GeneralNotificationsControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Crear una notificación general en la base de datos
@@ -83,15 +80,13 @@ class GeneralNotificationsControllerTest extends TestCase
         ]);
     }
 
-
     /**
      * @test
      * Prueba que devuelve correctamente la notificación automática general del usuario y la marca como leída
      */
     public function testGetGeneralNotificationAutomaticUserMarksAsRead()
     {
-
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -99,7 +94,7 @@ class GeneralNotificationsControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Verifica que el usuario se ha creado correctamente
@@ -134,7 +129,7 @@ class GeneralNotificationsControllerTest extends TestCase
      */
     public function testGetGeneralNotificationAutomaticUserReturnsErrorForNonExistingNotification()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -142,7 +137,7 @@ class GeneralNotificationsControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Hacer una solicitud GET con un UID de notificación automática inexistente

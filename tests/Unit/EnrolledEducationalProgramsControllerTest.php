@@ -72,7 +72,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
     public function testIndexLoadsEnrolledEducationalProgramsPageWithCorrectData()
     {
 
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -80,7 +80,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $general_options  = [
@@ -125,7 +125,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
      */
     public function testGetEnrolledEducationalProgramsReturnsCorrectData()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -133,7 +133,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();
@@ -146,9 +146,6 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                     'educational_program_status_uid' => $status->uid
                 ]
             );
-
-        // $educationalPrograms = EducationalProgramsModel::get();
-
         foreach ($educationalPrograms as $educationalProgram) {
 
             $user->educationalPrograms()->attach($educationalProgram->uid, [
@@ -182,9 +179,6 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
             ]));
         }
 
-
-        // dd($paymentTermsUser);
-
         // Crear una solicitud simulada con paginación
         $requestData = [
             'items_per_page' => 2,
@@ -209,7 +203,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
      */
     public function testGetEnrolledEducationalProgramsSearchWorks()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -217,10 +211,14 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
-        $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();      
+
+
+        $user1 = UsersModel::factory()->create();
+
+        $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();
 
 
         $educationalProgram = EducationalProgramsModel::factory()
@@ -248,7 +246,13 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
             [
                 'educational_program_uid' => $educationalProgram->uid
             ]
-        )->first();
+        );
+
+        $paymentTerm1 = EducationalProgramsPaymentTermsModel::factory()->create(
+            [
+                'educational_program_uid' => $educationalProgram->uid
+            ]
+        );
 
         EducationalProgramsPaymentTermsUsersModel::factory()->create(
             [
@@ -256,6 +260,14 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 'user_uid' => $user->uid
             ]
         );
+
+        EducationalProgramsPaymentTermsUsersModel::factory()->create(
+            [
+                'educational_program_payment_term_uid' => $paymentTerm1->uid,
+                'user_uid' => $user1->uid
+            ]
+        );
+
         // Crear una solicitud simulada con búsqueda
         $requestData = [
             'items_per_page' => 2,
@@ -284,7 +296,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
      */
     public function testAccessCourseWhenProgramIsInDevelopment()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -292,7 +304,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $status = EducationalProgramStatusesModel::where('code', 'DEVELOPMENT')->first();
@@ -352,7 +364,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::where('email', 'admin@admin.com')->first();
         // Si no existe el usuario lo creamos
         if (!$user) {
@@ -360,7 +372,7 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
                 'email' => 'admin@admin.com'
             ])->first();
         }
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         // Buscar un programa formativo con estado diferente a 'DEVELOPMENT'
@@ -401,9 +413,9 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
      */
     public function testPayTermWithPaymentTermUser()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::factory()->create();
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $educational = EducationalProgramsModel::factory()->withEducationalProgramType()->create();
@@ -447,13 +459,13 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
 
     /**
      * @test
-     * 
+     *
      */
     public function testPayTermWithEducationalProgramsPaymentTerms()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::factory()->create();
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $educational = EducationalProgramsModel::factory()->withEducationalProgramType()->create();
@@ -490,13 +502,13 @@ class EnrolledEducationalProgramsControllerTest extends TestCase
 
     /**
      * @test
-     * 
+     *
      */
     public function testPayTermWithEFail406()
     {
-        // Buscamos un usuario  
+        // Buscamos un usuario
         $user = UsersModel::factory()->create();
-        // Lo autenticarlo         
+        // Lo autenticarlo
         $this->actingAs($user);
 
         $educational = EducationalProgramsModel::factory()->withEducationalProgramType()->create();
