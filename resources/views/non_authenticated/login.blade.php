@@ -17,8 +17,11 @@
 
                     <h1 class="text-[32px] text-center mb-[15px]">Inicia sesión</h1>
 
-                    <p class="text-center mb-[20px]">¿No tienes cuenta? <a class="text-color_1"
-                            href="/register">Regístrate</a></p>
+                    @if ($general_options['registration_active'])
+                        <p class="text-center mb-[20px]">¿No tienes cuenta? <a class="text-color_1"
+                                href="/register">Regístrate</a></p>
+                    @endif
+
 
                     @if (session('sent_email_recover_password'))
                         <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
@@ -93,7 +96,7 @@
                                 <label class="px-3 mb-[8px]" for="password">Contraseña</label>
                                 <input aria-label="contraseña"
                                     class="border-[1.5px] border-solid border-color_1 rounded-full h-[60px] p-3"
-                                    name="password" type="password" id="password"/>
+                                    name="password" type="password" id="password" />
                             </div>
 
                             <div class="block px-3 mb-[20px]">
@@ -228,8 +231,10 @@
 
         <div class="text-[28px] font-bold text-center mb-[15px]">Inicia sesión</div>
 
-        <p class="text-center mb-[20px]">¿No tienes cuenta? <a aria-label="enlace" class="text-color_1"
-                href="/register">Regístrate</a></p>
+        @if ($general_options['registration_active'])
+            <p class="text-center mb-[20px]">¿No tienes cuenta? <a aria-label="enlace" class="text-color_1"
+                    href="/register">Regístrate</a></p>
+        @endif
 
         @if (session('account_created'))
             <div class="bg-[#E7ECF3] py-[12px] px-[27px] rounded-[8px] mb-[15px] text-center">
